@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import { initialVaultState } from "./initialData";
 import { IntelligenceVault, VaultNode, StrategicPattern, StrategicSignal, ActiveProject, ProducerProfile, ShowcaseItem, ProducerReview } from "./types";
+import RatingDistribution from "./components/RatingDistribution";
 
 export default function App() {
   // --- Workspace State ---
@@ -2007,10 +2008,16 @@ export default function App() {
                             </span>
                           </div>
 
+                          {/* D3 Star Ratings Distribution Chart */}
+                          <div id="rating-distribution-chart-block" className="md:col-span-1 border border-zinc-900 bg-zinc-950/60 p-3 rounded-lg flex flex-col justify-center space-y-1 text-center md:text-left font-mono min-h-[90px]">
+                            <span className="text-[10px] text-slate-500 uppercase tracking-wider block text-left">Rating Distribution</span>
+                            <RatingDistribution reviews={activeReviews} />
+                          </div>
+
                           {/* Professional summary Bio description */}
-                          <div className="md:col-span-3 border border-zinc-900 bg-zinc-950/20 p-4 rounded-lg flex flex-col justify-center">
+                          <div className="md:col-span-2 border border-zinc-900 bg-zinc-950/20 p-4 rounded-lg flex flex-col justify-center">
                             <span className="text-[10px] text-slate-500 font-mono uppercase tracking-wider mb-1 block text-left">Biography & Credentials</span>
-                            <p className="text-xs text-slate-300 leading-relaxed text-left font-mono whitespace-pre-wrap">
+                            <p className="text-xs text-slate-300 leading-relaxed text-left font-mono whitespace-pre-wrap max-h-[85px] overflow-y-auto">
                               {activeProducer.bio || "No professional biography has been established for this creative producer yet."}
                             </p>
                           </div>
