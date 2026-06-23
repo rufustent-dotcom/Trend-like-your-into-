@@ -189,6 +189,17 @@ export const initialProjects: ActiveProject[] = [
     revenuePotential: "High delta-neutral margin capture.",
     nextStep: "Isolate execution logic on lightweight Node V8 isolates to maintain optimal speed and connection strength.",
     lastUpdated: "2026-05-21"
+  },
+  {
+    id: "proj-4",
+    title: "methods-harness",
+    status: "Active",
+    objective: "SymPy-verified pipeline producing bilingual (EN/中文) VCE Mathematical Methods 3-4 lessons, cheat sheets, and mock SAC papers from one CLI.",
+    market: "EdTech, VCE curriculum tooling, and bilingual educational content generation.",
+    aiUsage: "Formula validation via SymPy, automated bilingual content generation, and PDF render gating through validator pipelines.",
+    revenuePotential: "Open-source utility with potential for institutional licensing and premium content packs.",
+    nextStep: "Expand validator coverage and add support for additional VCE subjects beyond Mathematical Methods.",
+    lastUpdated: "2026-06-23"
   }
 ];
 
