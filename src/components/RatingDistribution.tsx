@@ -106,6 +106,8 @@ export default function RatingDistribution({ reviews }: RatingDistributionProps)
         viewBox="0 0 160 80"
         className="w-full h-auto max-w-[180px]"
         id="rating-distribution-svg"
+        role="img"
+        aria-label="Rating distribution chart showing the breakdown of one to five star reviews"
       />
     </div>
   );

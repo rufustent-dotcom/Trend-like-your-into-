@@ -852,7 +852,11 @@ export default function App() {
 
                 {/* Connection SVG Center Bridge */}
                 <div className="absolute inset-0 pointer-events-none z-0">
-                  <svg className="w-full h-full opacity-80">
+                  <svg
+                    className="w-full h-full opacity-80"
+                    role="img"
+                    aria-label="Pattern to signal connections diagram"
+                  >
                     <defs>
                       <linearGradient id="linkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" stopColor="#00f5d4" stopOpacity="0.8" />
