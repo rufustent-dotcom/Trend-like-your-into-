@@ -826,7 +826,7 @@ export default function App() {
                       >
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-xs font-mono font-semibold text-white tracking-tight flex items-center gap-1.5">
-                            <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-[#00f5d4]" : "bg-slate-500Group-hover:bg-[#00f5d4]"}`} />
+                            <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-[#00f5d4]" : "bg-slate-500 group-hover:bg-[#00f5d4]"}`} />
                             {p.title}
                           </span>
                           <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
@@ -896,7 +896,7 @@ export default function App() {
                 <div className="w-[45%] ml-auto flex flex-col gap-2 z-10">
                   <h3 className="text-xs font-mono tracking-widest text-[#00f5d4] uppercase mb-1 border-b border-zinc-900 pb-2">Observed Signals</h3>
                   {vault.signals.map((s) => {
-                    const isConnected = activePattern?.connectedSignalIds.includes(s.id);
+                    const isConnected = activePattern?.connectedSignalIds?.includes(s.id) ?? false;
                     return (
                       <div
                         key={s.id}
@@ -910,7 +910,7 @@ export default function App() {
                           <span className="text-[11px] font-mono font-medium tracking-tight">
                             {s.title}
                           </span>
-                          <span className={`text-[9px] font-mono px-1 py-0.2 rounded ${
+                          <span className={`text-[9px] font-mono px-1 py-0.5 rounded ${
                             s.stage === "Acceleration" 
                               ? "bg-blue-950 text-blue-400" 
                               : "bg-amber-950 text-amber-500"
@@ -964,11 +964,11 @@ export default function App() {
               {/* Supported Dynamic Signals section */}
               <div className="space-y-3">
                 <h4 className="text-xs font-mono tracking-widest text-[#00f5d4] uppercase border-b border-zinc-900 pb-2">
-                  Connected Signal Matrix ({activePattern?.connectedSignalIds.length})
+                  Connected Signal Matrix ({activePattern?.connectedSignalIds?.length ?? 0})
                 </h4>
                 <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2">
                   {vault.signals
-                    .filter(s => activePattern?.connectedSignalIds.includes(s.id))
+                    .filter(s => activePattern?.connectedSignalIds?.includes(s.id))
                     .map(s => (
                       <div 
                         key={s.id} 
