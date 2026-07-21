@@ -67,6 +67,16 @@ export interface ProducerProfile {
   bio: string;
   showcase: ShowcaseItem[];
   reviews?: ProducerReview[];
+  availability: "Available" | "Busy";
+}
+
+export interface Sale {
+  id: string;
+  amount: number;
+  status: "Closed" | "Open";
+  representative: string;
+  region: "North" | "South" | "East" | "West";
+  date: string;
 }
 
 export interface IntelligenceVault {
@@ -75,6 +85,7 @@ export interface IntelligenceVault {
   signals: StrategicSignal[];
   projects: ActiveProject[];
   producers: ProducerProfile[];
+  sales: Sale[];
   coreThesis: {
     primaryThesis: string;
     supportingAssumptions: string[];

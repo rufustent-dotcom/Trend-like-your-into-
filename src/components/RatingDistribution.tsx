@@ -1,25 +1,25 @@
 import React, { useEffect, useRef } from "react";
-import * as d3 from "d3";
+import { select, scaleBand, scaleLinear, easeCubicOut } from "d3";
 import { ProducerReview } from "../types";
 
 interface RatingDistributionProps {
   reviews: ProducerReview[];
 }
 
-export default function RatingDistribution({ reviews }: RatingDistributionProps) {
+export default function RatingDistribution({ reviews = [] }: RatingDistributionProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   // Compute 5-star down to 1-star distributions
   const distribution = [5, 4, 3, 2, 1].map(star => {
-    const count = reviews.filter(r => r.rating === star).length;
-    const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+    const count = (reviews || []).filter(r => r && r.rating === star).length;
+    const percentage = reviews && reviews.length > 0 ? (count / reviews.length) * 100 : 0;
     return { star, count, percentage };
   });
 
   useEffect(() => {
     if (!svgRef.current) return;
 
-    const svg = d3.select(svgRef.current);
+    const svg = select(svgRef.current);
     svg.selectAll("*").remove(); // Purge old elements for reference freshness
 
     const width = 160;
@@ -33,13 +33,13 @@ export default function RatingDistribution({ reviews }: RatingDistributionProps)
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
     // Band scale mapping star ratings: ["5", "4", "3", "2", "1"]
-    const yScale = d3.scaleBand()
+    const yScale = scaleBand()
       .domain(["5", "4", "3", "2", "1"])
       .range([0, chartHeight])
       .padding(0.25);
 
     // Linear scale mapping percentage: [0, 100]
-    const xScale = d3.scaleLinear()
+    const xScale = scaleLinear()
       .domain([0, 100])
       .range([0, chartWidth]);
 
@@ -52,6 +52,7 @@ export default function RatingDistribution({ reviews }: RatingDistributionProps)
 
     // 1. Level labels (e.g. "5★")
     rows.append("text")
+      .attr("id", (d) => `rating-label-${d.star}`)
       .attr("x", -6)
       .attr("y", (yScale.bandwidth() / 2) + 3.5)
       .attr("text-anchor", "end")
@@ -63,6 +64,7 @@ export default function RatingDistribution({ reviews }: RatingDistributionProps)
 
     // 2. Background Track Rects (Full width path)
     rows.append("rect")
+      .attr("id", (d) => `rating-track-${d.star}`)
       .attr("x", 0)
       .attr("y", 0)
       .attr("width", chartWidth)
@@ -73,6 +75,7 @@ export default function RatingDistribution({ reviews }: RatingDistributionProps)
 
     // 3. Foreground filled bar with animated entry transition
     rows.append("rect")
+      .attr("id", (d) => `rating-bar-${d.star}`)
       .attr("class", "bar-fill")
       .attr("x", 0)
       .attr("y", 0)
@@ -83,11 +86,12 @@ export default function RatingDistribution({ reviews }: RatingDistributionProps)
       .attr("width", 0)
       .transition()
       .duration(700)
-      .ease(d3.easeCubicOut)
+      .ease(easeCubicOut)
       .attr("width", d => xScale(d.percentage));
 
     // 4. Count Labels on the right side
     rows.append("text")
+      .attr("id", (d) => `rating-count-${d.star}`)
       .attr("x", chartWidth + 6)
       .attr("y", (yScale.bandwidth() / 2) + 3.5)
       .attr("text-anchor", "start")
@@ -97,7 +101,7 @@ export default function RatingDistribution({ reviews }: RatingDistributionProps)
       .style("font-weight", d => d.count > 0 ? "700" : "500")
       .text(d => d.count);
 
-  }, [reviews]);
+  }, [reviews, distribution]);
 
   return (
     <div className="w-full flex justify-center items-center select-none" id="rating-distribution-svg-container">

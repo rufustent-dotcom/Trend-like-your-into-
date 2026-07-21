@@ -35,11 +35,14 @@ import {
   Edit,
   Star,
   MessageSquare,
-  X
+  X,
+  Copy
 } from "lucide-react";
 import { initialVaultState } from "./initialData";
 import { IntelligenceVault, VaultNode, StrategicPattern, StrategicSignal, ActiveProject, ProducerProfile, ShowcaseItem, ProducerReview } from "./types";
 import RatingDistribution from "./components/RatingDistribution";
+import { PaymentButton } from "./components/PaymentButton";
+import SalesDashboard from "./components/SalesDashboard";
 
 export default function App() {
   // --- Workspace State ---
@@ -72,8 +75,8 @@ export default function App() {
   }, [vault]);
 
   // --- UI Routing / Tabs ---
-  // "map" (Patterns <=> Signals Bridge), "vault" (Obsidian File Explorer), "thesis" (Executive Board & Chat), "producers" (Creative Registry Profiles)
-  const [activeTab, setActiveTab] = useState<"map" | "vault" | "thesis" | "producers">("map");
+  // "map" (Patterns <=> Signals Bridge), "vault" (Obsidian File Explorer), "thesis" (Executive Board & Chat), "producers" (Creative Registry Profiles), "dashboard" (Sales)
+  const [activeTab, setActiveTab] = useState<"map" | "vault" | "thesis" | "producers" | "dashboard">("map");
 
   // --- SVG Map State ---
   const [selectedPatternId, setSelectedPatternId] = useState<string>("pat-1");
@@ -98,6 +101,7 @@ export default function App() {
 
   // --- Producer Profiles State ---
   const [selectedProducerId, setSelectedProducerId] = useState<string>("prod-1");
+  const [selectedProducerIds, setSelectedProducerIds] = useState<string[]>([]);
   const [producerGenreFilter, setProducerGenreFilter] = useState<string>("All");
   const [producerSearchQuery, setProducerSearchQuery] = useState<string>("");
   
@@ -175,6 +179,99 @@ export default function App() {
       return { ...prev, nodes: updatedNodes };
     });
     setEditMode("preview");
+  };
+
+  const handleBatchExportProducers = () => {
+    const selectedProducers = (vault.producers || []).filter(p => selectedProducerIds.includes(p.id));
+    if (selectedProducers.length === 0) return;
+
+    let markdown = `# Registry Summary: Selective Producer Profiles\n`;
+    markdown += `Generated: ${new Date().toLocaleString()}\n\n`;
+    markdown += `> This automated report synthesizes clinical profiles for selected creative producers within the Intelligence Vault.\n\n`;
+    markdown += `--- \n\n`;
+
+    selectedProducers.forEach((p, idx) => {
+      markdown += `## ${idx + 1}. ${p.name}\n`;
+      markdown += `- **Domain Area:** ${p.genre}\n`;
+      markdown += `- **Execution Tenure:** ${p.experienceYears} Years\n\n`;
+      markdown += `### Biography & Core Thesis\n${p.bio}\n\n`;
+      
+      if (p.showcase && p.showcase.length > 0) {
+        markdown += `### Active Portfolio Assets\n`;
+        p.showcase.forEach(item => {
+          markdown += `- **${item.title}** (${item.type})\n`;
+          markdown += `  *${item.description}*\n`;
+          markdown += `  [Access Asset](${item.url})\n`;
+        });
+        markdown += `\n`;
+      }
+
+      if (p.reviews && p.reviews.length > 0) {
+        const avg = (p.reviews.reduce((sum, r) => sum + r.rating, 0) / p.reviews.length).toFixed(1);
+        markdown += `### Strategic Performance Metrics\n`;
+        markdown += `**Aggregate Rating:** ${avg}/5.0 based on ${p.reviews.length} validation cycles.\n\n`;
+        p.reviews.forEach(rev => {
+          markdown += `- **[${rev.rating}/5]** ${rev.reviewerName} | ${rev.date}\n`;
+          if (rev.projectName) markdown += `  *Project Context: ${rev.projectName}*\n`;
+          markdown += `  > "${rev.comment}"\n\n`;
+        });
+      }
+      markdown += `\n---\n\n`;
+    });
+
+    markdown += `\n*End of Executive Registry Summary. Confidential Strategic Asset.*\n`;
+
+    const folderId = "dir-research";
+    const fileName = "Registry_Summary.md";
+    const folderNode = vault.nodes[folderId];
+    if (!folderNode) return;
+
+    const newId = `file-export-${Date.now()}`;
+    const sanitizedPath = `${folderNode.path}/${fileName}`;
+
+    setVault(prev => {
+      const updatedNodes = { ...prev.nodes };
+      
+      // Check if file already exists to overwrite or create new
+      const existingFileId = Object.keys(updatedNodes).find(id => updatedNodes[id].path === sanitizedPath);
+      
+      if (existingFileId) {
+        updatedNodes[existingFileId] = {
+          ...updatedNodes[existingFileId],
+          content: markdown
+        };
+      } else {
+        const newNode: VaultNode = {
+          id: newId,
+          name: fileName,
+          path: sanitizedPath,
+          type: "file",
+          category: "Research",
+          content: markdown
+        };
+        updatedNodes[newId] = newNode;
+        
+        // Add to folder children
+        if (updatedNodes[folderId]) {
+          updatedNodes[folderId] = {
+            ...updatedNodes[folderId],
+            children: [...(updatedNodes[folderId].children || []), newId]
+          };
+        }
+      }
+
+      return { ...prev, nodes: updatedNodes };
+    });
+
+    setToast({
+      show: true,
+      producerName: `${selectedProducers.length} Producers`,
+      fileName: fileName,
+      path: sanitizedPath
+    });
+    
+    // Clear selection after export
+    setSelectedProducerIds([]);
   };
 
   // Create a new markdown file in the specified category folder
@@ -262,7 +359,8 @@ export default function App() {
       genre: newProdGenre.trim() || "General Production",
       experienceYears: Number(newProdExp) || 0,
       bio: newProdBio.trim() || "Creative producer profile on the digital node.",
-      showcase: []
+      showcase: [],
+      availability: "Available"
     };
 
     setVault(prev => {
@@ -430,6 +528,11 @@ export default function App() {
         return { ...prev, producers: updated };
       });
     }
+  };
+
+  const handleCopyLink = (producerId: string) => {
+    const url = `${window.location.origin}${window.location.pathname}#producer=${producerId}`;
+    navigator.clipboard.writeText(url);
   };
 
   const handleExportProducerToMarkdown = (producer: ProducerProfile) => {
@@ -758,6 +861,17 @@ export default function App() {
             <Users className="w-3.5 h-3.5" />
             Producers Profiles
           </button>
+          <button 
+            onClick={() => setActiveTab("dashboard")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono transition-all uppercase ${
+              activeTab === "dashboard" 
+                ? "bg-slate-800 text-[#00f5d4]" 
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <TrendingUp className="w-3.5 h-3.5" />
+            Dashboard
+          </button>
         </div>
       </header>
 
@@ -765,6 +879,11 @@ export default function App() {
       <main className="flex-1 flex flex-col">
 
         {/* --- Tab 1: Interactive Connections Bridge Forge --- */}
+        {activeTab === "dashboard" && (
+          <div className="flex-1 overflow-y-auto">
+            <SalesDashboard vault={vault} />
+          </div>
+        )}
         {activeTab === "map" && (
           <div className="flex-1 flex flex-col xl:flex-row divide-y xl:divide-y-0 xl:divide-x divide-zinc-900">
             {/* Left Bridge Section */}
@@ -1573,26 +1692,43 @@ export default function App() {
                   <p className="text-[10px] text-slate-500 font-mono">Registry ledger for creative staff</p>
                 </div>
                 
-                <button
-                  id="btn-toggle-add-producer"
-                  onClick={() => {
-                    setShowAddProducerForm(!showAddProducerForm);
-                    if (!showAddProducerForm) {
-                      setNewProdName("");
-                      setNewProdGenre("Music & Audio Engineering");
-                      setNewProdExp(5);
-                      setNewProdBio("");
-                    }
-                  }}
-                  className={`p-1.5 rounded border transition-all ${
-                    showAddProducerForm
-                      ? "bg-red-950/30 border-red-900/50 text-red-400 hover:bg-red-900/40"
-                      : "bg-[#00f5d4]/10 border-[#00f5d4]/20 text-[#00f5d4] hover:bg-[#00f5d4]/20"
-                  }`}
-                  title={showAddProducerForm ? "Cancel Add" : "Register New Producer"}
-                >
-                  {showAddProducerForm ? <Plus className="w-3.5 h-3.5 rotate-45 transition-transform" /> : <UserPlus className="w-3.5 h-3.5" />}
-                </button>
+                <div className="flex items-center gap-2">
+                  <PaymentButton />
+                  {selectedProducerIds.length > 0 && (
+                    <motion.button
+                      id="btn-batch-export"
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      onClick={handleBatchExportProducers}
+                      className="flex items-center gap-1.5 px-2 py-1.5 bg-[#00f5d4]/10 border border-[#00f5d4]/20 text-[#00f5d4] rounded text-[10px] font-mono hover:bg-[#00f5d4]/20 transition-all"
+                      title="Export selected profiles to Registry_Summary.md"
+                    >
+                      <Save className="w-3 h-3" />
+                      Export ({selectedProducerIds.length})
+                    </motion.button>
+                  )}
+                  
+                  <button
+                    id="btn-toggle-add-producer"
+                    onClick={() => {
+                      setShowAddProducerForm(!showAddProducerForm);
+                      if (!showAddProducerForm) {
+                        setNewProdName("");
+                        setNewProdGenre("Music & Audio Engineering");
+                        setNewProdExp(5);
+                        setNewProdBio("");
+                      }
+                    }}
+                    className={`p-1.5 rounded border transition-all ${
+                      showAddProducerForm
+                        ? "bg-red-950/30 border-red-900/50 text-red-400 hover:bg-red-900/40"
+                        : "bg-[#00f5d4]/10 border-[#00f5d4]/20 text-[#00f5d4] hover:bg-[#00f5d4]/20"
+                    }`}
+                    title={showAddProducerForm ? "Cancel Add" : "Register New Producer"}
+                  >
+                    {showAddProducerForm ? <Plus className="w-3.5 h-3.5 rotate-45 transition-transform" /> : <UserPlus className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
               </div>
 
               {/* Registration Form (Collapsible) */}
@@ -1745,18 +1881,58 @@ export default function App() {
                             : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/30"
                         }`}
                       >
+                        {/* Multi-select checkbox */}
+                        <button
+                          id={`btn-toggle-select-${producer.id}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedProducerIds(prev => 
+                              prev.includes(producer.id) 
+                                ? prev.filter(id => id !== producer.id) 
+                                : [...prev, producer.id]
+                            );
+                          }}
+                          className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors mr-3 shrink-0 ${
+                            selectedProducerIds.includes(producer.id)
+                              ? "bg-[#00f5d4] border-[#00f5d4] text-zinc-950"
+                              : "border-zinc-800 bg-zinc-950 text-transparent"
+                          }`}
+                        >
+                          <CheckCircle2 className="w-2.5 h-2.5" />
+                        </button>
+
                         <div className="space-y-1 font-mono text-left flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-1.5">
                             <div className={`text-xs font-semibold flex items-center gap-1.5 truncate ${isSelected ? "text-[#00f5d4]" : "text-slate-300"}`}>
                               <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isSelected ? "bg-[#00f5d4]" : "bg-zinc-650"}`} />
                               <span className="truncate">{producer.name}</span>
+                              <span className="relative flex h-1.5 w-1.5">
+                                {producer.availability === 'Available' && (
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                )}
+                                <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${producer.availability === 'Available' ? 'bg-green-500' : 'bg-red-500'}`} title={producer.availability} />
+                              </span>
                             </div>
-                            {averageRating && (
-                              <div className="flex items-center gap-0.5 bg-yellow-400/10 text-yellow-400 px-1 py-0.5 rounded text-[8px] font-bold shrink-0">
-                                <Star className="w-2 h-2 fill-yellow-400 text-yellow-450" />
-                                <span>{averageRating}</span>
-                              </div>
-                            )}
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setVault(prev => ({
+                                    ...prev,
+                                    producers: (prev.producers || []).map(p => p.id === producer.id ? { ...p, availability: p.availability === 'Available' ? 'Busy' : 'Available' } : p)
+                                  }));
+                                }}
+                                className={`text-[8px] px-1 py-0.5 rounded border border-zinc-700 hover:border-zinc-500 transition-colors ${producer.availability === 'Available' ? 'text-green-500' : 'text-red-500'}`}
+                              >
+                                {producer.availability}
+                              </button>
+                              {averageRating && (
+                                <div className="flex items-center gap-0.5 bg-yellow-400/10 text-yellow-400 px-1 py-0.5 rounded text-[8px] font-bold shrink-0">
+                                  <Star className="w-2 h-2 fill-yellow-400 text-yellow-450" />
+                                  <span>{averageRating}</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
                           <div className="text-[9px] text-slate-500 leading-none truncate max-w-[200px]">
                             {producer.genre}
@@ -1767,6 +1943,14 @@ export default function App() {
                               <span>{producer.experienceYears} Years Exp</span>
                             </span>
                           </div>
+                        </div>
+
+                        {/* Hover Tooltip */}
+                        <div className="absolute left-full ml-4 w-48 bg-zinc-800 border border-zinc-700 p-3 rounded shadow-xl invisible group-hover:visible z-50 text-[11px] text-slate-200 pointer-events-none">
+                          <p className="font-semibold text-white mb-1">Summary</p>
+                          <p><span className="text-slate-400">Genre:</span> {producer.genre}</p>
+                          <p><span className="text-slate-400">Rating:</span> {averageRating || 'N/A'}</p>
+                          <p><span className="text-slate-400">Showcase Assets:</span> {(producer.showcase || []).length}</p>
                         </div>
 
                         {/* Profile Delete control */}
@@ -1858,6 +2042,16 @@ export default function App() {
                           >
                             <FileText className="w-3 h-3 text-purple-400" />
                             Summary to Vault
+                          </button>
+
+                          <button
+                            id="btn-copy-producer-link"
+                            onClick={() => handleCopyLink(activeProducer.id)}
+                            className="bg-zinc-800/50 border border-zinc-700 text-slate-300 px-3 py-1.5 rounded-md text-[10px] uppercase font-bold hover:bg-zinc-700 transition flex items-center gap-1"
+                            title="Copy shareable link to this producer profile"
+                          >
+                            <Copy className="w-3 h-3" />
+                            Copy Link
                           </button>
 
                           <button
@@ -1992,7 +2186,7 @@ export default function App() {
                             <div className="flex items-center gap-1.5 justify-center md:justify-start">
                               <span className="text-2xl font-black text-white">{activeAvgRating || "N/A"}</span>
                               {activeAvgRating && (
-                                <div className="flex text-yellow-450">
+                                <div className="flex text-yellow-400">
                                   {Array.from({ length: 5 }).map((_, i) => {
                                     const ratingNum = parseFloat(activeAvgRating);
                                     const isFilled = i < Math.round(ratingNum);
@@ -2037,7 +2231,7 @@ export default function App() {
                             <Layers className="w-4 h-4 text-[#00f5d4]" />
                             Portfolio & Best Work Projects
                           </h3>
-                          <p className="text-[10px] text-slate-505 font-mono">Dynamic stream showcasing highlight creative media</p>
+                          <p className="text-[10px] text-slate-500 font-mono">Dynamic stream showcasing highlight creative media</p>
                         </div>
                         
                         <div className="font-mono text-[10px] text-[#00f5d4]">

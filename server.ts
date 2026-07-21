@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
+import Stripe from 'stripe';
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -11,7 +12,7 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// Lazy-initialize Gemini Client to fail gracefully if the key is missing at start.
+// Lazy-initialize Gemini Client
 let geminiClient: GoogleGenAI | null = null;
 function getGeminiClient(): GoogleGenAI {
   if (!geminiClient) {
@@ -30,6 +31,44 @@ function getGeminiClient(): GoogleGenAI {
   }
   return geminiClient;
 }
+
+// Lazy-initialize Stripe Client
+let stripeClient: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!stripeClient) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error("STRIPE_SECRET_KEY is not configured.");
+    }
+    stripeClient = new Stripe(key);
+  }
+  return stripeClient;
+}
+
+// API Endpoints
+app.post("/api/create-checkout-session", async (req, res) => {
+  try {
+    const stripe = getStripe();
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          product_data: { name: 'Producer Registry Premium Access' },
+          unit_amount: 5000, // $50.00
+        },
+        quantity: 1
+      }],
+      mode: 'payment',
+      success_url: `${process.env.APP_URL}/?success=true`,
+      cancel_url: `${process.env.APP_URL}/?canceled=true`
+    });
+    res.json({ id: session.id });
+  } catch (error: any) {
+    console.error("Stripe error:", error);
+    res.status(500).json({ error: error.message || "Payment session creation failed." });
+  }
+});
 
 // API Endpoints
 app.get("/api/health", (req, res) => {
@@ -89,7 +128,7 @@ ${text}
 Based on your analysis, define associated new Signals, key Patterns, and core strategic directions.`;
 
     const response = await client.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-1.5-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -148,7 +187,11 @@ Based on your analysis, define associated new Signals, key Patterns, and core st
     });
   } catch (error: any) {
     console.error("Synthesis error:", error);
-    res.status(500).json({ error: error.message || "An unexpected error occurred during synthesis." });
+    let errorMessage = error.message || "An unexpected error occurred during synthesis.";
+    if (errorMessage.includes("API key not valid")) {
+      errorMessage = "The Gemini API key is invalid. Please check your settings and ensure a valid key is provided.";
+    }
+    res.status(500).json({ error: errorMessage });
   }
 });
 
@@ -180,7 +223,7 @@ app.post("/api/chat", async (req, res) => {
     }));
 
     const response = await client.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-1.5-flash",
       contents: formattedContents,
       config: {
         systemInstruction: systemInstruction,
@@ -194,7 +237,11 @@ app.post("/api/chat", async (req, res) => {
     });
   } catch (error: any) {
     console.error("Chat proxy error:", error);
-    res.status(500).json({ error: error.message || "Error running advisor model query." });
+    let errorMessage = error.message || "Error running advisor model query.";
+    if (errorMessage.includes("API key not valid")) {
+      errorMessage = "The Gemini API key is invalid. Please check your settings and ensure a valid key is provided.";
+    }
+    res.status(500).json({ error: errorMessage });
   }
 });
 

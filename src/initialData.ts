@@ -1,4 +1,4 @@
-import { StrategicPattern, StrategicSignal, ActiveProject, VaultNode, IntelligenceVault, ProducerProfile } from "./types";
+import { StrategicPattern, StrategicSignal, ActiveProject, VaultNode, IntelligenceVault, ProducerProfile, Sale } from "./types";
 
 export const initialPatterns: StrategicPattern[] = [
   {
@@ -694,7 +694,8 @@ export const initialProducers: ProducerProfile[] = [
         projectName: "Social Video Teasers",
         date: "2026-05-28"
       }
-    ]
+    ],
+    availability: "Available"
   },
   {
     id: "prod-2",
@@ -727,7 +728,8 @@ export const initialProducers: ProducerProfile[] = [
         projectName: "Shattered Grid Audio",
         date: "2026-04-10"
       }
-    ]
+    ],
+    availability: "Available"
   },
   {
     id: "prod-3",
@@ -760,8 +762,16 @@ export const initialProducers: ProducerProfile[] = [
         projectName: "The Automation Paradox Production",
         date: "2026-03-22"
       }
-    ]
+    ],
+    availability: "Available"
   }
+];
+
+export const initialSales: Sale[] = [
+  { id: "sale-1", amount: 5000, status: "Closed", representative: "Alice", region: "North", date: "2026-06-01" },
+  { id: "sale-2", amount: 7500, status: "Closed", representative: "Bob", region: "East", date: "2026-06-05" },
+  { id: "sale-3", amount: 2000, status: "Open", representative: "Alice", region: "West", date: "2026-06-10" },
+  { id: "sale-4", amount: 10000, status: "Closed", representative: "Charlie", region: "South", date: "2026-06-15" },
 ];
 
 export const initialVaultState: IntelligenceVault = {
@@ -770,6 +780,7 @@ export const initialVaultState: IntelligenceVault = {
   signals: initialSignals,
   projects: initialProjects,
   producers: initialProducers,
+  sales: initialSales,
   coreThesis: initialCoreThesis,
   decisionFilter: initialDecisionFilter,
   dailyReviewLogs: initialDailyReviewLogs
