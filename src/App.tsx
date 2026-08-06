@@ -274,6 +274,46 @@ export default function App() {
     setSelectedProducerIds([]);
   };
 
+  const handleBatchToggleAvailability = () => {
+    if (selectedProducerIds.length === 0) return;
+    setVault(prev => ({
+      ...prev,
+      producers: (prev.producers || []).map(p => {
+        if (selectedProducerIds.includes(p.id)) {
+          return {
+            ...p,
+            availability: p.availability === 'Available' ? 'Busy' : 'Available'
+          };
+        }
+        return p;
+      })
+    }));
+  };
+
+  const visibleProducers = ((vault.producers || []) as ProducerProfile[]).filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(producerSearchQuery.toLowerCase()) || 
+                          p.genre.toLowerCase().includes(producerSearchQuery.toLowerCase());
+    if (producerGenreFilter === "All") return matchesSearch;
+    if (producerGenreFilter === "Music") return matchesSearch && p.genre.toLowerCase().includes("music");
+    if (producerGenreFilter === "Sound Design") return matchesSearch && (p.genre.toLowerCase().includes("sound") || p.genre.toLowerCase().includes("audio"));
+    if (producerGenreFilter === "Film") return matchesSearch && (p.genre.toLowerCase().includes("film") || p.genre.toLowerCase().includes("video"));
+    if (producerGenreFilter === "Interactive") return matchesSearch && (p.genre.toLowerCase().includes("interactive") || p.genre.toLowerCase().includes("media") || p.genre.toLowerCase().includes("vr"));
+    return matchesSearch;
+  });
+
+  const allVisibleSelected = visibleProducers.length > 0 && visibleProducers.every(p => selectedProducerIds.includes(p.id));
+  const someVisibleSelected = visibleProducers.some(p => selectedProducerIds.includes(p.id)) && !allVisibleSelected;
+
+  const handleToggleSelectAll = () => {
+    if (allVisibleSelected) {
+      const visibleIds = visibleProducers.map(p => p.id);
+      setSelectedProducerIds(prev => prev.filter(id => !visibleIds.includes(id)));
+    } else {
+      const visibleIds = visibleProducers.map(p => p.id);
+      setSelectedProducerIds(prev => Array.from(new Set([...prev, ...visibleIds])));
+    }
+  };
+
   // Create a new markdown file in the specified category folder
   const handleCreateFile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1695,17 +1735,30 @@ export default function App() {
                 <div className="flex items-center gap-2">
                   <PaymentButton />
                   {selectedProducerIds.length > 0 && (
-                    <motion.button
-                      id="btn-batch-export"
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      onClick={handleBatchExportProducers}
-                      className="flex items-center gap-1.5 px-2 py-1.5 bg-[#00f5d4]/10 border border-[#00f5d4]/20 text-[#00f5d4] rounded text-[10px] font-mono hover:bg-[#00f5d4]/20 transition-all"
-                      title="Export selected profiles to Registry_Summary.md"
-                    >
-                      <Save className="w-3 h-3" />
-                      Export ({selectedProducerIds.length})
-                    </motion.button>
+                    <div className="flex items-center gap-1.5">
+                      <motion.button
+                        id="btn-batch-export"
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        onClick={handleBatchExportProducers}
+                        className="flex items-center gap-1.5 px-2 py-1.5 bg-[#00f5d4]/10 border border-[#00f5d4]/20 text-[#00f5d4] rounded text-[10px] font-mono hover:bg-[#00f5d4]/20 transition-all"
+                        title="Export selected profiles to Registry_Summary.md"
+                      >
+                        <Save className="w-3 h-3" />
+                        Export ({selectedProducerIds.length})
+                      </motion.button>
+                      <motion.button
+                        id="btn-batch-toggle-availability"
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        onClick={handleBatchToggleAvailability}
+                        className="flex items-center gap-1.5 px-2 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded text-[10px] font-mono hover:bg-emerald-500/20 transition-all"
+                        title="Toggle Available/Busy status for selected producers"
+                      >
+                        <RefreshCw className="w-3 h-3" />
+                        Toggle Status
+                      </motion.button>
+                    </div>
                   )}
                   
                   <button
@@ -1808,6 +1861,30 @@ export default function App() {
                 </form>
               )}
 
+              {/* Select All Toggle Bar */}
+              <div className="flex items-center justify-between bg-zinc-900/60 px-3 py-2 rounded-md border border-zinc-900 text-xs font-mono">
+                <label className="flex items-center gap-2 cursor-pointer select-none text-slate-300 hover:text-white transition">
+                  <input
+                    type="checkbox"
+                    id="checkbox-select-all-producers"
+                    checked={allVisibleSelected}
+                    ref={input => {
+                      if (input) {
+                        input.indeterminate = someVisibleSelected;
+                      }
+                    }}
+                    onChange={handleToggleSelectAll}
+                    className="w-3.5 h-3.5 rounded border-zinc-800 bg-zinc-950 accent-[#00f5d4] cursor-pointer"
+                  />
+                  <span>Select All Visible ({visibleProducers.length})</span>
+                </label>
+                {selectedProducerIds.length > 0 && (
+                  <span className="text-[10px] text-[#00f5d4]">
+                    {selectedProducerIds.length} selected
+                  </span>
+                )}
+              </div>
+
               {/* Filtering and Query Tools */}
               <div className="space-y-2 font-mono">
                 {/* Search string */}
@@ -1848,18 +1925,7 @@ export default function App() {
 
               {/* Recipient Ledger / Directory Stack list */}
               <div className="flex-1 space-y-1.5 overflow-y-auto pr-1" id="producers-list-box">
-                {((vault.producers || []) as ProducerProfile[])
-                  .filter(p => {
-                    const matchesSearch = p.name.toLowerCase().includes(producerSearchQuery.toLowerCase()) || 
-                                          p.genre.toLowerCase().includes(producerSearchQuery.toLowerCase());
-                    if (producerGenreFilter === "All") return matchesSearch;
-                    
-                    if (producerGenreFilter === "Music") return matchesSearch && p.genre.toLowerCase().includes("music");
-                    if (producerGenreFilter === "Sound Design") return matchesSearch && (p.genre.toLowerCase().includes("sound") || p.genre.toLowerCase().includes("audio"));
-                    if (producerGenreFilter === "Film") return matchesSearch && (p.genre.toLowerCase().includes("film") || p.genre.toLowerCase().includes("video"));
-                    if (producerGenreFilter === "Interactive") return matchesSearch && (p.genre.toLowerCase().includes("interactive") || p.genre.toLowerCase().includes("media") || p.genre.toLowerCase().includes("vr"));
-                    return matchesSearch;
-                  })
+                {visibleProducers
                   .map(producer => {
                     const isSelected = selectedProducerId === producer.id;
                     const reviews = producer.reviews || [];
