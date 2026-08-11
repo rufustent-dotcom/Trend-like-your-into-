@@ -36,7 +36,8 @@ import {
   Star,
   MessageSquare,
   X,
-  Copy
+  Copy,
+  ArrowUpDown
 } from "lucide-react";
 import { initialVaultState } from "./initialData";
 import { IntelligenceVault, VaultNode, StrategicPattern, StrategicSignal, ActiveProject, ProducerProfile, ShowcaseItem, ProducerReview } from "./types";
@@ -104,6 +105,7 @@ export default function App() {
   const [selectedProducerIds, setSelectedProducerIds] = useState<string[]>([]);
   const [producerGenreFilter, setProducerGenreFilter] = useState<string>("All");
   const [producerSearchQuery, setProducerSearchQuery] = useState<string>("");
+  const [sortSelectedToTop, setSortSelectedToTop] = useState<boolean>(false);
   
   // Create state
   const [showAddProducerForm, setShowAddProducerForm] = useState(false);
@@ -290,7 +292,7 @@ export default function App() {
     }));
   };
 
-  const visibleProducers = ((vault.producers || []) as ProducerProfile[]).filter(p => {
+  const rawFilteredProducers = ((vault.producers || []) as ProducerProfile[]).filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(producerSearchQuery.toLowerCase()) || 
                           p.genre.toLowerCase().includes(producerSearchQuery.toLowerCase());
     if (producerGenreFilter === "All") return matchesSearch;
@@ -299,6 +301,16 @@ export default function App() {
     if (producerGenreFilter === "Film") return matchesSearch && (p.genre.toLowerCase().includes("film") || p.genre.toLowerCase().includes("video"));
     if (producerGenreFilter === "Interactive") return matchesSearch && (p.genre.toLowerCase().includes("interactive") || p.genre.toLowerCase().includes("media") || p.genre.toLowerCase().includes("vr"));
     return matchesSearch;
+  });
+
+  const visibleProducers = [...rawFilteredProducers].sort((a, b) => {
+    if (sortSelectedToTop) {
+      const aSel = selectedProducerIds.includes(a.id);
+      const bSel = selectedProducerIds.includes(b.id);
+      if (aSel && !bSel) return -1;
+      if (!aSel && bSel) return 1;
+    }
+    return 0;
   });
 
   const allVisibleSelected = visibleProducers.length > 0 && visibleProducers.every(p => selectedProducerIds.includes(p.id));
@@ -1884,6 +1896,26 @@ export default function App() {
                   </span>
                 )}
               </div>
+
+              {/* Sort Selected to Top Toggle Button */}
+              <button
+                id="btn-sort-selected-top"
+                onClick={() => setSortSelectedToTop(prev => !prev)}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-md border text-xs font-mono transition ${
+                  sortSelectedToTop
+                    ? "bg-[#00f5d4]/10 border-[#00f5d4]/30 text-[#00f5d4]"
+                    : "bg-zinc-900/60 border-zinc-900 text-slate-400 hover:text-slate-200"
+                }`}
+                title="Sort currently selected producers to the top of the list"
+              >
+                <span className="flex items-center gap-2">
+                  <ArrowUpDown className="w-3.5 h-3.5" />
+                  <span>Sort Selected to Top</span>
+                </span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded ${sortSelectedToTop ? "bg-[#00f5d4]/20 text-[#00f5d4]" : "bg-zinc-800 text-slate-500"}`}>
+                  {sortSelectedToTop ? "Active" : "Off"}
+                </span>
+              </button>
 
               {/* Filtering and Query Tools */}
               <div className="space-y-2 font-mono">

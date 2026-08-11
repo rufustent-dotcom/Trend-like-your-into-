@@ -128,7 +128,7 @@ ${text}
 Based on your analysis, define associated new Signals, key Patterns, and core strategic directions.`;
 
     const response = await client.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-3.6-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -223,7 +223,7 @@ app.post("/api/chat", async (req, res) => {
     }));
 
     const response = await client.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-3.6-flash",
       contents: formattedContents,
       config: {
         systemInstruction: systemInstruction,
