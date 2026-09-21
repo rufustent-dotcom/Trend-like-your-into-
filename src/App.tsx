@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, Reorder } from "motion/react";
 import { 
   Network, 
   FileText, 
@@ -37,7 +37,8 @@ import {
   MessageSquare,
   X,
   Copy,
-  ArrowUpDown
+  ArrowUpDown,
+  GripVertical
 } from "lucide-react";
 import { initialVaultState } from "./initialData";
 import { IntelligenceVault, VaultNode, StrategicPattern, StrategicSignal, ActiveProject, ProducerProfile, ShowcaseItem, ProducerReview } from "./types";
@@ -106,6 +107,9 @@ export default function App() {
   const [producerGenreFilter, setProducerGenreFilter] = useState<string>("All");
   const [producerSearchQuery, setProducerSearchQuery] = useState<string>("");
   const [sortSelectedToTop, setSortSelectedToTop] = useState<boolean>(false);
+  const [showQuickActionsMenu, setShowQuickActionsMenu] = useState<boolean>(false);
+  const [showAdvancedSelect, setShowAdvancedSelect] = useState<boolean>(false);
+  const lastHoverAdvancedSelectRef = useRef<number>(0);
   
   // Create state
   const [showAddProducerForm, setShowAddProducerForm] = useState(false);
@@ -290,6 +294,64 @@ export default function App() {
         return p;
       })
     }));
+  };
+
+  const handleArchiveSelectedProducers = () => {
+    if (selectedProducerIds.length === 0) return;
+    setVault(prev => ({
+      ...prev,
+      producers: (prev.producers || []).filter(p => !selectedProducerIds.includes(p.id))
+    }));
+    setSelectedProducerIds([]);
+  };
+
+  const availableProducers = useMemo(() => {
+    return ((vault.producers || []) as ProducerProfile[]).filter(
+      p => p.availability === "Available" || (p.availability as string) === "available"
+    );
+  }, [vault.producers]);
+
+  const highRatingProducers = useMemo(() => {
+    return ((vault.producers || []) as ProducerProfile[]).filter(p => {
+      if (typeof (p as any).rating === "number") {
+        return (p as any).rating >= 4.0;
+      }
+      const reviews = p.reviews || [];
+      if (reviews.length === 0) return false;
+      const avg = reviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0) / reviews.length;
+      return avg >= 4.0;
+    });
+  }, [vault.producers]);
+
+  const handleSelectAllAvailable = () => {
+    const ids = availableProducers.map(p => p.id);
+    setSelectedProducerIds(ids);
+  };
+
+  const handleSelectAllHighRating = () => {
+    const ids = highRatingProducers.map(p => p.id);
+    setSelectedProducerIds(ids);
+  };
+
+  const handleReorderProducers = (newOrder: ProducerProfile[]) => {
+    setVault(prev => {
+      const allProducers = [...(prev.producers || [])];
+      
+      const visibleIds = newOrder.map(p => p.id);
+      const indices: number[] = [];
+      allProducers.forEach((p, index) => {
+        if (visibleIds.includes(p.id)) indices.push(index);
+      });
+      
+      newOrder.forEach((p, i) => {
+        allProducers[indices[i]] = p;
+      });
+      
+      return {
+        ...prev,
+        producers: allProducers
+      };
+    });
   };
 
   const rawFilteredProducers = ((vault.producers || []) as ProducerProfile[]).filter(p => {
@@ -765,6 +827,10 @@ export default function App() {
       const data = await response.json();
       setSynthesisResult(data);
 
+      if (!response.ok && !data.synthesized) {
+        throw new Error(data.error || `Synthesis failed (HTTP ${response.status})`);
+      }
+
       if (data.synthesized) {
         // Automatically inject synthesized new patterns and signals inside the state
         setVault(prev => {
@@ -812,10 +878,14 @@ export default function App() {
             }
           };
         });
+
+        if (data.fallbackNotice) {
+          alert(`Synthesis Completed (Resilient Mode):\n\n${data.fallbackNotice}\n\nIntegrated ${data.signals?.length || 0} signals and ${data.patterns?.length || 0} patterns into vault.`);
+        }
       }
     } catch (e: any) {
       console.error(e);
-      alert("Error carrying out Gemini analytical synthesis.");
+      alert(`Synthesis Notice:\n\n${e.message || "Error carrying out Gemini analytical synthesis."}`);
     } finally {
       setLoadingSynthesis(false);
     }
@@ -1469,10 +1539,14 @@ export default function App() {
                         body: JSON.stringify({ text: `File: ${vault.nodes[activeFileId]?.name}\n\n${fileContent}` })
                       });
                       const data = await response.json();
+                      if (!response.ok && !data.synthesized) {
+                        throw new Error(data.error || "Analysis failed.");
+                      }
                       setSynthesisResult(data);
-                      alert(`Analysis Processed!\n\nSummary Metrics:\n${data.summary || "Adhered perfectly to strict schema validation."}`);
-                    } catch (e) {
-                      alert("AI validation error - make sure GEMINI_API_KEY is configured in Settings.");
+                      const notice = data.fallbackNotice ? `\n\nNotice: ${data.fallbackNotice}` : "";
+                      alert(`Analysis Processed!\n\nSummary Metrics:\n${data.summary || "Adhered perfectly to strict schema validation."}${notice}`);
+                    } catch (e: any) {
+                      alert(`Analysis Notice:\n\n${e.message || "AI validation error - please verify your Gemini settings."}`);
                     } finally {
                       setLoadingSynthesis(false);
                     }
@@ -1747,29 +1821,158 @@ export default function App() {
                 <div className="flex items-center gap-2">
                   <PaymentButton />
                   {selectedProducerIds.length > 0 && (
-                    <div className="flex items-center gap-1.5">
+                    <div className="relative">
                       <motion.button
-                        id="btn-batch-export"
+                        id="btn-quick-actions"
                         initial={{ opacity: 0, x: 10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        onClick={handleBatchExportProducers}
-                        className="flex items-center gap-1.5 px-2 py-1.5 bg-[#00f5d4]/10 border border-[#00f5d4]/20 text-[#00f5d4] rounded text-[10px] font-mono hover:bg-[#00f5d4]/20 transition-all"
-                        title="Export selected profiles to Registry_Summary.md"
+                        onClick={() => {
+                          setShowQuickActionsMenu(!showQuickActionsMenu);
+                          if (showQuickActionsMenu) {
+                            setShowAdvancedSelect(false);
+                          }
+                        }}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 ${
+                          selectedProducerIds.length > 5
+                            ? "bg-zinc-800 border-[#00f5d4]/40 text-white"
+                            : "bg-zinc-800/80 border-zinc-700 text-slate-300"
+                        } hover:text-white rounded text-[10px] font-mono hover:bg-zinc-800 transition-all`}
                       >
-                        <Save className="w-3 h-3" />
-                        Export ({selectedProducerIds.length})
+                        <span>Quick Actions</span>
+                        {selectedProducerIds.length > 5 ? (
+                          <span
+                            id="badge-quick-actions-count"
+                            className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#00f5d4] text-zinc-950 leading-none shadow-sm"
+                            title={`${selectedProducerIds.length} selected`}
+                          >
+                            {selectedProducerIds.length}
+                          </span>
+                        ) : (
+                          <span>({selectedProducerIds.length})</span>
+                        )}
+                        <ChevronDown className="w-3 h-3" />
                       </motion.button>
-                      <motion.button
-                        id="btn-batch-toggle-availability"
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        onClick={handleBatchToggleAvailability}
-                        className="flex items-center gap-1.5 px-2 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded text-[10px] font-mono hover:bg-emerald-500/20 transition-all"
-                        title="Toggle Available/Busy status for selected producers"
-                      >
-                        <RefreshCw className="w-3 h-3" />
-                        Toggle Status
-                      </motion.button>
+                      
+                      <AnimatePresence>
+                        {showQuickActionsMenu && (
+                          <motion.div
+                            id="quick-actions-menu"
+                            initial={{ opacity: 0, y: -5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -5 }}
+                            className="absolute top-full right-0 mt-1 w-56 bg-zinc-950 border border-zinc-800 rounded-lg shadow-xl z-50 overflow-hidden font-mono text-[11px]"
+                          >
+                            <button
+                              id="btn-quick-export"
+                              onClick={() => { handleBatchExportProducers(); setShowQuickActionsMenu(false); setShowAdvancedSelect(false); }}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-left text-slate-300 hover:bg-zinc-900 hover:text-[#00f5d4] transition"
+                            >
+                              <Save className="w-3 h-3" /> <span>Export Summary</span>
+                            </button>
+                            <button
+                              id="btn-quick-toggle-status"
+                              onClick={() => { handleBatchToggleAvailability(); setShowQuickActionsMenu(false); setShowAdvancedSelect(false); }}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-left text-slate-300 hover:bg-zinc-900 hover:text-emerald-400 transition"
+                            >
+                              <RefreshCw className="w-3 h-3" /> <span>Toggle Status</span>
+                            </button>
+                            <div className="h-px bg-zinc-900 my-1" />
+
+                            {/* Advanced Select Option */}
+                            <div className="relative">
+                              <button
+                                id="btn-advanced-select"
+                                onClick={() => {
+                                  if (Date.now() - lastHoverAdvancedSelectRef.current < 300) {
+                                    setShowAdvancedSelect(true);
+                                  } else {
+                                    setShowAdvancedSelect(prev => !prev);
+                                  }
+                                }}
+                                onMouseEnter={() => {
+                                  lastHoverAdvancedSelectRef.current = Date.now();
+                                  setShowAdvancedSelect(true);
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-2 text-left transition ${
+                                  showAdvancedSelect ? "bg-zinc-900 text-[#00f5d4]" : "text-slate-300 hover:bg-zinc-900 hover:text-[#00f5d4]"
+                                }`}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <Sliders className="w-3 h-3 text-[#00f5d4]" />
+                                  <span>Advanced Select</span>
+                                </span>
+                                <ChevronRight className={`w-3 h-3 transition-transform duration-200 ${showAdvancedSelect ? "rotate-90 text-[#00f5d4]" : "text-slate-500"}`} />
+                              </button>
+
+                              <AnimatePresence>
+                                {showAdvancedSelect && (
+                                  <motion.div
+                                    id="advanced-select-submenu"
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="bg-zinc-900/80 border-y border-zinc-850 py-1 pl-4 pr-2 space-y-0.5 overflow-hidden"
+                                  >
+                                    <button
+                                      id="btn-select-all-available"
+                                      onClick={() => {
+                                        handleSelectAllAvailable();
+                                        setShowQuickActionsMenu(false);
+                                        setShowAdvancedSelect(false);
+                                      }}
+                                      className="w-full flex items-center justify-between px-2 py-1.5 rounded text-[10px] text-slate-300 hover:bg-zinc-800 hover:text-emerald-400 transition text-left"
+                                      title={`Select all available producers (${availableProducers.length})`}
+                                    >
+                                      <span className="flex items-center gap-1.5">
+                                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                                        <span>Select All Available</span>
+                                      </span>
+                                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-zinc-800 text-emerald-400 font-mono">
+                                        {availableProducers.length}
+                                      </span>
+                                    </button>
+
+                                    <button
+                                      id="btn-select-all-high-rating"
+                                      onClick={() => {
+                                        handleSelectAllHighRating();
+                                        setShowQuickActionsMenu(false);
+                                        setShowAdvancedSelect(false);
+                                      }}
+                                      className="w-full flex items-center justify-between px-2 py-1.5 rounded text-[10px] text-slate-300 hover:bg-zinc-800 hover:text-yellow-400 transition text-left"
+                                      title={`Select all high-rating (4.0+ stars) producers (${highRatingProducers.length})`}
+                                    >
+                                      <span className="flex items-center gap-1.5">
+                                        <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                                        <span>Select All High-Rating</span>
+                                      </span>
+                                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-zinc-800 text-yellow-400 font-mono">
+                                        {highRatingProducers.length}
+                                      </span>
+                                    </button>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+
+                            <div className="h-px bg-zinc-900 my-1" />
+                            <button
+                              id="btn-quick-clear-selection"
+                              onClick={() => { setSelectedProducerIds([]); setShowQuickActionsMenu(false); setShowAdvancedSelect(false); }}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-left text-slate-300 hover:bg-zinc-900 hover:text-slate-100 transition"
+                            >
+                              <X className="w-3 h-3" /> <span>Clear Selection</span>
+                            </button>
+                            <button
+                              id="btn-quick-archive-selected"
+                              onClick={() => { handleArchiveSelectedProducers(); setShowQuickActionsMenu(false); setShowAdvancedSelect(false); }}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-left text-red-400/80 hover:bg-zinc-900 hover:text-red-400 transition"
+                            >
+                              <Trash2 className="w-3 h-3" /> <span>Archive Selected</span>
+                            </button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   )}
                   
@@ -1956,7 +2159,7 @@ export default function App() {
               </div>
 
               {/* Recipient Ledger / Directory Stack list */}
-              <div className="flex-1 space-y-1.5 overflow-y-auto pr-1" id="producers-list-box">
+              <Reorder.Group axis="y" values={visibleProducers} onReorder={handleReorderProducers} className="flex-1 space-y-1.5 overflow-y-auto pr-1" id="producers-list-box">
                 {visibleProducers
                   .map(producer => {
                     const isSelected = selectedProducerId === producer.id;
@@ -1966,7 +2169,8 @@ export default function App() {
                       : null;
 
                     return (
-                      <div
+                      <Reorder.Item
+                        value={producer}
                         key={producer.id}
                         id={`producer-card-${producer.id}`}
                         onClick={() => {
@@ -1979,6 +2183,9 @@ export default function App() {
                             : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/30"
                         }`}
                       >
+                        <div className="flex items-center text-zinc-700 hover:text-zinc-500 cursor-grab active:cursor-grabbing mr-2 shrink-0">
+                          <GripVertical className="w-3.5 h-3.5" />
+                        </div>
                         {/* Multi-select checkbox */}
                         <button
                           id={`btn-toggle-select-${producer.id}`}
@@ -2063,7 +2270,7 @@ export default function App() {
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
-                      </div>
+                      </Reorder.Item>
                     );
                   })}
 
@@ -2072,7 +2279,7 @@ export default function App() {
                     No registered producer profiles found.
                   </div>
                 )}
-              </div>
+              </Reorder.Group>
 
             </div>
 
