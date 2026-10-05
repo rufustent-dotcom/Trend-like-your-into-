@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Autonomous Policy Console // Treasury Top-Up</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "error": "#ffb4ab",
+            "on-background": "#e1e2e8",
+            "inverse-primary": "#006970",
+            "on-tertiary-container": "#006e35",
+            "on-tertiary-fixed-variant": "#005226",
+            "tertiary-container": "#34f885",
+            "on-surface-variant": "#b9cacb",
+            "on-surface": "#e1e2e8",
+            "on-error": "#690005",
+            "tertiary-fixed": "#62ff96",
+            "on-secondary-fixed": "#281900",
+            "tertiary-fixed-dim": "#00e475",
+            "inverse-surface": "#e1e2e8",
+            "secondary-fixed": "#ffdeac",
+            "tertiary": "#dbffde",
+            "primary-container": "#00f0ff",
+            "surface-container-high": "#272a2f",
+            "secondary-container": "#feb300",
+            "surface-container-low": "#191c20",
+            "on-secondary": "#432c00",
+            "surface-container-highest": "#32353a",
+            "secondary-fixed-dim": "#ffba38",
+            "surface-variant": "#32353a",
+            "inverse-on-surface": "#2e3135",
+            "surface": "#111418",
+            "outline": "#849495",
+            "surface-container-lowest": "#0b0e12",
+            "primary-fixed": "#7df4ff",
+            "secondary": "#ffd799",
+            "surface-container": "#1d2024",
+            "on-primary-fixed": "#002022",
+            "outline-variant": "#3b494b",
+            "on-tertiary-fixed": "#00210b",
+            "on-tertiary": "#003918",
+            "surface-bright": "#36393e",
+            "on-primary-fixed-variant": "#004f54",
+            "on-primary-container": "#006970",
+            "on-primary": "#00363a",
+            "background": "#111418",
+            "error-container": "#93000a",
+            "on-secondary-container": "#6a4800",
+            "primary-fixed-dim": "#00dbe9",
+            "primary": "#dbfcff",
+            "on-secondary-fixed-variant": "#604100",
+            "surface-dim": "#111418",
+            "on-error-container": "#ffdad6",
+            "surface-tint": "#00dbe9"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "0.75rem",
+            "space-lg": "1.25rem",
+            "margin": "1rem",
+            "space-xs": "0.25rem",
+            "space-md": "0.75rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "label-xs": ["JetBrains Mono"],
+            "headline-md": ["JetBrains Mono"],
+            "display-lg-mobile": ["JetBrains Mono"],
+            "body-md": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "label-lg": ["JetBrains Mono"],
+            "body-lg": ["JetBrains Mono"],
+            "display-lg": ["JetBrains Mono"],
+            "headline-lg": ["JetBrains Mono"]
+          },
+          "fontSize": {
+            "label-xs": ["9px", { "lineHeight": "12px", "letterSpacing": "0.12em", "fontWeight": "700" }],
+            "headline-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "display-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+            "body-md": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "label-md": ["10px", { "lineHeight": "14px", "letterSpacing": "0.1em", "fontWeight": "600" }],
+            "label-lg": ["11px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "600" }],
+            "body-lg": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+            "headline-lg": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #040608;
+      color: #e1e2e8;
+      font-family: 'JetBrains Mono', monospace;
+      -webkit-font-smoothing: antialiased;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    .custom-scroll {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .cyan-glow {
+      box-shadow: inset 0 0 0 1px #00f0ff, 0 0 12px rgba(0, 240, 255, 0.25);
+    }
+    .amber-glow {
+      box-shadow: inset 0 0 0 1px #feb300, 0 0 8px rgba(254, 179, 0, 0.2);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#040608] text-on-surface flex flex-col min-h-screen selection:bg-primary-container selection:text-black">
+<!-- TopAppBar Component (from Shared Components JSON with applied tokens) -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-margin h-14 bg-surface-container-lowest border-b border-outline-variant">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary-container text-[20px]" data-icon="shield">shield</span>
+<span class="font-headline-md text-headline-md tracking-wider text-primary-container uppercase font-semibold">
+        TREASURY // TOP-UP
+      </span>
+</div>
+<div class="flex items-center">
+<div class="flex items-center space-x-1.5 px-2 py-0.5 border border-secondary-container bg-secondary-container/10">
+<span class="w-1.5 h-1.5 bg-secondary-container animate-ping"></span>
+<span class="font-label-xs text-label-xs text-secondary-container tracking-wider">FIDO2_READY</span>
+</div>
+</div>
+</header>
+<!-- Breadcrumb / Sub-bar -->
+<div class="fixed top-14 left-0 right-0 z-40 flex items-center justify-between px-margin h-7 bg-[#06090d] border-b border-outline-variant/60">
+<div class="flex items-center space-x-1.5 overflow-hidden">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>
+<span class="font-label-xs text-label-xs text-outline tracking-wider truncate">
+        AETHER://CAPITAL_GOVERNANCE // <span class="text-primary-container">VECTOR α POOL</span>
+</span>
+</div>
+<span class="font-label-xs text-label-xs text-outline-variant shrink-0">REV 4.9.1</span>
+</div>
+<!-- Scrollable Canvas Area (Padded for header + subbar + bottom nav) -->
+<main class="flex-1 pt-[88px] pb-24 px-gutter space-y-3 custom-scroll overflow-y-auto">
+<!-- Critical Drift Alert Banner -->
+<div class="border border-secondary-container bg-secondary-container/10 p-space-md amber-glow">
+<div class="flex items-start justify-between">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-secondary-container text-base shrink-0 animate-pulse" data-icon="warning">warning</span>
+<span class="font-label-md text-label-md text-secondary-container tracking-wider font-bold">
+            DRIFT_BUDGET_WARNING // 84.2% CONSUMED
+          </span>
+</div>
+<span class="font-label-xs text-label-xs text-secondary-container border border-secondary-container px-1 py-0.2">
+          THROTTLED
+        </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2 leading-relaxed">
+        Autonomous exploration throttled to <span class="text-secondary font-semibold">15% compute capacity</span>. Reserve injection required immediately to unlock parallel hyperparameter sweeps.
+      </p>
+<!-- Linear Visual Gauge Bar -->
+<div class="mt-3">
+<div class="flex justify-between font-label-xs text-label-xs text-outline mb-1">
+<span>SAFE OPERATING BOUNDARY</span>
+<span class="text-secondary-container">84.2% / 100.0%</span>
+</div>
+<div class="w-full h-1.5 bg-[#171F2A] relative flex overflow-hidden">
+<div class="bg-primary-container h-full w-[60%]"></div>
+<div class="bg-secondary-container h-full w-[24.2%] animate-pulse"></div>
+<div class="bg-transparent h-full w-[15.8%] border-l border-dashed border-error/70"></div>
+</div>
+</div>
+</div>
+<!-- Reserve & Drift Runway 2x2 Mobile Telemetry Grid -->
+<div class="grid grid-cols-2 gap-2">
+<!-- Metric 1 -->
+<div class="bg-[#080B0F] border border-outline-variant p-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-outline uppercase tracking-wider">Liquid Reserve</span>
+<span class="w-1.5 h-1.5 bg-primary-container"></span>
+</div>
+<div class="mt-2 text-right">
+<span class="font-headline-md text-headline-md font-bold text-on-surface tracking-tight">$14,850.00</span>
+<span class="block font-label-xs text-label-xs text-outline-variant mt-0.5">USD (ACTIVE BUFFER)</span>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="bg-[#080B0F] border border-outline-variant p-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-outline uppercase tracking-wider">Vector α Burn</span>
+<span class="w-1.5 h-1.5 bg-secondary-container"></span>
+</div>
+<div class="mt-2 text-right">
+<span class="font-headline-md text-headline-md font-bold text-on-surface tracking-tight">$120.00</span>
+<span class="block font-label-xs text-label-xs text-secondary mt-0.5">/CYCLE (24% CAP)</span>
+</div>
+</div>
+<!-- Metric 3 (Critical Alert) -->
+<div class="bg-[#080B0F] border border-error-container p-space-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 w-2 h-2 bg-error"></div>
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-error uppercase tracking-wider">Runway Depletion</span>
+<span class="material-symbols-outlined text-[13px] text-error" data-icon="alarm">alarm</span>
+</div>
+<div class="mt-2 text-right">
+<span class="font-headline-md text-headline-md font-bold text-error tracking-tight">4h 18m</span>
+<span class="block font-label-xs text-label-xs text-error font-semibold mt-0.5">CRITICAL HALT LIMIT</span>
+</div>
+</div>
+<!-- Metric 4 -->
+<div class="bg-[#080B0F] border border-outline-variant p-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-outline uppercase tracking-wider">Autostop Cap</span>
+<span class="w-1.5 h-1.5 bg-outline"></span>
+</div>
+<div class="mt-2 text-right">
+<span class="font-headline-md text-headline-md font-bold text-on-surface tracking-tight">$20,000.00</span>
+<span class="block font-label-xs text-label-xs text-outline-variant mt-0.5">BRANCH B ARMED</span>
+</div>
+</div>
+</div>
+<!-- Capital Top-Up & Allocation Module -->
+<div class="bg-[#080B0F] border border-outline-variant p-space-md space-y-4">
+<!-- Section Tag Header -->
+<div class="flex items-center justify-between border-b border-outline-variant pb-2">
+<span class="font-label-xs text-label-xs text-primary-container font-bold tracking-widest uppercase">
+          01 // CAPITAL INJECTION PRESETS
+        </span>
+<span class="font-label-xs text-label-xs text-outline">SELECT ALLOCATION</span>
+</div>
+<!-- Preset Chips (3-column on mobile) -->
+<div class="grid grid-cols-3 gap-1.5">
+<button class="py-2 px-1 text-center bg-surface-container border border-outline-variant font-label-md text-label-md text-on-surface-variant hover:border-primary-container active:scale-95 transition-all" type="button">
+          +$5,000
+        </button>
+<button class="py-2 px-1 text-center bg-surface-container border border-outline-variant font-label-md text-label-md text-on-surface-variant hover:border-primary-container active:scale-95 transition-all" type="button">
+          +$10,000
+        </button>
+<!-- Selected Preset with Cyan Glow -->
+<button class="py-2 px-1 text-center bg-primary-container/10 border border-primary-container font-label-md text-label-md text-primary-container font-bold cyan-glow relative" type="button">
+          +$25,000
+          <span class="absolute -top-1 -right-1 w-2 h-2 bg-primary-container"></span>
+</button>
+<button class="py-2 px-1 text-center bg-surface-container border border-outline-variant font-label-md text-label-md text-on-surface-variant hover:border-primary-container active:scale-95 transition-all" type="button">
+          +$50,000
+        </button>
+<button class="col-span-2 py-2 px-2 text-center bg-surface-container border border-outline-variant font-label-md text-label-md text-outline hover:text-on-surface active:scale-95 transition-all flex items-center justify-center space-x-1" type="button">
+<span class="material-symbols-outlined text-[13px]" data-icon="edit">edit</span>
+<span>CUSTOM AMOUNT</span>
+</button>
+</div>
+<!-- Amount Callout Sub-bar -->
+<div class="flex items-center justify-between p-2.5 bg-[#040608] border border-outline-variant">
+<div>
+<span class="font-label-xs text-label-xs text-outline block">TARGET CAPITAL DELTA</span>
+<span class="font-display-lg-mobile text-display-lg-mobile text-primary-container font-bold tracking-tight">+$25,000.00</span>
+</div>
+<div class="text-right">
+<span class="font-label-xs text-label-xs text-tertiary-fixed-dim block flex items-center justify-end space-x-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim inline-block"></span>
+<span>INSTANT SETTLEMENT</span>
+</span>
+<span class="font-label-xs text-label-xs text-outline mt-0.5 block">FEE: $4.20 (L2 ROLLUP)</span>
+</div>
+</div>
+<!-- Step 2: Treasury Funding Source Selector -->
+<div class="space-y-2 pt-1">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-primary-container font-bold tracking-widest uppercase">
+            02 // FUNDING SOURCE INTERFACE
+          </span>
+<span class="font-label-xs text-label-xs text-outline-variant">LEDGER IDENT</span>
+</div>
+<div class="space-y-1.5">
+<!-- Selected Source -->
+<label class="block p-2 bg-[#10151C] border border-primary-container cursor-pointer relative cyan-glow">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-2">
+<input checked="" class="mt-1 w-3 h-3 text-primary-container bg-black border-outline-variant focus:ring-0 focus:ring-offset-0" name="funding_source" type="radio"/>
+<div>
+<div class="font-body-md text-body-md font-semibold text-on-surface">Corp Prime Treasury</div>
+<div class="font-label-xs text-label-xs text-outline">JPM Multi-Sig •••• 9104</div>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-xs text-label-xs text-primary-container font-bold block">AVAIL</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">$2,450,000</span>
+</div>
+</div>
+</label>
+<!-- Alternative 1 -->
+<label class="block p-2 bg-[#040608] border border-outline-variant cursor-pointer opacity-75 hover:opacity-100 transition-opacity">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-2">
+<input class="mt-1 w-3 h-3 text-primary-container bg-black border-outline-variant focus:ring-0" name="funding_source" type="radio"/>
+<div>
+<div class="font-body-md text-body-md font-semibold text-on-surface">USDC Escrow Contract</div>
+<div class="font-label-xs text-label-xs text-outline">Arb-One 0x7E31...F219</div>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-xs text-label-xs text-outline block">AVAIL</span>
+<span class="font-label-md text-label-md text-on-surface-variant">$420,000</span>
+</div>
+</div>
+</label>
+<!-- Alternative 2 -->
+<label class="block p-2 bg-[#040608] border border-outline-variant cursor-pointer opacity-75 hover:opacity-100 transition-opacity">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-2">
+<input class="mt-1 w-3 h-3 text-primary-container bg-black border-outline-variant focus:ring-0" name="funding_source" type="radio"/>
+<div>
+<div class="font-body-md text-body-md font-semibold text-on-surface">Cloud Billing Quota</div>
+<div class="font-label-xs text-label-xs text-outline">Enterprise Invoicing Tier 1</div>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-xs text-label-xs text-outline block">AVAIL</span>
+<span class="font-label-md text-label-md text-on-surface-variant">$185,000</span>
+</div>
+</div>
+</label>
+</div>
+</div>
+<!-- Step 3: Vector α Policy Breakdown -->
+<div class="space-y-2.5 pt-1 border-t border-outline-variant">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-primary-container font-bold tracking-widest uppercase">
+            03 // TARGET POLICY BREAKDOWN
+          </span>
+<span class="font-label-xs text-label-xs text-outline">SPLIT RATIO</span>
+</div>
+<!-- Multi-segment Progress Bar -->
+<div class="w-full h-2 bg-[#171F2A] flex overflow-hidden border border-outline-variant">
+<div class="bg-primary-container h-full w-[60%]" title="Tuning (60%)"></div>
+<div class="bg-tertiary-fixed-dim h-full w-[25%]" title="Ring 0 (25%)"></div>
+<div class="bg-secondary-container h-full w-[15%]" title="Quorum Escrow (15%)"></div>
+</div>
+<div class="space-y-1.5 font-label-xs text-label-xs">
+<!-- Split 1 -->
+<div class="flex items-center justify-between p-1.5 bg-[#040608] border-l-2 border-primary-container border-y border-r border-outline-variant/60">
+<div class="flex items-center space-x-1.5">
+<span class="w-2 h-2 bg-primary-container shrink-0"></span>
+<span class="text-on-surface">Autonomous Model Tuning</span>
+</div>
+<div class="text-right font-mono font-semibold">
+<span class="text-primary-container">60%</span>
+<span class="text-outline ml-1">($15,000.00)</span>
+</div>
+</div>
+<!-- Split 2 -->
+<div class="flex items-center justify-between p-1.5 bg-[#040608] border-l-2 border-tertiary-fixed-dim border-y border-r border-outline-variant/60">
+<div class="flex items-center space-x-1.5">
+<span class="w-2 h-2 bg-tertiary-fixed-dim shrink-0"></span>
+<span class="text-on-surface">Canary Ring 0 Infrastructure</span>
+</div>
+<div class="text-right font-mono font-semibold">
+<span class="text-tertiary-fixed-dim">25%</span>
+<span class="text-outline ml-1">($6,250.00)</span>
+</div>
+</div>
+<!-- Split 3 -->
+<div class="flex items-center justify-between p-1.5 bg-[#040608] border-l-2 border-secondary-container border-y border-r border-outline-variant/60">
+<div class="flex items-center space-x-1.5">
+<span class="w-2 h-2 bg-secondary-container shrink-0"></span>
+<span class="text-on-surface">Safety Interlock Quorum Escrow</span>
+</div>
+<div class="text-right font-mono font-semibold">
+<span class="text-secondary-container">15%</span>
+<span class="text-outline ml-1">($3,750.00)</span>
+</div>
+</div>
+</div>
+<!-- Toggle Switch -->
+<div class="flex items-center justify-between p-2 bg-[#040608] border border-outline-variant mt-2">
+<div class="pr-2">
+<div class="font-label-md text-label-md font-semibold text-on-surface">AUTO-REPLENISH POLICY</div>
+<div class="font-label-xs text-label-xs text-outline mt-0.5">Trigger when reserve drops &lt; $5,000</div>
+</div>
+<!-- Sharp Custom Switch -->
+<div class="w-8 h-4 border border-outline-variant bg-[#10151C] relative flex items-center p-0.5 cursor-pointer">
+<div class="w-3 h-3 bg-primary-container ml-auto shadow-[0_0_6px_#00f0ff]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Hardware Quorum Interlock & Execution Block -->
+<div class="bg-[#080B0F] border border-outline-variant p-space-md space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-1.5 text-secondary-container font-label-xs text-label-xs font-bold uppercase">
+<span class="material-symbols-outlined text-[14px]" data-icon="lock">lock</span>
+<span>LEVEL-4 SECOPS QUORUM REQUIRED</span>
+</div>
+<span class="font-label-xs text-label-xs text-outline-variant">TIER &gt;$10K</span>
+</div>
+<!-- Detected Key Hardware Pill -->
+<div class="p-2 border border-outline-variant bg-[#040608] flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary-container text-base" data-icon="key">key</span>
+<div>
+<div class="font-label-xs text-label-xs text-primary-container font-semibold">YubiKey 5Ci Detected (NFC/Lightning)</div>
+<div class="font-label-xs text-label-xs text-outline font-mono">Nonce: 0xC83F-44A1-E92B</div>
+</div>
+</div>
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim animate-ping"></span>
+</div>
+<!-- Primary Action CTA Button -->
+<button class="w-full py-3 px-4 bg-primary-container text-black font-headline-md text-[14px] font-bold tracking-wider uppercase flex items-center justify-center space-x-2 hover:bg-[#80f7ff] active:scale-[0.98] transition-transform cyan-glow" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="fingerprint">fingerprint</span>
+<span>EXECUTE TOP-UP &amp; CRYPTO-SIGN [$25,000]</span>
+</button>
+<!-- Secondary Simulation Action -->
+<button class="w-full py-2 px-3 bg-transparent border border-outline-variant text-on-surface-variant font-label-md text-label-md tracking-wider uppercase flex items-center justify-center space-x-1 hover:border-on-surface active:scale-[0.98] transition-all" type="button">
+<span class="material-symbols-outlined text-[14px]" data-icon="troubleshoot">troubleshoot</span>
+<span>SIMULATE DRIFT IMPACT &amp; EXTENSION RUNWAY</span>
+</button>
+</div>
+<!-- Historical Transactions Drawer / Compact List -->
+<div class="bg-[#080B0F] border border-outline-variant p-space-md space-y-2">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-outline font-bold uppercase tracking-wider">
+          RECENT TREASURY INJECTIONS
+        </span>
+<span class="font-label-xs text-label-xs text-primary-container">VIEW ALL</span>
+</div>
+<div class="space-y-1.5">
+<!-- Entry 1 -->
+<div class="p-2 bg-[#040608] border border-outline-variant flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-base" data-icon="arrow_downward">arrow_downward</span>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">+$10,000.00 USD</div>
+<div class="font-label-xs text-label-xs text-outline">Loop #41 Replenishment</div>
+</div>
+</div>
+<div class="text-right font-label-xs text-label-xs">
+<span class="text-outline">14:22 UTC</span>
+<span class="block text-tertiary-fixed-dim">CONFIRMED</span>
+</div>
+</div>
+<!-- Entry 2 -->
+<div class="p-2 bg-[#040608] border border-outline-variant flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-base" data-icon="arrow_downward">arrow_downward</span>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">+$5,000.00 USD</div>
+<div class="font-label-xs text-label-xs text-outline">Node Elastic Spillover</div>
+</div>
+</div>
+<div class="text-right font-label-xs text-label-xs">
+<span class="text-outline">09:04 UTC</span>
+<span class="block text-tertiary-fixed-dim">CONFIRMED</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Diagnostic Footnote -->
+<div class="text-center font-label-xs text-label-xs text-outline-variant pt-1 pb-2">
+<span>PROTOCOL SEC-ID // SHA256: 9b2d8...f31a • ALL SESSIONS RECORDED</span>
+</div>
+</main>
+<!-- Docked Bottom Navigation Bar (Executed from Shared Components JSON) -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center h-16 px-gutter bg-surface-container-lowest border-t border-outline-variant">
+<!-- Tab 1: INCIDENT (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-1 hover:text-primary active:scale-95 transition-transform duration-75" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="warning">warning</span>
+<span class="font-label-xs text-label-xs mt-1">INCIDENT</span>
+</a>
+<!-- Tab 2: TELEMETRY (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-1 hover:text-primary active:scale-95 transition-transform duration-75" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="monitoring">monitoring</span>
+<span class="font-label-xs text-label-xs mt-1">TELEMETRY</span>
+</a>
+<!-- Tab 3: TREASURY (Active - Semantic Selection for Treasury Top-Up) -->
+<a class="flex flex-col items-center justify-center text-primary-container border-t-2 border-primary-container pt-1 active:scale-95 transition-transform duration-75" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="account_balance_wallet" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="font-label-xs text-label-xs mt-1 font-bold">TREASURY</span>
+</a>
+<!-- Tab 4: OVERRIDE (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-1 hover:text-primary active:scale-95 transition-transform duration-75" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="lock_open">lock_open</span>
+<span class="font-label-xs text-label-xs mt-1">OVERRIDE</span>
+</a>
+</nav>
+<!-- Lightweight Script for Preset Selection Micro-interactions -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const presetButtons = document.querySelectorAll('main .grid-cols-3 button');
+      presetButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          presetButtons.forEach(b => {
+            b.classList.remove('cyan-glow', 'bg-primary-container/10', 'border-primary-container', 'text-primary-container', 'font-bold');
+            b.classList.add('bg-surface-container', 'border-outline-variant', 'text-on-surface-variant');
+            const dot = b.querySelector('span.absolute');
+            if (dot) dot.remove();
+          });
+          this.classList.remove('bg-surface-container', 'border-outline-variant', 'text-on-surface-variant');
+          this.classList.add('cyan-glow', 'bg-primary-container/10', 'border-primary-container', 'text-primary-container', 'font-bold');
+          
+          if (!this.innerText.includes('CUSTOM')) {
+            const dot = document.createElement('span');
+            dot.className = 'absolute -top-1 -right-1 w-2 h-2 bg-primary-container';
+            this.appendChild(dot);
+          }
+        });
+      });
+    });
+  </script>
+</body></html>

@@ -38,13 +38,20 @@ import {
   X,
   Copy,
   ArrowUpDown,
-  GripVertical
+  GripVertical,
+  Download,
+  Activity,
+  Zap,
+  Terminal,
+  Cpu
 } from "lucide-react";
 import { initialVaultState } from "./initialData";
 import { IntelligenceVault, VaultNode, StrategicPattern, StrategicSignal, ActiveProject, ProducerProfile, ShowcaseItem, ProducerReview } from "./types";
 import RatingDistribution from "./components/RatingDistribution";
 import { PaymentButton } from "./components/PaymentButton";
 import SalesDashboard from "./components/SalesDashboard";
+import TelemetryDashboard from "./components/TelemetryDashboard";
+import DeepResearchConsole from "./components/DeepResearchConsole";
 
 export default function App() {
   // --- Workspace State ---
@@ -65,6 +72,17 @@ export default function App() {
             };
           });
         }
+
+        // Merge in any newly introduced vault nodes (e.g. system.md, decisions.md, entities)
+        parsed.nodes = { ...initialVaultState.nodes, ...parsed.nodes };
+        if (parsed.nodes["dir-root"] && initialVaultState.nodes["dir-root"]) {
+          const mergedChildren = Array.from(new Set([
+            ...(initialVaultState.nodes["dir-root"].children || []),
+            ...(parsed.nodes["dir-root"].children || [])
+          ]));
+          parsed.nodes["dir-root"].children = mergedChildren;
+        }
+
         return parsed as IntelligenceVault;
       } catch (e) { console.error("Error loading saved vault", e); }
     }
@@ -77,8 +95,8 @@ export default function App() {
   }, [vault]);
 
   // --- UI Routing / Tabs ---
-  // "map" (Patterns <=> Signals Bridge), "vault" (Obsidian File Explorer), "thesis" (Executive Board & Chat), "producers" (Creative Registry Profiles), "dashboard" (Sales)
-  const [activeTab, setActiveTab] = useState<"map" | "vault" | "thesis" | "producers" | "dashboard">("map");
+  // "telemetry" (Market Sizing, Defensibility Matrix, MCP Interop), "deep-research" (Gemini Deep Research Agent), "map" (Patterns <=> Signals), "vault" (Obsidian File Explorer), "thesis" (Executive Board & Chat), "producers" (Creative Registry Profiles), "dashboard" (Sales)
+  const [activeTab, setActiveTab] = useState<"telemetry" | "deep-research" | "map" | "vault" | "thesis" | "producers" | "dashboard">("telemetry");
 
   // --- SVG Map State ---
   const [selectedPatternId, setSelectedPatternId] = useState<string>("pat-1");
@@ -90,11 +108,12 @@ export default function App() {
   // --- Obsidian Vault Tree State ---
   const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({
     "dir-root": true,
+    "dir-entities": true,
     "dir-inbox": true,
     "dir-projects": true,
     "dir-system": true
   });
-  const [activeFileId, setActiveFileId] = useState<string>("file-thesis");
+  const [activeFileId, setActiveFileId] = useState<string>("file-apex-system");
   const [editMode, setEditMode] = useState<"preview" | "write">("preview");
   const [fileContent, setFileContent] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -154,13 +173,109 @@ export default function App() {
   const [synthesisRawText, setSynthesisRawText] = useState("");
   const [synthesisResult, setSynthesisResult] = useState<any | null>(null);
 
-  // Sync edited file source state when switching active files
+  const [syncingVault, setSyncingVault] = useState(false);
+
+  // Dynamically sync vault files from server /api/vault
+  const syncVaultFromServer = async () => {
+    setSyncingVault(true);
+    try {
+      const res = await fetch("/api/vault");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.files && Array.isArray(data.files)) {
+        for (const fileInfo of data.files) {
+          const contentRes = await fetch(`/api/vault/read?file=${encodeURIComponent(fileInfo.path)}`);
+          if (contentRes.ok) {
+            const fileData = await contentRes.json();
+            const safeName = fileInfo.name;
+            const isEntity = fileInfo.path.startsWith("entities/");
+            const nodeId = isEntity 
+              ? `file-entity-${safeName.replace(/\.md$/, "").toLowerCase()}`
+              : `file-apex-${safeName.replace(/\.md$/, "").toLowerCase().replace(/_/g, "-")}`;
+            const targetFolderId = isEntity ? "dir-entities" : "dir-root";
+            const category = isEntity ? "Entities" : "Root";
+
+            setVault(prev => {
+              const updatedNodes = { ...prev.nodes };
+              if (isEntity && !updatedNodes["dir-entities"]) {
+                updatedNodes["dir-entities"] = {
+                  id: "dir-entities",
+                  name: "entities",
+                  path: "/entities",
+                  type: "directory",
+                  category: "Entities",
+                  children: []
+                };
+              }
+
+              updatedNodes[nodeId] = {
+                id: nodeId,
+                name: safeName,
+                path: isEntity ? `/entities/${safeName}` : `/${safeName}`,
+                type: "file",
+                category: category as any,
+                content: fileData.content
+              };
+
+              const parentFolder = updatedNodes[targetFolderId];
+              if (parentFolder && parentFolder.children && !parentFolder.children.includes(nodeId)) {
+                updatedNodes[targetFolderId] = {
+                  ...parentFolder,
+                  children: [...parentFolder.children, nodeId]
+                };
+              }
+              return { ...prev, nodes: updatedNodes };
+            });
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Vault server sync error", e);
+    } finally {
+      setSyncingVault(false);
+    }
+  };
+
+  useEffect(() => {
+    syncVaultFromServer();
+  }, []);
+
+  // Sync edited file source state when switching active files, and dynamically pull from server if it's a vault file
   useEffect(() => {
     const activeNode = vault.nodes[activeFileId];
     if (activeNode && activeNode.type === "file") {
       setFileContent(activeNode.content || "");
+
+      // Check if file corresponds to a server vault path
+      let serverPath: string | null = null;
+      if (activeNode.path.startsWith("/entities/")) {
+        serverPath = `entities/${activeNode.name}`;
+      } else if (["system.md", "decisions.md", "notes.md", "breathing_space.md"].includes(activeNode.name)) {
+        serverPath = activeNode.name;
+      }
+
+      if (serverPath) {
+        fetch(`/api/vault/read?file=${encodeURIComponent(serverPath)}`)
+          .then(r => r.ok ? r.json() : null)
+          .then(data => {
+            if (data && data.content && data.content !== activeNode.content) {
+              setFileContent(data.content);
+              setVault(prev => ({
+                ...prev,
+                nodes: {
+                  ...prev.nodes,
+                  [activeFileId]: {
+                    ...prev.nodes[activeFileId],
+                    content: data.content
+                  }
+                }
+              }));
+            }
+          })
+          .catch(() => {});
+      }
     }
-  }, [activeFileId, vault.nodes]);
+  }, [activeFileId]);
 
   // Auto-dismiss toast after 5 seconds
   useEffect(() => {
@@ -386,6 +501,43 @@ export default function App() {
       const visibleIds = visibleProducers.map(p => p.id);
       setSelectedProducerIds(prev => Array.from(new Set([...prev, ...visibleIds])));
     }
+  };
+
+  const handleExportProducersCSV = () => {
+    if (!visibleProducers || visibleProducers.length === 0) return;
+
+    const escapeCsv = (val: string | number | undefined | null) => {
+      const str = String(val ?? "");
+      if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    const headers = ["Name", "Genre", "Experience", "Average Rating"];
+    const rows = visibleProducers.map(p => {
+      const reviews = p.reviews || [];
+      const avgRating = reviews.length > 0
+        ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+        : "N/A";
+      return [
+        escapeCsv(p.name),
+        escapeCsv(p.genre),
+        escapeCsv(`${p.experienceYears} Years`),
+        escapeCsv(avgRating)
+      ].join(",");
+    });
+
+    const csvContent = [headers.join(","), ...rows].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `producers_view_export_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   // Create a new markdown file in the specified category folder
@@ -912,17 +1064,20 @@ export default function App() {
               <span className="text-xs font-mono tracking-widest text-[#00f5d4] uppercase">Operating System</span>
               <span className="text-[10px] bg-emerald-950 text-emerald-400 px-1.5 py-0.5 rounded font-mono border border-emerald-900/50">SECURE SHELL</span>
             </div>
-            <h1 className="text-lg font-medium tracking-tight text-white font-mono">AI Strategic Intelligence Vault</h1>
+            <h1 className="text-lg font-bold tracking-tight text-white font-mono flex items-center gap-2">
+              <span>Apex Vault Agent</span>
+              <span className="text-[10px] font-mono text-[#00f5d4] border border-[#00f5d4]/40 px-1.5 py-0.2 rounded bg-[#00f5d4]/10">MCP / A2A</span>
+            </h1>
           </div>
         </div>
 
         {/* Workspace Quick Statistics */}
         <div className="hidden lg:flex items-center gap-6 text-xs border-l border-zinc-900 pl-6">
           <div className="flex flex-col">
-            <span className="text-slate-500 font-mono">HIGHEST PRODUCING</span>
+            <span className="text-slate-500 font-mono">2030 MARKET SAM</span>
             <span className="text-[#00f5d4] font-mono font-medium flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5 text-[#00f5d4]" />
-              AI Compresses Time (8/8)
+              $47.82B (CAGR 25.8%)
             </span>
           </div>
           <div className="flex flex-col">
@@ -932,13 +1087,35 @@ export default function App() {
             </span>
           </div>
           <div className="flex flex-col">
-            <span className="text-slate-500 font-mono">STRATEGIC SIGNALS</span>
-            <span className="text-slate-200 font-mono font-medium">{vault.signals.length} Signals Captured</span>
+            <span className="text-slate-500 font-mono">GLOBAL TAM</span>
+            <span className="text-slate-200 font-mono font-medium">$140B Labor Pool</span>
           </div>
         </div>
 
         {/* Nav Tabs */}
         <div className="flex items-center gap-1.5 bg-zinc-900/60 p-1.5 rounded-lg border border-zinc-800/80">
+          <button 
+            onClick={() => setActiveTab("telemetry")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono transition-all uppercase ${
+              activeTab === "telemetry" 
+                ? "bg-slate-800 text-[#00f5d4] border border-[#00f5d4]/40 shadow-[0_0_12px_rgba(0,245,212,0.2)]" 
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Activity className="w-3.5 h-3.5 text-[#00f5d4]" />
+            Telemetry Engine
+          </button>
+          <button 
+            onClick={() => setActiveTab("deep-research")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono transition-all uppercase ${
+              activeTab === "deep-research" 
+                ? "bg-slate-800 text-[#00f5d4] border border-[#00f5d4]/40 shadow-[0_0_12px_rgba(0,245,212,0.2)]" 
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#00f5d4]" />
+            Deep Research
+          </button>
           <button 
             onClick={() => setActiveTab("map")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono transition-all uppercase ${
@@ -999,6 +1176,25 @@ export default function App() {
 
       {/* --- Main Workspace Frame --- */}
       <main className="flex-1 flex flex-col">
+
+        {/* --- Tab 0: Market Telemetry & Strategic Anchors --- */}
+        {activeTab === "telemetry" && (
+          <div className="flex-1 overflow-y-auto">
+            <TelemetryDashboard />
+          </div>
+        )}
+
+        {/* --- Tab: Deep Research Studio (Interactions API deep-research-preview-04-2026) --- */}
+        {activeTab === "deep-research" && (
+          <div className="flex-1 overflow-y-auto">
+            <DeepResearchConsole 
+              onSavedToVault={() => {
+                syncVaultFromServer();
+                setActiveTab("vault");
+              }} 
+            />
+          </div>
+        )}
 
         {/* --- Tab 1: Interactive Connections Bridge Forge --- */}
         {activeTab === "dashboard" && (
@@ -1262,9 +1458,20 @@ export default function App() {
               {/* Obsidian Tree Structure */}
               <div className="flex-1 p-3 space-y-1 text-xs">
                 {/* Recursively Render Files & Categories */}
-                <div className="flex items-center gap-1.5 px-3 py-2 text-[#00f5d4] hover:bg-zinc-900 rounded font-mono font-semibold tracking-wider">
-                  <ObsidianIcon className="w-4 h-4 text-[#00f5d4]" />
-                  <span>VAULT INDEX</span>
+                <div className="flex items-center justify-between px-3 py-2 text-[#00f5d4] hover:bg-zinc-900 rounded font-mono font-semibold tracking-wider">
+                  <div className="flex items-center gap-1.5">
+                    <ObsidianIcon className="w-4 h-4 text-[#00f5d4]" />
+                    <span>VAULT INDEX</span>
+                  </div>
+                  <button 
+                    onClick={syncVaultFromServer}
+                    disabled={syncingVault}
+                    className="text-[10px] text-slate-400 hover:text-[#00f5d4] flex items-center gap-1 px-1.5 py-0.5 rounded border border-zinc-800 hover:border-[#00f5d4]/40 transition disabled:opacity-50"
+                    title="Reload and sync markdown files from the server /vault/ directory"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${syncingVault ? "animate-spin text-[#00f5d4]" : ""}`} />
+                    <span>{syncingVault ? "Syncing" : "Sync"}</span>
+                  </button>
                 </div>
 
                 <div className="pl-2 space-y-0.5 font-mono">
@@ -1870,6 +2077,13 @@ export default function App() {
                               <Save className="w-3 h-3" /> <span>Export Summary</span>
                             </button>
                             <button
+                              id="btn-quick-export-csv"
+                              onClick={() => { handleExportProducersCSV(); setShowQuickActionsMenu(false); setShowAdvancedSelect(false); }}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-left text-slate-300 hover:bg-zinc-900 hover:text-[#00f5d4] transition"
+                            >
+                              <Download className="w-3 h-3" /> <span>Export as CSV</span>
+                            </button>
+                            <button
                               id="btn-quick-toggle-status"
                               onClick={() => { handleBatchToggleAvailability(); setShowQuickActionsMenu(false); setShowAdvancedSelect(false); }}
                               className="w-full flex items-center gap-2 px-3 py-2 text-left text-slate-300 hover:bg-zinc-900 hover:text-emerald-400 transition"
@@ -2117,6 +2331,23 @@ export default function App() {
                 </span>
                 <span className={`text-[10px] px-1.5 py-0.5 rounded ${sortSelectedToTop ? "bg-[#00f5d4]/20 text-[#00f5d4]" : "bg-zinc-800 text-slate-500"}`}>
                   {sortSelectedToTop ? "Active" : "Off"}
+                </span>
+              </button>
+
+              {/* Export as CSV Button */}
+              <button
+                id="btn-export-producers-csv"
+                onClick={handleExportProducersCSV}
+                disabled={visibleProducers.length === 0}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-md border border-zinc-900 bg-zinc-900/60 hover:bg-zinc-900 hover:border-zinc-800 text-slate-300 hover:text-[#00f5d4] disabled:opacity-50 disabled:cursor-not-allowed text-xs font-mono transition"
+                title={`Export current view (${visibleProducers.length} producers) as structured CSV file`}
+              >
+                <span className="flex items-center gap-2">
+                  <Download className="w-3.5 h-3.5 text-[#00f5d4]" />
+                  <span>Export as CSV</span>
+                </span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-slate-400 font-mono">
+                  {visibleProducers.length}
                 </span>
               </button>
 

@@ -38,7 +38,7 @@ export interface VaultNode {
   path: string;
   type: "file" | "directory";
   children?: string[]; // array of child Node IDs
-  category: "Inbox" | "Projects" | "Research" | "AI" | "Content" | "Finance" | "Learning" | "Archive" | "System" | "Root";
+  category: "Inbox" | "Projects" | "Research" | "AI" | "Content" | "Finance" | "Learning" | "Archive" | "System" | "Root" | "Entities";
   content?: string;
 }
 

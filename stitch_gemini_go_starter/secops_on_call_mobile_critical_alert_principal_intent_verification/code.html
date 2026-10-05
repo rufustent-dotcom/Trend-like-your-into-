@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>INC-8821 // CRIT-0 Alert // Principal Intent Verification</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-fixed": "#62ff96",
+            "surface-variant": "#32353a",
+            "primary": "#dbfcff",
+            "surface-bright": "#36393e",
+            "secondary-fixed-dim": "#ffba38",
+            "on-secondary-container": "#6a4800",
+            "on-primary-container": "#006970",
+            "on-secondary-fixed": "#281900",
+            "secondary-container": "#feb300",
+            "primary-fixed-dim": "#00dbe9",
+            "surface-tint": "#00dbe9",
+            "inverse-on-surface": "#2e3135",
+            "background": "#111418",
+            "on-error-container": "#ffdad6",
+            "surface-dim": "#111418",
+            "on-surface": "#e1e2e8",
+            "surface-container-lowest": "#0b0e12",
+            "surface-container-low": "#191c20",
+            "surface-container": "#1d2024",
+            "inverse-surface": "#e1e2e8",
+            "on-tertiary": "#003918",
+            "tertiary-container": "#34f885",
+            "on-tertiary-container": "#006e35",
+            "error": "#ffb4ab",
+            "on-surface-variant": "#b9cacb",
+            "on-primary-fixed": "#002022",
+            "on-secondary-fixed-variant": "#604100",
+            "surface": "#111418",
+            "outline": "#849495",
+            "on-error": "#690005",
+            "secondary-fixed": "#ffdeac",
+            "on-background": "#e1e2e8",
+            "error-container": "#93000a",
+            "outline-variant": "#3b494b",
+            "surface-container-high": "#272a2f",
+            "on-tertiary-fixed-variant": "#005226",
+            "on-secondary": "#432c00",
+            "primary-fixed": "#7df4ff",
+            "tertiary": "#dbffde",
+            "inverse-primary": "#006970",
+            "primary-container": "#00f0ff",
+            "tertiary-fixed-dim": "#00e475",
+            "on-tertiary-fixed": "#00210b",
+            "secondary": "#ffd799",
+            "on-primary": "#00363a",
+            "on-primary-fixed-variant": "#004f54",
+            "surface-container-highest": "#32353a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin": "1rem",
+            "space-xl": "2rem",
+            "gutter": "0.75rem",
+            "space-lg": "1.25rem",
+            "space-sm": "0.5rem",
+            "space-md": "0.75rem",
+            "space-xs": "0.25rem"
+          },
+          "fontFamily": {
+            "display-lg": ["JetBrains Mono"],
+            "body-md": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "display-lg-mobile": ["JetBrains Mono"],
+            "headline-lg": ["JetBrains Mono"],
+            "headline-lg-mobile": ["JetBrains Mono"],
+            "label-lg": ["JetBrains Mono"],
+            "headline-md": ["JetBrains Mono"],
+            "headline-md-mobile": ["JetBrains Mono"],
+            "body-lg": ["JetBrains Mono"],
+            "label-xs": ["JetBrains Mono"]
+          },
+          "fontSize": {
+            "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+            "body-md": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "label-md": ["10px", { "lineHeight": "14px", "letterSpacing": "0.1em", "fontWeight": "600" }],
+            "display-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+            "headline-lg": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "label-lg": ["11px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "600" }],
+            "headline-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-md-mobile": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-lg": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "label-xs": ["9px", { "lineHeight": "12px", "letterSpacing": "0.12em", "fontWeight": "700" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 18px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    @keyframes pulse-fast {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.92); }
+    }
+    .animate-pulse-fast {
+      animation: pulse-fast 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .amber-edge-glow {
+      box-shadow: 0 0 14px -2px rgba(254, 179, 0, 0.35), inset 0 0 0 1px #feb300;
+    }
+    .crimson-pulse-border {
+      border: 1px solid #ffb4ab;
+      box-shadow: 0 0 8px rgba(255, 180, 171, 0.25);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest text-on-surface antialiased font-body-md selection:bg-primary-container selection:text-surface-container-lowest min-h-screen pb-24">
+<!-- TopAppBar (Shared Component Implementation) -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-margin h-14 bg-surface-container-lowest border-b border-outline-variant">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 flex items-center justify-center bg-surface-container border border-outline-variant text-primary-container">
+<span class="material-symbols-outlined text-primary-container" data-icon="shield">shield</span>
+</div>
+<div>
+<div class="font-headline-md-mobile text-headline-md-mobile tracking-wider text-primary-container uppercase leading-tight">INC-8821 // CRIT-0</div>
+<div class="font-label-xs text-label-xs text-on-surface-variant flex items-center gap-1">
+<span class="inline-block w-1.5 h-1.5 bg-error animate-pulse-fast"></span>
+<span>PAGERDUTY // ESC-A1</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="flex items-center gap-1 bg-surface-container border border-outline-variant px-space-xs py-1 text-on-surface hover:bg-surface-container-high transition-opacity duration-100" type="button">
+<span class="material-symbols-outlined text-xs text-secondary-container" data-icon="call">call</span>
+<span class="font-label-xs text-label-xs text-secondary-container tracking-wider">BRIDGE</span>
+</button>
+<button class="bg-primary-container text-surface-container-lowest font-label-md text-label-md px-space-sm py-1 font-bold hover:bg-surface-container-high hover:text-primary active:opacity-80 transition-opacity duration-100 border border-primary-container" type="button">
+        ACK
+      </button>
+</div>
+</header>
+<!-- Mobile Viewport Canvas Container (Max-w 390px-like dense shell) -->
+<main class="pt-16 px-space-sm max-w-md mx-auto space-y-space-md">
+<!-- System Origin Breadcrumb & Timer Strip -->
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-xs pt-space-xs">
+<div class="font-label-xs text-label-xs text-on-surface-variant flex items-center gap-1">
+<span class="text-primary-container">SYS://</span>AETHER://SYS_CORE
+      </div>
+<div class="flex items-center gap-1 font-label-xs text-label-xs text-error font-bold">
+<span class="w-2 h-2 rounded-none bg-error animate-pulse-fast inline-block"></span>
+<span>TRIGGERED (2m ago)</span>
+</div>
+</div>
+<!-- Critical Breach Banner -->
+<section class="bg-surface-container-lowest border border-secondary-container p-space-md relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary-container"></div>
+<div class="flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-secondary-container mt-0.5" data-icon="warning">warning</span>
+<div class="space-y-1">
+<div class="font-label-lg text-label-lg font-bold text-secondary-container tracking-wide flex items-center gap-1.5">
+            AWAKENING THRESHOLD BREACH DETECTED
+          </div>
+<p class="font-body-md text-body-md text-on-surface leading-snug">
+<span class="text-secondary-fixed font-bold">Branch B Activated:</span> Autonomous actuation suspended. Cryptographic sign-off required from authorized SecOps Principal to authorize fleet deployment.
+          </p>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between font-label-xs text-label-xs text-on-surface-variant">
+<span>INTERLOCK STATUS: <span class="text-secondary-container font-bold">ACTUATION_SUSPENDED</span></span>
+<span>LEVEL: <span class="text-error font-bold">TIER_0</span></span>
+</div>
+</section>
+<!-- Incident & Candidate Context Card -->
+<section class="bg-surface-container-lowest border border-outline-variant p-space-md space-y-space-sm">
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-xs">
+<div class="flex items-center gap-1.5">
+<div class="w-1.5 h-1.5 bg-primary-container"></div>
+<span class="font-label-xs text-label-xs uppercase text-on-surface-variant tracking-wider">PAYLOAD TELEMETRY ENVELOPE</span>
+</div>
+<span class="font-label-xs text-label-xs text-primary-container">VER: 04.1.z</span>
+</div>
+<div class="space-y-space-xs pt-space-xs">
+<!-- Candidate Package -->
+<div class="bg-surface-container p-space-xs flex items-center justify-between border border-outline-variant">
+<div class="space-y-0.5">
+<div class="font-label-xs text-label-xs text-on-surface-variant uppercase">Candidate Package</div>
+<div class="font-body-md text-body-md text-primary font-bold">pkg://kernel-patch-v4.1.z</div>
+</div>
+<button class="p-1 text-on-surface-variant hover:text-primary-container active:opacity-75" title="Copy Package Reference" type="button">
+<span class="material-symbols-outlined text-sm" data-icon="content_copy">content_copy</span>
+</button>
+</div>
+<!-- Target Scope & Origin Matrix -->
+<div class="grid grid-cols-2 gap-space-xs">
+<div class="bg-surface-container p-space-xs border border-outline-variant">
+<div class="font-label-xs text-label-xs text-on-surface-variant uppercase">Target Fleet Scope</div>
+<div class="font-body-md text-body-md text-on-surface mt-0.5">240 Jamf macOS Nodes</div>
+<div class="font-label-xs text-label-xs text-primary-container mt-0.5">[Canary Ring 0]</div>
+</div>
+<div class="bg-surface-container p-space-xs border border-outline-variant">
+<div class="font-label-xs text-label-xs text-on-surface-variant uppercase">Origin Subsystem</div>
+<div class="font-body-md text-body-md text-on-surface mt-0.5">Loop #42 (Exploration)</div>
+<div class="font-label-xs text-label-xs text-secondary-container mt-0.5">[Synthesized]</div>
+</div>
+</div>
+<!-- Challenge Nonce -->
+<div class="flex items-center justify-between px-space-xs py-1 border border-outline-variant bg-surface-container-low font-label-xs text-label-xs">
+<span class="text-on-surface-variant">CHALLENGE NONCE:</span>
+<span class="font-label-md text-label-md text-primary-container font-mono">0x9F4B-88E2-CA7A</span>
+</div>
+</div>
+</section>
+<!-- Threshold Variance Telemetry (The Breach Matrix) -->
+<section class="bg-surface-container-lowest border border-outline-variant p-space-md space-y-space-sm">
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-xs">
+<div class="flex items-center gap-1.5">
+<div class="w-1.5 h-1.5 bg-secondary-container"></div>
+<span class="font-label-xs text-label-xs uppercase text-on-surface-variant tracking-wider">THRESHOLD VARIANCE MATRIX (3-VECTOR)</span>
+</div>
+<span class="font-label-xs text-label-xs text-error font-bold">1 BREACH</span>
+</div>
+<!-- Vector List -->
+<div class="space-y-space-xs">
+<!-- Vector Alpha: Safe -->
+<div class="p-space-xs bg-surface-container border border-outline-variant">
+<div class="flex items-center justify-between text-label-xs font-label-xs">
+<span class="text-on-surface-variant">VECTOR α // CAPITAL DRIFT RATE</span>
+<span class="text-tertiary-fixed font-bold flex items-center gap-1">
+<span class="inline-block w-1 h-1 bg-tertiary-fixed"></span>SAFE
+            </span>
+</div>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-headline-md-mobile text-headline-md-mobile text-on-surface font-bold">$120.00 <span class="font-label-xs text-label-xs text-on-surface-variant">/ cycle</span></span>
+<span class="font-label-xs text-label-xs text-on-surface-variant">CAP: &lt; $500.00</span>
+</div>
+<div class="w-full bg-surface-container-low h-1 mt-1.5 overflow-hidden">
+<div class="bg-tertiary-fixed-dim h-full" style="width: 24%;"></div>
+</div>
+</div>
+<!-- Vector Beta: BREACH -->
+<div class="p-space-xs bg-surface-container border border-secondary-container relative">
+<div class="flex items-center justify-between text-label-xs font-label-xs">
+<span class="text-secondary-fixed font-bold">VECTOR β // FLEET STABILITY / REBOOT</span>
+<span class="text-secondary-container font-bold flex items-center gap-1">
+<span class="inline-block w-1.5 h-1.5 bg-secondary-container animate-pulse-fast"></span>BREACH DETECTED
+            </span>
+</div>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-headline-md-mobile text-headline-md-mobile text-secondary-container font-bold">0.85%</span>
+<span class="font-label-xs text-label-xs text-error font-bold">POLICY LIMIT: 0.50%</span>
+</div>
+<!-- Breach Indicator Progress bar -->
+<div class="relative w-full bg-surface-container-low h-2 mt-1.5 border border-outline-variant">
+<!-- 0.50 limit pin -->
+<div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-error z-10" title="Guardrail limit: 0.50%"></div>
+<!-- Progress fill -->
+<div class="bg-secondary-container h-full" style="width: 85%;"></div>
+</div>
+<div class="flex justify-between items-center font-label-xs text-label-xs text-on-surface-variant mt-1">
+<span>DELTA: +0.35% OVER MAXIMUM ALLOWABLE VARIANCE</span>
+<span class="text-secondary-fixed">[CRIT-0]</span>
+</div>
+</div>
+<!-- Vector Gamma: Verified -->
+<div class="p-space-xs bg-surface-container border border-outline-variant">
+<div class="flex items-center justify-between text-label-xs font-label-xs">
+<span class="text-on-surface-variant">VECTOR γ // CRYPTO SIGNATURE</span>
+<span class="text-primary-container font-bold flex items-center gap-1">
+<span class="inline-block w-1 h-1 bg-primary-container"></span>VERIFIED
+            </span>
+</div>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-headline-md-mobile text-headline-md-mobile text-primary font-bold tracking-tight">ED25519_VALIDATED</span>
+<span class="font-label-xs text-label-xs text-primary-container font-mono">ID: 0x4E...7C</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Principal Cryptographic Intent Sign-Off Section -->
+<section class="bg-surface-container-lowest amber-edge-glow p-space-md space-y-space-md">
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-xs">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary-container" data-icon="lock_open">lock_open</span>
+<span class="font-label-md text-label-md uppercase text-secondary-container font-bold tracking-wider">PRINCIPAL INTENT VERIFICATION</span>
+</div>
+<span class="font-label-xs text-label-xs text-secondary-fixed bg-surface-container-high px-1 py-0.5 border border-outline-variant">FIDO2_ACTIVE</span>
+</div>
+<!-- Identity & Key Hardware Block -->
+<div class="space-y-space-xs bg-surface-container p-space-xs border border-outline-variant">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-on-surface-variant">SIGNING PRINCIPAL:</span>
+<span class="font-label-md text-label-md text-on-surface font-bold">Dr. S. Vance (SecOps Principal)</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-on-surface-variant">HARDWARE KEY:</span>
+<span class="font-label-xs text-label-xs text-tertiary-fixed font-bold flex items-center gap-1">
+<span class="inline-block w-1.5 h-1.5 bg-tertiary-fixed rounded-none"></span>YubiKey 5Ci Detected / Ready
+          </span>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-outline-variant font-label-xs text-label-xs">
+<span class="text-on-surface-variant">PAYLOAD DIGEST:</span>
+<span class="text-primary-container font-mono">SHA256: e3b0c442...a506</span>
+</div>
+</div>
+<!-- CTAs Cluster -->
+<div class="space-y-space-xs pt-space-xs">
+<!-- Big Mobile CTA 1: Sign Intent -->
+<button class="w-full py-3 px-space-md bg-secondary-container hover:bg-secondary-fixed text-surface-container-lowest font-headline-md-mobile text-headline-md-mobile font-bold tracking-wider flex items-center justify-center gap-2 border border-secondary-container active:scale-95 transition-transform duration-75" type="button">
+<span class="material-symbols-outlined text-surface-container-lowest" data-icon="fingerprint">fingerprint</span>
+<span>CONFIRM &amp; CRYPTO-SIGN INTENT</span>
+</button>
+<!-- Big Mobile CTA 2: Reject / Hard Lock -->
+<button class="w-full py-2.5 px-space-md bg-surface-container hover:bg-error-container text-error hover:text-on-error border border-error font-label-lg text-label-lg font-bold tracking-wider flex items-center justify-center gap-2 active:scale-95 transition-transform duration-75" type="button">
+<span class="material-symbols-outlined text-error" data-icon="shield">shield</span>
+<span>REJECT &amp; ENFORCE HARD-LOCK</span>
+</button>
+<!-- Escalate Link -->
+<div class="text-center pt-1">
+<button class="font-label-xs text-label-xs text-on-surface-variant hover:text-primary-container tracking-wider uppercase underline underline-offset-4" type="button">
+            Escalate to SecOps War Room / Snooze 10m
+          </button>
+</div>
+</div>
+</section>
+<!-- Recent Execution Audit Log Snippet -->
+<section class="bg-surface-container-lowest border border-outline-variant p-space-md space-y-space-xs">
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-xs">
+<span class="font-label-xs text-label-xs uppercase text-on-surface-variant tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="history">history</span>
+          AUDIT STREAM [LATEST 3 TICKS]
+        </span>
+<span class="font-label-xs text-label-xs text-primary-container">STREAMING</span>
+</div>
+<div class="font-body-md text-body-md space-y-1 text-on-surface-variant font-mono bg-surface-container-lowest p-space-xs border border-outline-variant leading-tight">
+<div class="flex items-start gap-1">
+<span class="text-primary-container font-label-xs text-label-xs">[16:04:18]</span>
+<span class="text-on-surface text-label-xs text-label-xs">Exploration loop dreaming initialized [Loop #42].</span>
+</div>
+<div class="flex items-start gap-1">
+<span class="text-primary-container font-label-xs text-label-xs">[16:04:22]</span>
+<span class="text-on-surface text-label-xs text-label-xs">Vector evaluation complete. Drift β at 0.85% &gt; limit.</span>
+</div>
+<div class="flex items-start gap-1">
+<span class="text-secondary-container font-label-xs text-label-xs">[16:04:24]</span>
+<span class="text-secondary-fixed text-label-xs text-label-xs font-bold">Branch B triggered. Actuation suspended for SecOps key.</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Shared Component Implementation) -->
+<nav aria-label="Incident Response Navigation" class="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center h-16 px-gutter bg-surface-container-lowest border-t border-outline-variant">
+<!-- Tab 1: INCIDENT (Active State as per JSON instructions) -->
+<a class="flex flex-col items-center justify-center text-primary-container border-t-2 border-primary-container pt-1 transition-transform duration-75 active:scale-95 w-1/4" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="warning">warning</span>
+<span class="font-label-xs text-label-xs uppercase tracking-wider">INCIDENT</span>
+</a>
+<!-- Tab 2: TELEMETRY (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-1 hover:text-primary transition-transform duration-75 active:scale-95 w-1/4" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="monitoring">monitoring</span>
+<span class="font-label-xs text-label-xs uppercase tracking-wider">TELEMETRY</span>
+</a>
+<!-- Tab 3: AUDIT (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-1 hover:text-primary transition-transform duration-75 active:scale-95 w-1/4" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="history">history</span>
+<span class="font-label-xs text-label-xs uppercase tracking-wider">AUDIT</span>
+</a>
+<!-- Tab 4: OVERRIDE (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-1 hover:text-primary transition-transform duration-75 active:scale-95 w-1/4" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="lock_open">lock_open</span>
+<span class="font-label-xs text-label-xs uppercase tracking-wider">OVERRIDE</span>
+</a>
+</nav>
+</body></html>

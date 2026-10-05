@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AETHER://SYS_CORE - Autonomous Fleet Policy &amp; Awakening Threshold Orchestration</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-lowest": "#0b0e12",
+            "on-secondary-fixed-variant": "#604100",
+            "outline-variant": "#3b494b",
+            "on-secondary-fixed": "#281900",
+            "on-primary": "#00363a",
+            "secondary-container": "#feb300",
+            "inverse-surface": "#e1e2e8",
+            "surface": "#111418",
+            "surface-container": "#1d2024",
+            "tertiary": "#dbffde",
+            "on-surface": "#e1e2e8",
+            "secondary-fixed": "#ffdeac",
+            "on-tertiary": "#003918",
+            "primary-container": "#00f0ff",
+            "tertiary-container": "#34f885",
+            "on-error-container": "#ffdad6",
+            "surface-tint": "#00dbe9",
+            "outline": "#849495",
+            "on-secondary": "#432c00",
+            "secondary": "#ffd799",
+            "surface-dim": "#111418",
+            "on-secondary-container": "#6a4800",
+            "on-primary-container": "#006970",
+            "background": "#111418",
+            "inverse-on-surface": "#2e3135",
+            "primary-fixed-dim": "#00dbe9",
+            "on-tertiary-fixed": "#00210b",
+            "error": "#ffb4ab",
+            "inverse-primary": "#006970",
+            "on-background": "#e1e2e8",
+            "surface-container-low": "#191c20",
+            "tertiary-fixed-dim": "#00e475",
+            "surface-container-high": "#272a2f",
+            "tertiary-fixed": "#62ff96",
+            "secondary-fixed-dim": "#ffba38",
+            "primary-fixed": "#7df4ff",
+            "on-tertiary-fixed-variant": "#005226",
+            "primary": "#dbfcff",
+            "error-container": "#93000a",
+            "on-surface-variant": "#b9cacb",
+            "on-primary-fixed": "#002022",
+            "on-tertiary-container": "#006e35",
+            "on-primary-fixed-variant": "#004f54",
+            "surface-bright": "#36393e",
+            "surface-variant": "#32353a",
+            "on-error": "#690005",
+            "surface-container-highest": "#32353a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "0.75rem",
+            "gutter": "0.75rem",
+            "space-xl": "2rem",
+            "space-lg": "1.25rem",
+            "margin": "1rem",
+            "space-sm": "0.5rem",
+            "space-xs": "0.25rem"
+          },
+          "fontFamily": {
+            "label-xs": ["JetBrains Mono"],
+            "body-md": ["JetBrains Mono"],
+            "display-lg-mobile": ["JetBrains Mono"],
+            "headline-md": ["JetBrains Mono"],
+            "body-lg": ["JetBrains Mono"],
+            "display-lg": ["JetBrains Mono"],
+            "headline-lg": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "label-lg": ["JetBrains Mono"]
+          },
+          "fontSize": {
+            "label-xs": ["9px", { "lineHeight": "12px", "letterSpacing": "0.12em", "fontWeight": "700" }],
+            "body-md": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "display-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+            "headline-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-lg": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+            "headline-lg": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "label-md": ["10px", { "lineHeight": "14px", "letterSpacing": "0.1em", "fontWeight": "600" }],
+            "label-lg": ["11px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #040608;
+      color: #e1e2e8;
+      font-family: 'JetBrains Mono', monospace;
+      overflow-x: hidden;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #0b0e12;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #1E293B;
+      border-radius: 0px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #00f0ff;
+    }
+    .glow-cyan-border {
+      box-shadow: inset 0 0 0 1px #00f0ff;
+    }
+    .glow-amber-border {
+      box-shadow: inset 0 0 0 1px #feb300;
+    }
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+    .status-ping {
+      animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .grid-bg {
+      background-size: 24px 24px;
+      background-image: 
+        linear-gradient(to right, rgba(59, 73, 75, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(59, 73, 75, 0.08) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body class="bg-[#040608] min-h-screen flex flex-col select-none grid-bg">
+<!-- ================= TOP BAR (SHARED COMPONENT: TopNavBar) ================= -->
+<header class="w-full flex items-center justify-between px-space-lg h-14 bg-surface-container-lowest dark:bg-surface-container-lowest border-b border-outline-variant dark:border-outline-variant fixed top-0 left-0 right-0 z-50">
+<div class="flex items-center gap-space-lg">
+<div class="flex items-center gap-space-sm">
+<span class="w-2.5 h-2.5 bg-primary-container inline-block"></span>
+<span class="font-label-lg text-label-lg font-bold tracking-widest text-primary-container dark:text-primary-container uppercase">AETHER://SYS_CORE</span>
+</div>
+<div class="hidden lg:flex items-center bg-[#040608] border border-outline-variant px-space-sm py-1 gap-2">
+<span class="material-symbols-outlined text-outline text-[14px]">search</span>
+<input class="bg-transparent border-none text-on-surface font-body-md text-body-md focus:ring-0 focus:outline-none p-0 w-44 placeholder:text-outline-variant" placeholder="FILTER_TELEMETRY_PIPELINES..." type="text"/>
+</div>
+<nav class="hidden md:flex items-center gap-space-md ml-2">
+<a class="text-primary-container dark:text-primary-container border-b-2 border-primary-container font-label-md text-label-md uppercase tracking-wider py-4" href="#pipeline">TELEMETRY</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-md text-label-md uppercase tracking-wider py-4 border-b-2 border-transparent hover:border-primary-container hover:text-primary-container hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors duration-150" href="#blueprints">BLUEPRINTS</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-md text-label-md uppercase tracking-wider py-4 border-b-2 border-transparent hover:border-primary-container hover:text-primary-container hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors duration-150" href="#policies">POLICIES</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-md text-label-md uppercase tracking-wider py-4 border-b-2 border-transparent hover:border-primary-container hover:text-primary-container hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors duration-150" href="#interlocks">INTERLOCKS</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-md text-label-md uppercase tracking-wider py-4 border-b-2 border-transparent hover:border-primary-container hover:text-primary-container hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors duration-150" href="#fleet">FLEET_NODES</a>
+</nav>
+</div>
+<!-- Right Instrument Cluster -->
+<div class="flex items-center gap-space-md">
+<!-- Sync Status & Interlock Beacon -->
+<div class="hidden sm:flex items-center gap-space-sm px-2 py-1 bg-surface-container border border-outline-variant">
+<span class="w-1.5 h-1.5 rounded-none bg-tertiary-container status-ping"></span>
+<span class="font-label-xs text-label-xs text-on-surface">JAMF_NOW: SYNCED (14ms)</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant">
+<button class="p-1 hover:text-primary-container transition-colors" title="Alerts">
+<span class="material-symbols-outlined text-[18px]">notifications</span>
+</button>
+<button class="p-1 hover:text-primary-container transition-colors" title="CLI Terminal">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+</button>
+<button class="p-1 hover:text-primary-container transition-colors" title="Tuning">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+</div>
+<!-- Action Buttons from JSON -->
+<div class="flex items-center gap-2">
+<button class="border border-secondary-container text-secondary-container hover:bg-secondary-container hover:text-[#040608] px-space-sm py-1 font-label-md text-label-md tracking-wider uppercase transition-colors" onclick="triggerAwakenPrincipal()">
+          AWAKEN_PRINCIPAL
+        </button>
+<button class="bg-primary-container text-on-primary hover:bg-primary-fixed-dim px-space-md py-1 font-label-md text-label-md font-bold tracking-wider uppercase transition-colors" onclick="executeJamfBlueprint()">
+          JAMF_EXECUTE
+        </button>
+</div>
+<div class="w-7 h-7 bg-surface-container-high border border-outline-variant flex items-center justify-center font-label-xs text-label-xs text-primary-container" title="Operator biometric identification signature badge">
+        OP-7
+      </div>
+</div>
+</header>
+<!-- ================= SIDEBAR (SHARED COMPONENT: SideNavBar) ================= -->
+<aside class="fixed left-0 top-14 bottom-0 w-64 flex flex-col justify-between p-space-md bg-surface dark:bg-surface border-r border-outline-variant dark:border-outline-variant z-40">
+<div class="flex flex-col gap-space-md">
+<!-- Nexus Header Node -->
+<div class="border border-outline-variant bg-[#080B0F] p-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-bold text-on-surface dark:text-on-surface uppercase">NODE://OMEGA-09</span>
+<span class="w-2 h-2 bg-tertiary-container"></span>
+</div>
+<div class="font-label-xs text-label-xs text-secondary-container mt-1">POLICY: LVL_4_STRICT</div>
+<div class="font-label-xs text-label-xs text-on-surface-variant flex justify-between mt-1 pt-1 border-t border-outline-variant">
+<span>MEM: 18.2%</span>
+<span>LAT: 4.1MS</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-space-sm px-space-md py-space-sm bg-surface-container-high dark:bg-surface-container-high text-primary-container dark:text-primary-container border-l-2 border-primary-container font-label-md text-label-md" href="#pipeline">
+<span class="material-symbols-outlined text-[16px]">conversion_path</span>
+<span>PIPELINE</span>
+</a>
+<a class="flex items-center gap-space-sm px-space-md py-space-sm text-on-surface-variant dark:text-on-surface-variant border-l-2 border-transparent font-label-md text-label-md hover:bg-surface-container-high hover:text-primary-container transition-colors" href="#stream">
+<span class="material-symbols-outlined text-[16px]">vital_signs</span>
+<span>STREAM</span>
+</a>
+<a class="flex items-center gap-space-sm px-space-md py-space-sm text-on-surface-variant dark:text-on-surface-variant border-l-2 border-transparent font-label-md text-label-md hover:bg-surface-container-high hover:text-primary-container transition-colors" href="#metrics">
+<span class="material-symbols-outlined text-[16px]">monitoring</span>
+<span>METRICS</span>
+</a>
+<a class="flex items-center gap-space-sm px-space-md py-space-sm text-on-surface-variant dark:text-on-surface-variant border-l-2 border-transparent font-label-md text-label-md hover:bg-surface-container-high hover:text-primary-container transition-colors" href="#guardrails">
+<span class="material-symbols-outlined text-[16px]">shield</span>
+<span>GUARDRAILS</span>
+</a>
+<a class="flex items-center gap-space-sm px-space-md py-space-sm text-on-surface-variant dark:text-on-surface-variant border-l-2 border-transparent font-label-md text-label-md hover:bg-surface-container-high hover:text-primary-container transition-colors" href="#audit">
+<span class="material-symbols-outlined text-[16px]">history_edu</span>
+<span>AUDIT</span>
+</a>
+</div>
+</div>
+<!-- Lower Side Controls -->
+<div class="flex flex-col gap-space-sm">
+<div class="border-t border-outline-variant pt-2 flex flex-col gap-1">
+<a class="flex items-center gap-space-sm px-space-md py-1 text-on-surface-variant border-l-2 border-transparent font-label-md text-label-md hover:text-primary-container" href="#diagnostics">
+<span class="material-symbols-outlined text-[16px]">bug_report</span>
+<span>DIAGNOSTICS</span>
+</a>
+<a class="flex items-center gap-space-sm px-space-md py-1 text-on-surface-variant border-l-2 border-transparent font-label-md text-label-md hover:text-primary-container" href="#settings">
+<span class="material-symbols-outlined text-[16px]">settings</span>
+<span>SETTINGS</span>
+</a>
+</div>
+<!-- Abort CTA from JSON -->
+<button class="w-full bg-[#FF3838] text-[#040608] hover:bg-red-500 font-label-md text-label-md font-bold py-2 border border-red-700 tracking-wider flex items-center justify-center gap-2" onclick="emergencyAbortSequence()">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+<span>ABORT_SEQUENCE</span>
+</button>
+</div>
+</aside>
+<!-- ================= MAIN CONTENT CANVAS ================= -->
+<main class="ml-64 mt-14 p-space-md flex flex-col gap-space-md">
+<!-- Top Telemetry & Global Interlock Banner -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<!-- Node Card -->
+<div class="bg-[#080B0F] border border-outline-variant p-space-md relative overflow-hidden">
+<div class="h-0.5 bg-primary-container absolute top-0 left-0 right-0"></div>
+<div class="flex justify-between items-start">
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase">INTERLOCK STATUS</span>
+<span class="px-1.5 py-0.5 border border-tertiary-container text-tertiary-container font-label-xs text-label-xs bg-tertiary-container/10">ONLINE</span>
+</div>
+<div class="mt-2 flex items-baseline justify-between">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">HARD_GATED</span>
+<span class="font-label-xs text-label-xs text-primary-container font-mono">CANARY_V3</span>
+</div>
+<div class="mt-2 flex items-center gap-2 font-label-xs text-label-xs text-outline">
+<span>SEC_HASH: 0x9f88...a21</span>
+<span class="text-tertiary-container ml-auto">PASS</span>
+</div>
+</div>
+<!-- Fleet Pulse Card -->
+<div class="bg-[#080B0F] border border-outline-variant p-space-md relative overflow-hidden">
+<div class="h-0.5 bg-tertiary-container absolute top-0 left-0 right-0"></div>
+<div class="flex justify-between items-start">
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase">JAMF RECEPTIVITY</span>
+<span class="font-label-xs text-label-xs text-tertiary-container">240/240 NODES</span>
+</div>
+<div class="mt-2 flex items-baseline justify-between">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">100.0%</span>
+<span class="font-label-xs text-label-xs text-on-surface-variant">0 ERR</span>
+</div>
+<div class="mt-2 w-full bg-[#171F2A] h-1.5 flex overflow-hidden">
+<div class="bg-tertiary-container h-full" style="width: 100%"></div>
+</div>
+</div>
+<!-- Capital Delta Limit -->
+<div class="bg-[#080B0F] border border-outline-variant p-space-md relative overflow-hidden">
+<div class="h-0.5 bg-secondary-container absolute top-0 left-0 right-0"></div>
+<div class="flex justify-between items-start">
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase">CAPITAL DRIFT TOLERANCE</span>
+<span class="font-label-xs text-label-xs text-secondary-container">±$500.00 / CYCLE</span>
+</div>
+<div class="mt-2 flex items-baseline justify-between">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">$142.80</span>
+<span class="font-label-xs text-label-xs text-secondary-container">SAFE_DELTA</span>
+</div>
+<div class="mt-2 flex items-center justify-between font-label-xs text-label-xs text-outline">
+<span>RUN_RATE: $12.4/H</span>
+<span class="text-secondary-container font-mono">28.5% BURDEN</span>
+</div>
+</div>
+<!-- Awakening Index Card -->
+<div class="bg-[#080B0F] border border-outline-variant p-space-md relative overflow-hidden">
+<div class="h-0.5 bg-primary-container absolute top-0 left-0 right-0"></div>
+<div class="flex justify-between items-start">
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase">AWAKENING INDEX</span>
+<span class="font-label-xs text-label-xs text-primary-container">REAL-TIME GATING</span>
+</div>
+<div class="mt-2 flex items-baseline justify-between">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">0.082 <span class="text-label-sm font-normal text-outline">/ 1.00</span></span>
+<span class="font-label-xs text-label-xs text-tertiary-container">DORMANT_EXEC</span>
+</div>
+<div class="mt-2 flex items-center justify-between font-label-xs text-label-xs text-outline">
+<span>ESCALATION: IDLE</span>
+<span class="text-primary-container font-mono">THOLD: 0.650</span>
+</div>
+</div>
+</div>
+<!-- ================= ARCHITECTURE PIPELINE CANVAS ================= -->
+<div class="border border-outline-variant bg-[#080B0F] p-space-md">
+<div class="flex flex-wrap items-center justify-between pb-space-sm border-b border-outline-variant mb-space-md gap-2">
+<div class="flex items-center gap-space-sm">
+<span class="w-2 h-2 bg-primary-container"></span>
+<span class="font-label-md text-label-md uppercase tracking-wider font-bold text-on-surface">FLOW ARCHITECTURE // AWAKENING THRESHOLD TOPOLOGY</span>
+<span class="px-2 py-0.5 bg-surface-container font-label-xs text-label-xs text-outline-variant border border-outline-variant">LIVE GRAPH</span>
+</div>
+<!-- Simulation Trigger Quick Control -->
+<div class="flex items-center gap-space-sm">
+<span class="font-label-xs text-label-xs text-outline uppercase">SIMULATE CANDIDATE:</span>
+<select class="bg-[#040608] border border-outline-variant text-on-surface font-body-md text-body-md px-2 py-1 focus:ring-0 focus:outline-none" id="simPackageSelect">
+<option value="kernel-patch-v4">pkg://kernel-patch-v4.1.z</option>
+<option value="config-drift-auto-remediation">pkg://config-drift-auto-remediation</option>
+<option value="high-cost-gpu-scaling">pkg://high-cost-gpu-scaling-delta</option>
+<option value="unverified-security-bundle">pkg://unverified-security-bundle</option>
+</select>
+<button class="bg-primary-container text-on-primary hover:bg-primary-fixed-dim px-3 py-1 font-label-xs text-label-xs font-bold tracking-wider uppercase transition-colors flex items-center gap-1" onclick="runSimulation()">
+<span class="material-symbols-outlined text-[14px]">play_arrow</span>
+<span>INJECT_FLOW</span>
+</button>
+</div>
+</div>
+<!-- Schematic High-Density Grid Structure (3 Columns: Phase 1, Phase 2 Threshold, Dual Resolution) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter relative">
+<!-- PHASE 1: DREAMING & CANDIDATE EXPLORATION (Columns 1-4) -->
+<div class="lg:col-span-4 flex flex-col gap-space-sm bg-[#040608] border border-outline-variant p-space-sm relative">
+<div class="flex items-center justify-between border-b border-outline-variant pb-1">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-primary-container"></span>
+<span class="font-label-xs text-label-xs text-primary-container uppercase">PHASE 1: UNSUPERVISED "DREAMING"</span>
+</div>
+<span class="font-label-xs text-label-xs text-outline">EXPLORATION DECK</span>
+</div>
+<!-- Micro Feeds of Candidate Optimizations -->
+<div class="flex flex-col gap-space-xs overflow-y-auto max-h-[360px] custom-scroll pr-1">
+<!-- Item 1: Active In-Flight -->
+<div class="border border-primary-container/40 bg-surface-container-low p-2 transition-all" id="card-cand-1">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-on-surface font-bold">CAND://MEM_CACHE_ALLOC</span>
+<span class="px-1 py-0.2 bg-tertiary-container/10 border border-tertiary-container text-tertiary-container font-label-xs text-label-xs">SYNTHESIZED</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-[11px] leading-tight mt-1">Autonomous heap partition restructuring to shave 4.2% I/O latency across macOS fleet nodes.</p>
+<div class="grid grid-cols-3 gap-1 mt-2 text-center border-t border-outline-variant/60 pt-1 font-label-xs text-label-xs">
+<div>
+<div class="text-outline">CONFIDENCE</div>
+<div class="text-primary-container font-bold">98.4%</div>
+</div>
+<div>
+<div class="text-outline">EST_COST</div>
+<div class="text-tertiary-container">+$0.00</div>
+</div>
+<div>
+<div class="text-outline">DRIFT_RISK</div>
+<div class="text-tertiary-container">LOW (0.01)</div>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="border border-outline-variant bg-[#080B0F] p-2 hover:border-outline transition-all" id="card-cand-2">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-on-surface">CAND://KERNEL_PATCH_V4</span>
+<span class="px-1 py-0.2 bg-secondary-container/10 border border-secondary-container text-secondary-container font-label-xs text-label-xs">EVALUATING</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-[11px] leading-tight mt-1">Dynamic micro-patch for Jamf daemon keep-alive on Monterey/Ventura silicon instances.</p>
+<div class="grid grid-cols-3 gap-1 mt-2 text-center border-t border-outline-variant/60 pt-1 font-label-xs text-label-xs">
+<div>
+<div class="text-outline">CONFIDENCE</div>
+<div class="text-secondary-container font-bold">81.2%</div>
+</div>
+<div>
+<div class="text-outline">EST_COST</div>
+<div class="text-secondary-container">+$120.00</div>
+</div>
+<div>
+<div class="text-outline">DRIFT_RISK</div>
+<div class="text-secondary-container">MED (0.42)</div>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="border border-outline-variant bg-[#080B0F] p-2 hover:border-outline transition-all" id="card-cand-3">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-on-surface">CAND://CONFIG_DRIFT_AUTO</span>
+<span class="px-1 py-0.2 bg-tertiary-container/10 border border-tertiary-container text-tertiary-container font-label-xs text-label-xs">VALIDATED</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-[11px] leading-tight mt-1">Automatic sync of TLS cert rotation and Jamf MDM payload trust profile v2.8.</p>
+<div class="grid grid-cols-3 gap-1 mt-2 text-center border-t border-outline-variant/60 pt-1 font-label-xs text-label-xs">
+<div>
+<div class="text-outline">CONFIDENCE</div>
+<div class="text-primary-container font-bold">99.1%</div>
+</div>
+<div>
+<div class="text-outline">EST_COST</div>
+<div class="text-tertiary-container">+$0.00</div>
+</div>
+<div>
+<div class="text-outline">DRIFT_RISK</div>
+<div class="text-tertiary-container">ZERO</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Micro-telemetry trend sparkline simulation -->
+<div class="mt-auto border-t border-outline-variant pt-2">
+<div class="flex justify-between font-label-xs text-label-xs text-outline mb-1">
+<span>EXPLORATION RATE: 42 PERMUTATIONS/S</span>
+<span class="text-primary-container">BURST_MODE</span>
+</div>
+<div class="flex items-end gap-1 h-8 bg-[#080B0F] p-1 border border-outline-variant">
+<div class="bg-primary-container/40 hover:bg-primary-container h-2/5 flex-1"></div>
+<div class="bg-primary-container/60 hover:bg-primary-container h-3/5 flex-1"></div>
+<div class="bg-primary-container/80 hover:bg-primary-container h-4/5 flex-1"></div>
+<div class="bg-primary-container hover:bg-primary-container h-full flex-1"></div>
+<div class="bg-primary-container/70 hover:bg-primary-container h-3/4 flex-1"></div>
+<div class="bg-primary-container/50 hover:bg-primary-container h-1/2 flex-1"></div>
+<div class="bg-primary-container/90 hover:bg-primary-container h-5/6 flex-1"></div>
+<div class="bg-primary-container hover:bg-primary-container h-4/5 flex-1"></div>
+<div class="bg-secondary-container h-full flex-1" title="Threshold Ping"></div>
+<div class="bg-primary-container/60 hover:bg-primary-container h-3/5 flex-1"></div>
+</div>
+</div>
+</div>
+<!-- PHASE 2: CENTRAL EVALUATOR - THRESHOLD OF AWAKENING (Columns 5-8) -->
+<div class="lg:col-span-4 flex flex-col gap-space-sm bg-[#040608] border border-secondary-container/80 p-space-sm relative transition-all" id="evaluator-core">
+<div class="flex items-center justify-between border-b border-outline-variant pb-1">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-secondary-container"></span>
+<span class="font-label-xs text-label-xs text-secondary-container uppercase">EVALUATOR: THRESHOLD OF AWAKENING</span>
+</div>
+<span class="px-1 py-0.5 bg-secondary-container/10 border border-secondary-container text-secondary-container font-label-xs text-label-xs">MULTI-VECTOR GATING</span>
+</div>
+<!-- Multi-Vector Guardrail Inspection -->
+<div class="flex flex-col gap-space-sm">
+<!-- Vector 1: Capital Tolerance -->
+<div class="border border-outline-variant bg-[#080B0F] p-2">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-xs text-label-xs text-on-surface">VECTOR α: CAPITAL TOLERANCE</span>
+<span class="font-label-xs text-label-xs text-tertiary-container" id="vec-cap-status">WITHIN BOUNDS</span>
+</div>
+<div class="flex justify-between font-label-xs text-label-xs text-outline mb-1">
+<span>THRESHOLD LIMIT: $500.00</span>
+<span class="text-on-surface font-mono" id="vec-cap-val">+$0.00 EVAL</span>
+</div>
+<div class="w-full bg-[#171F2A] h-2 relative flex items-center">
+<div class="bg-tertiary-container h-full transition-all duration-300" id="vec-cap-bar" style="width: 14%;"></div>
+<!-- Threshold Marker -->
+<div class="absolute top-0 bottom-0 left-[75%] w-0.5 bg-secondary-container" title="Max Autonomous Limit"></div>
+</div>
+</div>
+<!-- Vector 2: Fleet Stability / Canary Boundary -->
+<div class="border border-outline-variant bg-[#080B0F] p-2">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-xs text-label-xs text-on-surface">VECTOR β: FLEET STABILITY &amp; CANARY</span>
+<span class="font-label-xs text-label-xs text-tertiary-container" id="vec-fleet-status">NOMINAL (&lt;0.5% REBOOTS)</span>
+</div>
+<div class="flex justify-between font-label-xs text-label-xs text-outline mb-1">
+<span>MAX REBOOT IMPACT: 2.0%</span>
+<span class="text-on-surface font-mono" id="vec-fleet-val">0.02% ESTIMATED</span>
+</div>
+<div class="w-full bg-[#171F2A] h-2 relative flex items-center">
+<div class="bg-tertiary-container h-full transition-all duration-300" id="vec-fleet-bar" style="width: 8%;"></div>
+<div class="absolute top-0 bottom-0 left-[60%] w-0.5 bg-secondary-container" title="Crash Threshold"></div>
+</div>
+</div>
+<!-- Vector 3: Security & Cryptographic Integrity -->
+<div class="border border-outline-variant bg-[#080B0F] p-2">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-xs text-label-xs text-on-surface">VECTOR γ: CRYPTO &amp; ENTITLEMENT SIGNATURE</span>
+<span class="font-label-xs text-label-xs text-tertiary-container" id="vec-sec-status">VALIDATED</span>
+</div>
+<div class="flex justify-between font-label-xs text-label-xs text-outline mb-1">
+<span>POLICY: JAMF_HARDENED_V4</span>
+<span class="text-primary-container font-mono" id="vec-sec-val">ED25519_OK</span>
+</div>
+<div class="w-full bg-[#171F2A] h-2 relative flex items-center">
+<div class="bg-primary-container h-full transition-all duration-300" id="vec-sec-bar" style="width: 100%;"></div>
+</div>
+</div>
+</div>
+<!-- Sensitivity Threshold Toggles -->
+<div class="border-t border-outline-variant pt-2 mt-auto">
+<span class="font-label-xs text-label-xs text-outline uppercase block mb-1">SENSITIVITY THRESHOLD TUNING</span>
+<div class="grid grid-cols-2 gap-2">
+<button class="border border-secondary-container bg-secondary-container/20 text-secondary-container px-2 py-1 font-label-xs text-label-xs uppercase" id="btn-sens-strict" onclick="setSensitivity('STRICT')">
+                STRICT (0.40)
+              </button>
+<button class="border border-outline-variant text-outline hover:text-on-surface px-2 py-1 font-label-xs text-label-xs uppercase" id="btn-sens-perm" onclick="setSensitivity('PERMISSIVE')">
+                PERMISSIVE (0.75)
+              </button>
+</div>
+</div>
+</div>
+<!-- DUAL RESOLUTION FORK: BRANCH A & BRANCH B (Columns 9-12) -->
+<div class="lg:col-span-4 flex flex-col gap-space-sm">
+<!-- BRANCH A: [NO / SAFE] -> AUTONOMOUS EXECUTION -->
+<div class="bg-[#040608] border-2 border-primary-container p-space-sm flex-1 flex flex-col justify-between transition-all" id="branch-a">
+<div>
+<div class="flex items-center justify-between border-b border-outline-variant pb-1">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 bg-primary-container"></span>
+<span class="font-label-xs text-label-xs text-primary-container uppercase font-bold">BRANCH A: AUTONOMOUS EXECUTION</span>
+</div>
+<span class="font-label-xs text-label-xs text-tertiary-container bg-tertiary-container/10 px-1 border border-tertiary-container">DORMANT_PATH</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-[11px] mt-2">
+                Awakening criteria not triggered. Direct headless actuation via Jamf Now push to canary fleet.
+              </p>
+<div class="mt-2 space-y-1 text-label-xs text-outline border-l-2 border-primary-container pl-2 font-mono">
+<div>[ACT] Push Jamf blueprint: `CANARY_RING_0`</div>
+<div>[CANARY] 240 endpoints target locked</div>
+<div>[STATUS] 0 principal alerts emitted</div>
+</div>
+</div>
+<div class="mt-2 pt-2 border-t border-outline-variant flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-outline">AUTO_ROLLOUT: ARMED</span>
+<button class="px-2 py-1 bg-primary-container text-on-primary font-label-xs text-label-xs font-bold hover:bg-primary-fixed-dim" onclick="simulateBranchA()">
+                DISPATCH_AUTO
+              </button>
+</div>
+</div>
+<!-- BRANCH B: [YES / WAKE] -> ALERT PRINCIPAL PIPELINE -->
+<div class="bg-[#040608] border border-outline-variant p-space-sm flex-1 flex flex-col justify-between transition-all" id="branch-b">
+<div>
+<div class="flex items-center justify-between border-b border-outline-variant pb-1">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 bg-secondary-container"></span>
+<span class="font-label-xs text-label-xs text-secondary-container uppercase font-bold">BRANCH B: ALERT PRINCIPAL (WAKE)</span>
+</div>
+<span class="font-label-xs text-label-xs text-outline bg-surface-container px-1 border border-outline-variant" id="wake-badge">STANDBY</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-[11px] mt-2">
+                Threshold breached. Autonomous action withheld. High-priority cryptographic challenge sent to Mission Director.
+              </p>
+<div class="mt-2 space-y-1 text-label-xs text-outline border-l-2 border-secondary-container pl-2 font-mono">
+<div>[INTERRUPT] Challenge Token: <span class="text-secondary-container" id="wake-token">0x000000</span></div>
+<div>[ESCALATE] Slack/PagerDuty Webhook sync</div>
+<div>[INTERLOCK] Human Intent Verification Required</div>
+</div>
+</div>
+<div class="mt-2 pt-2 border-t border-outline-variant flex items-center justify-between">
+<span class="font-label-xs text-label-xs text-outline">PRINCIPAL: STANDBY</span>
+<button class="px-2 py-1 border border-secondary-container text-secondary-container hover:bg-secondary-container hover:text-black font-label-xs text-label-xs font-bold" onclick="simulateBranchB()">
+                SIM_WAKE
+              </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ================= SIMULATION SANDBOX & POLICY RULES INSPECTOR ================= -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Live Sandbox Simulation Terminal -->
+<div class="lg:col-span-7 bg-[#080B0F] border border-outline-variant p-space-md flex flex-col">
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-sm mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container text-[16px]">science</span>
+<span class="font-label-md text-label-md font-bold text-on-surface uppercase">POLICY SANDBOX &amp; INTERACTIVE GATING SIMULATOR</span>
+</div>
+<span class="font-label-xs text-label-xs text-outline">SANDBOX_RUNTIME: V2.14-STRICT</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
+<div class="bg-[#040608] border border-outline-variant p-2">
+<label class="font-label-xs text-label-xs text-outline block mb-1">CAPITAL DELTA ($)</label>
+<input class="w-full bg-surface-container border border-outline-variant text-on-surface font-body-md text-body-md px-2 py-1 focus:outline-none focus:border-primary-container" id="input-cost" step="50" type="number" value="120"/>
+</div>
+<div class="bg-[#040608] border border-outline-variant p-2">
+<label class="font-label-xs text-label-xs text-outline block mb-1">CRASH BOUNDARY (%)</label>
+<input class="w-full bg-surface-container border border-outline-variant text-on-surface font-body-md text-body-md px-2 py-1 focus:outline-none focus:border-primary-container" id="input-crash" step="0.1" type="number" value="0.4"/>
+</div>
+<div class="bg-[#040608] border border-outline-variant p-2">
+<label class="font-label-xs text-label-xs text-outline block mb-1">ENTITLEMENT KEY</label>
+<select class="w-full bg-surface-container border border-outline-variant text-on-surface font-body-md text-body-md px-2 py-1 focus:outline-none focus:border-primary-container" id="input-crypto">
+<option value="VALID">JAMF_HW_VALIDATED</option>
+<option value="REVOKED">REVOKED_CERT_EXP</option>
+<option value="UNTRUSTED">UNTRUSTED_ROOT</option>
+</select>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="bg-primary-container text-on-primary hover:bg-primary-fixed-dim px-4 py-2 font-label-md text-label-md font-bold uppercase tracking-wider flex items-center gap-2" onclick="executeSandboxTest()">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+<span>EVALUATE_AGAINST_POLICY</span>
+</button>
+<button class="border border-outline-variant text-outline hover:text-on-surface px-3 py-2 font-label-md text-label-md uppercase" onclick="resetSandbox()">
+            RESET_DEFAULTS
+          </button>
+</div>
+<div class="mt-3 p-2 bg-[#040608] border border-outline-variant font-body-md text-body-md text-on-surface-variant font-mono text-[11px]" id="sim-status-box">
+          [SYSTEM] READY. Select candidate optimization or adjust sliders above to evaluate dynamic threshold gating.
+        </div>
+</div>
+<!-- Policy Rules Inspector -->
+<div class="lg:col-span-5 bg-[#080B0F] border border-outline-variant p-space-md flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-sm mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary-container text-[16px]">policy</span>
+<span class="font-label-md text-label-md font-bold text-on-surface uppercase">POLICY RULES SPECIFICATION</span>
+</div>
+<span class="font-label-xs text-label-xs text-tertiary-container">LOCKED</span>
+</div>
+<div class="space-y-2 text-[11px] font-mono">
+<div class="p-1.5 bg-[#040608] border-l-2 border-primary-container border-outline-variant">
+<span class="text-primary-container font-bold">RULE #01: AUTONOMOUS_SAFE_EXEC</span>
+<p class="text-on-surface-variant mt-0.5">IF delta_capital &lt; $500 AND canary_crash &lt; 1.0% AND sig == VERIFIED -&gt; AUTO_DISPATCH.</p>
+</div>
+<div class="p-1.5 bg-[#040608] border-l-2 border-secondary-container border-outline-variant">
+<span class="text-secondary-container font-bold">RULE #02: AWAKEN_ON_CAPITAL_EXCESS</span>
+<p class="text-on-surface-variant mt-0.5">IF delta_capital ≥ $500 -&gt; HALT AUTO, EMIT CHALLENGE TOKEN TO PRINCIPAL.</p>
+</div>
+<div class="p-1.5 bg-[#040608] border-l-2 border-red-500 border-outline-variant">
+<span class="text-red-400 font-bold">RULE #03: HARD_ABORT_CRYPTO_FAIL</span>
+<p class="text-on-surface-variant mt-0.5">IF sig == INVALID OR UNTRUSTED -&gt; HARD_LOCK_BLUEPRINT, SILENT TERMINATION.</p>
+</div>
+</div>
+</div>
+<div class="mt-3 pt-2 border-t border-outline-variant flex justify-between items-center font-label-xs text-label-xs text-outline">
+<span>SPEC_VERSION: RFC-8994_OMEGA</span>
+<span class="text-secondary-container font-mono">POLICY_HASH: 0xb5f22</span>
+</div>
+</div>
+</div>
+<!-- ================= TELEMETRY AUDIT STREAM & LOGS (BOTTOM MODULE) ================= -->
+<div class="bg-[#080B0F] border border-outline-variant p-space-md" id="audit">
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-sm mb-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-tertiary-container"></span>
+<span class="font-label-md text-label-md font-bold text-on-surface uppercase">TELEMETRY AUDIT STREAM &amp; HIGH-FREQUENCY EXECUTION LOG</span>
+</div>
+<div class="flex items-center gap-space-sm font-label-xs text-label-xs text-outline">
+<span>STREAM: ACTIVE (100HZ)</span>
+<button class="hover:text-primary-container underline uppercase" onclick="clearLogs()">CLEAR</button>
+</div>
+</div>
+<div class="bg-[#040608] border border-outline-variant p-space-sm h-36 overflow-y-auto font-mono text-[11px] leading-relaxed text-on-surface-variant custom-scroll space-y-1" id="log-terminal">
+<div class="text-outline">[16:04:12.002] SYS_INIT // Node OMEGA-09 interlock verified. Policy level 4 strict armed.</div>
+<div class="text-outline">[16:04:12.014] JAMF_DISPATCH // Verified connection to Jamf Now cloud endpoint API gateway. Latency: 14ms.</div>
+<div class="text-tertiary-container">[16:04:18.112] PHASE_1 // Exploration loop dreaming 42 permutations/sec. Candidate CAND://MEM_CACHE_ALLOC prioritized.</div>
+<div class="text-primary-container">[16:04:19.450] EVALUATOR // Vector alpha ($0.00), beta (0.01%), gamma (VALID). Threshold score 0.082 &lt; 0.400.</div>
+<div class="text-tertiary-container">[16:04:20.002] RESOLUTION // Branch A autonomous trigger confirmed. Jamf blueprint staged for canary fleet.</div>
+</div>
+</div>
+</main>
+<!-- ================= HUMAN-IN-THE-LOOP PRINCIPAL CONFIRMATION MODAL ================= -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-[#040608]/85 backdrop-blur-sm p-4" id="principalModal">
+<div class="w-full max-w-xl bg-[#080B0F] border-2 border-secondary-container p-space-lg relative glow-amber-border">
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary-container text-[20px]">warning</span>
+<span class="font-headline-md text-headline-md font-bold text-on-surface uppercase tracking-wider">PRINCIPAL INTERVENTION REQUIRED</span>
+</div>
+<button class="text-outline hover:text-on-surface" onclick="closeModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="mt-space-md space-y-3">
+<p class="font-body-md text-body-md text-on-surface">
+          The autonomous policy engine has encountered an <span class="text-secondary-container font-bold">AWAKENING THRESHOLD BREACH</span>. 
+          Intent must be validated by a cryptographically signed human-in-the-loop interlock.
+        </p>
+<div class="bg-[#040608] border border-outline-variant p-space-sm font-mono text-[11px] space-y-1">
+<div class="text-outline flex justify-between">
+<span>TRIGGER_REASON:</span>
+<span class="text-secondary-container" id="modal-reason">CAPITAL_DRIFT_EXCEEDED</span>
+</div>
+<div class="text-outline flex justify-between">
+<span>CHALLENGE_HASH:</span>
+<span class="text-primary-container" id="modal-hash">0x88F9B2C04E4...</span>
+</div>
+<div class="text-outline flex justify-between">
+<span>ESCALATION_DESTINATIONS:</span>
+<span class="text-on-surface">SLACK #sec-principal-ops, PagerDuty [P1]</span>
+</div>
+</div>
+<div class="border border-outline-variant p-space-sm bg-surface-container">
+<label class="font-label-xs text-label-xs text-outline block mb-1">ENTER PRINCIPAL BIOMETRIC OR CRYPTOGRAPHIC PASSCODE:</label>
+<input class="w-full bg-[#040608] border border-outline-variant text-on-surface font-body-md text-body-md px-2 py-1.5 focus:border-secondary-container focus:ring-0" id="principalTokenInput" placeholder="ENTER AUTH CODE..." type="password"/>
+</div>
+</div>
+<div class="mt-space-lg flex justify-end gap-2 border-t border-outline-variant pt-space-sm">
+<button class="border border-outline-variant text-outline hover:text-on-surface px-4 py-2 font-label-md text-label-md uppercase" onclick="closeModal()">
+          REJECT &amp; ABORT
+        </button>
+<button class="bg-secondary-container text-black font-bold hover:bg-yellow-400 px-5 py-2 font-label-md text-label-md uppercase tracking-wider" onclick="confirmPrincipalExecution()">
+          SIGN &amp; CONFIRM INTENT
+        </button>
+</div>
+</div>
+</div>
+<!-- Micro-Interactions and Simulation JS Script -->
+<script>
+    let activeSensitivity = 'STRICT'; // or PERMISSIVE
+    let thresholdLimit = 0.40;
+
+    function appendLog(text, colorClass = "text-on-surface-variant") {
+      const terminal = document.getElementById("log-terminal");
+      const timestamp = new Date().toTimeString().split(' ')[0] + '.' + String(new Date().getMilliseconds()).padStart(3, '0');
+      const div = document.createElement("div");
+      div.className = colorClass;
+      div.innerText = `[${timestamp}] ${text}`;
+      terminal.appendChild(div);
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function clearLogs() {
+      document.getElementById("log-terminal").innerHTML = '';
+      appendLog("LOGS CLEARED BY OPERATOR.", "text-outline");
+    }
+
+    function setSensitivity(type) {
+      activeSensitivity = type;
+      const btnStrict = document.getElementById("btn-sens-strict");
+      const btnPerm = document.getElementById("btn-sens-perm");
+      if (type === 'STRICT') {
+        thresholdLimit = 0.40;
+        btnStrict.className = "border border-secondary-container bg-secondary-container/20 text-secondary-container px-2 py-1 font-label-xs text-label-xs uppercase";
+        btnPerm.className = "border border-outline-variant text-outline hover:text-on-surface px-2 py-1 font-label-xs text-label-xs uppercase";
+        appendLog("SENSITIVITY SET TO STRICT. AWAKENING THRESHOLD CLAMPED TO 0.40.", "text-secondary-container");
+      } else {
+        thresholdLimit = 0.75;
+        btnPerm.className = "border border-secondary-container bg-secondary-container/20 text-secondary-container px-2 py-1 font-label-xs text-label-xs uppercase";
+        btnStrict.className = "border border-outline-variant text-outline hover:text-on-surface px-2 py-1 font-label-xs text-label-xs uppercase";
+        appendLog("SENSITIVITY SET TO PERMISSIVE. AWAKENING THRESHOLD EXPANDED TO 0.75.", "text-primary-container");
+      }
+    }
+
+    function runSimulation() {
+      const pkg = document.getElementById("simPackageSelect").value;
+      appendLog(`INJECTING CANDIDATE PACKAGE: ${pkg} INTO ARCHITECTURE PIPELINE...`, "text-primary-container");
+      
+      if (pkg === "kernel-patch-v4") {
+        document.getElementById("input-cost").value = 180;
+        document.getElementById("input-crash").value = 0.6;
+        document.getElementById("input-crypto").value = "VALID";
+      } else if (pkg === "config-drift-auto-remediation") {
+        document.getElementById("input-cost").value = 0;
+        document.getElementById("input-crash").value = 0.05;
+        document.getElementById("input-crypto").value = "VALID";
+      } else if (pkg === "high-cost-gpu-scaling") {
+        document.getElementById("input-cost").value = 1450;
+        document.getElementById("input-crash").value = 0.1;
+        document.getElementById("input-crypto").value = "VALID";
+      } else if (pkg === "unverified-security-bundle") {
+        document.getElementById("input-cost").value = 50;
+        document.getElementById("input-crash").value = 2.4;
+        document.getElementById("input-crypto").value = "UNTRUSTED";
+      }
+      executeSandboxTest();
+    }
+
+    function executeSandboxTest() {
+      const cost = parseFloat(document.getElementById("input-cost").value) || 0;
+      const crash = parseFloat(document.getElementById("input-crash").value) || 0;
+      const crypto = document.getElementById("input-crypto").value;
+
+      // Update vectors in evaluator UI
+      document.getElementById("vec-cap-val").innerText = `+$${cost.toFixed(2)} EVAL`;
+      const costPercent = Math.min((cost / 500) * 75, 100);
+      document.getElementById("vec-cap-bar").style.width = `${costPercent}%`;
+
+      document.getElementById("vec-fleet-val").innerText = `${crash.toFixed(2)}% ESTIMATED`;
+      const crashPercent = Math.min((crash / 2.0) * 60, 100);
+      document.getElementById("vec-fleet-bar").style.width = `${crashPercent}%`;
+
+      document.getElementById("vec-sec-val").innerText = crypto === "VALID" ? "ED25519_OK" : "CRYPTO_VIOLATION";
+
+      const simStatusBox = document.getElementById("sim-status-box");
+      const branchA = document.getElementById("branch-a");
+      const branchB = document.getElementById("branch-b");
+
+      // Evaluation criteria
+      const isCapitalBreach = cost >= 500;
+      const isFleetBreach = crash >= 1.0;
+      const isCryptoBreach = crypto !== "VALID";
+
+      let score = (cost / 1000) * 0.4 + (crash / 2) * 0.4 + (isCryptoBreach ? 0.9 : 0.05);
+
+      if (isCapitalBreach || isFleetBreach || isCryptoBreach || score >= thresholdLimit) {
+        // Trigger Branch B (Awaken Principal)
+        branchA.className = "bg-[#040608] border border-outline-variant p-space-sm flex-1 flex flex-col justify-between opacity-50";
+        branchB.className = "bg-[#040608] border-2 border-secondary-container p-space-sm flex-1 flex flex-col justify-between glow-amber-border";
+        
+        let reason = isCapitalBreach ? "CAPITAL_DRIFT_EXCEEDED" : (isCryptoBreach ? "CRYPTOGRAPHIC_SIGNATURE_INVALID" : "CANARY_REBOOT_RATE_BREACH");
+        document.getElementById("wake-badge").innerText = "AWAKENED";
+        document.getElementById("wake-badge").className = "font-label-xs text-label-xs text-secondary-container bg-secondary-container/10 px-1 border border-secondary-container font-bold";
+        const challengeHex = "0x" + Math.floor(Math.random()*16777215).toString(16).toUpperCase() + "7B";
+        document.getElementById("wake-token").innerText = challengeHex;
+
+        simStatusBox.innerHTML = `<span class="text-secondary-container font-bold">[BREACH DETECTED]</span> Awakening Threshold reached (Score: ${score.toFixed(3)} &ge; ${thresholdLimit}). Gating autonomous push. Principal Awakened via Challenge ${challengeHex}.`;
+        appendLog(`[AWAKEN] Gating tripped by policy vector. Routing candidate to Branch B (Principal Intent Challenge).`, "text-secondary-container font-bold");
+        
+        // Open Principal Modal
+        openModal(reason, challengeHex);
+      } else {
+        // Branch A (Autonomous Execution)
+        branchA.className = "bg-[#040608] border-2 border-primary-container p-space-sm flex-1 flex flex-col justify-between glow-cyan-border";
+        branchB.className = "bg-[#040608] border border-outline-variant p-space-sm flex-1 flex flex-col justify-between opacity-50";
+        
+        document.getElementById("wake-badge").innerText = "DORMANT";
+        document.getElementById("wake-badge").className = "font-label-xs text-label-xs text-outline bg-surface-container px-1 border border-outline-variant";
+
+        simStatusBox.innerHTML = `<span class="text-tertiary-container font-bold">[PASS: SAFE]</span> Telemetry within bounded tolerances (Score: ${score.toFixed(3)} &lt; ${thresholdLimit}). Dispatching Jamf Now canary rollout directly to 240 endpoints.`;
+        appendLog(`[AUTONOMOUS] Candidate cleared Threshold. Headless Jamf push initiated to Canary ring.`, "text-tertiary-container");
+      }
+    }
+
+    function resetSandbox() {
+      document.getElementById("input-cost").value = 120;
+      document.getElementById("input-crash").value = 0.4;
+      document.getElementById("input-crypto").value = "VALID";
+      executeSandboxTest();
+      appendLog("SANDBOX RESET TO DEFAULT BASELINE CONFIGURATION.", "text-outline");
+    }
+
+    function openModal(reason, hash) {
+      document.getElementById("modal-reason").innerText = reason;
+      document.getElementById("modal-hash").innerText = hash;
+      document.getElementById("principalModal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("principalModal").classList.add("hidden");
+      appendLog("[MODAL] Operator canceled or bypassed principal intervention.", "text-outline");
+    }
+
+    function confirmPrincipalExecution() {
+      const code = document.getElementById("principalTokenInput").value;
+      if (!code) {
+        alert("PLEASE ENTER PASSCODE OR HARDWARE TOKEN TO SIGN");
+        return;
+      }
+      closeModal();
+      appendLog(`[PRINCIPAL CONFIRMED] Intent cryptographic signature accepted. Manual authorization override granted for rollout.`, "text-tertiary-container font-bold");
+    }
+
+    function triggerAwakenPrincipal() {
+      const challenge = "0x" + Math.floor(Math.random()*16777215).toString(16).toUpperCase();
+      openModal("MANUAL_OPERATOR_AWAKENING", challenge);
+      appendLog("[OPERATOR] Manual AWAKEN_PRINCIPAL event triggered from Executive TopBar.", "text-secondary-container");
+    }
+
+    function executeJamfBlueprint() {
+      appendLog("[JAMF_EXECUTE] Manual blueprint sync triggered for Jamf Now fleet. 240 endpoints polling.", "text-primary-container font-bold");
+    }
+
+    function emergencyAbortSequence() {
+      if (confirm("CONFIRM IMMEDIATE ABORT SEQUENCE: Hard shutdown all automated Jamf deployment pipes and reset to safety interlock?")) {
+        appendLog("[CRITICAL] EMERGENCY ABORT SEQUENCE EXECUTED. ALL GATES TERMINATED.", "text-red-400 font-bold");
+        document.body.style.filter = "sepia(0.6) hue-rotate(300deg)";
+        setTimeout(() => { document.body.style.filter = "none"; }, 1500);
+      }
+    }
+
+    function simulateBranchA() {
+      appendLog("[MANUAL DISPATCH] Branch A Autonomous push dispatched directly to Canary Node Ring.", "text-tertiary-container");
+    }
+
+    function simulateBranchB() {
+      triggerAwakenPrincipal();
+    }
+  </script>
+</body></html>

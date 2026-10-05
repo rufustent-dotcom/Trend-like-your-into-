@@ -194,7 +194,8 @@ export const initialProjects: ActiveProject[] = [
 
 export const initialVaultNodes: Record<string, VaultNode> = {
   // Directories
-  "dir-root": { id: "dir-root", name: "Vault", path: "/", type: "directory", category: "Root", children: ["dir-inbox", "dir-projects", "dir-research", "dir-ai", "dir-content", "dir-finance", "dir-learning", "dir-archive", "dir-system", "file-thesis", "file-patterns", "file-systems", "file-decision", "file-breathing"] },
+  "dir-root": { id: "dir-root", name: "Vault", path: "/", type: "directory", category: "Root", children: ["file-apex-system", "file-apex-decisions", "file-apex-notes", "file-apex-breathing", "dir-entities", "dir-inbox", "dir-projects", "dir-research", "dir-ai", "dir-content", "dir-finance", "dir-learning", "dir-archive", "dir-system", "file-thesis", "file-patterns", "file-systems", "file-decision", "file-breathing"] },
+  "dir-entities": { id: "dir-entities", name: "entities", path: "/entities", type: "directory", category: "Entities", children: ["file-entity-openai", "file-entity-anthropic", "file-entity-nvidia", "file-entity-salesforce"] },
   "dir-inbox": { id: "dir-inbox", name: "00_Inbox", path: "/00_Inbox", type: "directory", category: "Inbox", children: ["file-jamf-now", "file-tiktok-inspo", "file-arbitrage-raw"] },
   "dir-projects": { id: "dir-projects", name: "01_Projects", path: "/01_Projects", type: "directory", category: "Projects", children: ["file-intrepid", "file-workspace-obsidian", "file-customer-agent"] },
   "dir-research": { id: "dir-research", name: "02_Research", path: "/02_Research", type: "directory", category: "Research", children: ["file-labor-restructuring", "file-psych-attention", "file-system-dynamics"] },
@@ -584,6 +585,270 @@ Continuous intake without structure generates cognitive overload and choice para
 - Pause informational intake cycles for 48 hours every fortnight.
 - Purge duplicate entries and overextended abstractions.
 - Isolate the single most valuable action item each day.`
+  },
+
+  // Apex Vault Agent Architecture & Decision Files
+  "file-apex-system": {
+    id: "file-apex-system",
+    name: "system.md",
+    path: "/system.md",
+    type: "file",
+    category: "Root",
+    content: `# Apex Vault Agent — System Architecture & Collaboration Rules
+
+## 1. Operating Principles
+
+1. **Momentum Over Recursion**
+   Simpler systems generate sustainable velocity; clarity scales better than complexity. Avoid multi-turn recursive loops where a deterministic linear pipeline produces verifiable results.
+
+2. **Task Execution Over Q&A**
+   Interface evolution moves from passive conversational search to deterministic, audit-ready operational labor. External agents invoke deterministic tools rather than unbounded chat prompts.
+
+3. **Upstream Settlement**
+   Zero compute executes without valid pre-flight authentication and active ledger verification. All transactions must be authorized, metered, and settled before compute allocation.
+
+---
+
+## 2. System Architecture
+
+\`\`\`
+apex-vault-agent/
+├── client/                     # React + Vite Analytics Dashboard
+│   ├── public/
+│   │   └── .well-known/
+│   │       └── agent.json      # A2A agent discovery manifest
+│   └── src/
+│       ├── App.tsx             # Telemetry & analysis interface
+│       └── main.tsx
+├── server/                     # Interoperability & Monetization Gateway
+│   └── src/
+│       ├── gatekeeper.ts       # Upstream pre-execution metering hook
+│       ├── mcp.ts              # Model Context Protocol (MCP) tool server
+│       └── index.ts            # Server entry point
+├── vault/                      # Synthesized Research & Decision Vault
+│   ├── system.md               # Production architecture & collaboration rules
+│   ├── decisions.md            # Immutable decision & trade-off logs
+│   ├── notes.md                # Raw thought intake & momentum buffers
+│   ├── breathing_space.md      # Noise reduction and complexity control
+│   └── entities/               # Entity profile links
+│       └── OpenAI.md           # Entity mapping & thesis signals
+└── package.json                # Monorepo workspace configuration
+\`\`\`
+
+---
+
+## 3. Communication Protocols
+
+- **Agent-to-Agent (A2A) Discovery:** Hosted at \`/.well-known/agent.json\` conforming to machine-readable agent specification cards.
+- **Model Context Protocol (MCP):** Server-Sent Events (SSE) stream at \`/mcp/sse\` and message bus at \`/mcp/message\`.
+- **Pre-execution Gatekeeper:** Enforces ledger balance verification or active subscription check prior to triggering model execution.
+- **Audit Logging:** Every execution emits structured logs with timestamp, skillId, cost, and balance status.`
+  },
+  "file-apex-decisions": {
+    id: "file-apex-decisions",
+    name: "decisions.md",
+    path: "/decisions.md",
+    type: "file",
+    category: "Root",
+    content: `# Apex Vault Agent — Architectural Decision Records (ADRs)
+
+## ADR-001: Upstream Settlement Gatekeeper
+* **Status:** Accepted
+* **Context:** Pay-as-you-go AI agent workloads risk unbounded GPU inference abuse without pre-flight payment settlement.
+* **Decision:** Implement strict pre-execution ledger checks in \`gatekeeper.ts\`. No task runs without either an active subscription or atomic reservation of credits ($0.05/invocation) with automatic refund on execution failure.
+* **Consequences:** Eliminates bad-debt exposure and prevents DDoS compute drains.
+
+---
+
+## ADR-002: Model Context Protocol (MCP) Standard for Agent Interop
+* **Status:** Accepted
+* **Context:** External autonomous agents (Cursor, Windsurf, LangChain, Claude Desktop) need structured, standardized tool discovery.
+* **Decision:** Implement an MCP Server over Server-Sent Events (SSE) exposing:
+  1. \`get_market_telemetry\`
+  2. \`get_defensibility_matrix\`
+  3. \`query_vault\`
+  4. \`execute_agent_task\`
+* **Consequences:** Enables seamless integration with IDEs and multi-agent frameworks without custom SDK requirements.
+
+---
+
+## ADR-003: 2024–2030 Market Anchors
+* **Status:** Accepted
+* **Context:** Market analysis requires stable, verified analytical benchmarks for AI customer service & enterprise automation.
+* **Decision:** Anchor telemetry to:
+  * 2024 Baseline: **$12.06B**
+  * 2030 Projection: **$47.82B**
+  * CAGR (2024–2030): **25.8%**
+  * TAM: **$140B** (Support operations & contact center labor)
+  * SAM: **$47.82B** (Agentic software & inference pipelines)
+  * SOM: **$4.5B** (High-volume enterprise wedges: SaaS, FinTech, Telecom)
+* **Consequences:** Provides consistent financial models across dashboard visualizers and external agent telemetry queries.
+
+---
+
+## ADR-004: Decoupled Value Capture Matrix
+* **Status:** Accepted
+* **Context:** AI value is concentrating non-uniformly across the stack.
+* **Decision:** Segment competitive landscape into 4 distinct defensibility layers:
+  1. Compute & Silicon (Hardware margins, supply choke point)
+  2. Cloud & Distribution (Recurring pipelines, infrastructure dominance)
+  3. Frontier Models (API usage, research velocity vs. compute compression)
+  4. Enterprise Workflows (Per-seat SaaS, deep workflow embedding & high switching costs)
+* **Consequences:** Clarifies investment wedges and risk surfaces for enterprise deployments.`
+  },
+  "file-apex-notes": {
+    id: "file-apex-notes",
+    name: "notes.md",
+    path: "/notes.md",
+    type: "file",
+    category: "Root",
+    content: `# Raw Thought Intake & Momentum Buffers
+
+## Strategic Observations
+
+### 1. The Shift to Autonomous Labor
+- Traditional customer support software (Zendesk, Freshdesk) charged per seat for human ticketing.
+- Agentic systems charge per successful resolution or deterministic workflow run.
+- Economic transfer from human BPO (Business Process Outsourcing) contact center budgets directly into automated inference pipelines.
+
+### 2. Low-Latency Voice Inference
+- Sub-300ms speech-to-speech models are crossing the uncanny valley in telephony.
+- Real-time agents handle tier-1 calls (cancellations, order tracking, address verification) with higher CSAT than offshore call centers.
+
+### 3. Workflow Embedding as the Ultimate Moat
+- Frontier models are commoditizing rapidly; raw intelligence is accessible via commodity APIs.
+- The durable moat is not model weights, but integration with enterprise systems of record (ERP, CRM, SQL databases, internal policy documents).
+
+### 4. Deterministic Execution vs. Unbounded Hallucination
+- Enterprise CIOs reject probabilistic chatbots with hallucination risks in regulated workflows.
+- Successful agents use deterministic finite-state machines where LLMs only choose parameters, while code strictly executes the actions.`
+  },
+  "file-apex-breathing": {
+    id: "file-apex-breathing",
+    name: "breathing_space.md",
+    path: "/breathing_space.md",
+    type: "file",
+    category: "Root",
+    content: `# Breathing Space — Noise Reduction & Complexity Control
+
+## Cognitive Control Directives
+
+> *"Momentum Over Recursion: Simpler systems generate sustainable velocity; clarity scales better than complexity."*
+
+### Rules for Noise Elimination
+
+1. **Anti-Recursion Halt**
+   Reject multi-agent loops that do not terminate within 3 verification cycles. Recursive ping-pong among LLM agents generates token bloat without incremental utility.
+
+2. **Feature Pruning Mandate**
+   Before introducing a new visual tab or secondary abstraction, verify that it directly contributes to verified market intelligence or deterministic task execution.
+
+3. **Silence Speculative Hype**
+   Ground all projections in verified market anchors:
+   - 2024 Market Baseline: **$12.06B**
+   - 2030 Projection: **$47.82B**
+   - CAGR: **25.8%**
+   - Addressable Contact Center Labor: **$140B**
+
+4. **Deterministic Gatekeeping**
+   Ensure zero unmetered compute runs in background processes. State must be clear, transparent, and auditable.`
+  },
+
+  // Entities Dossiers
+  "file-entity-openai": {
+    id: "file-entity-openai",
+    name: "OpenAI.md",
+    path: "/entities/OpenAI.md",
+    type: "file",
+    category: "Entities",
+    content: `# Entity Profile: OpenAI
+
+## Layer: Frontier Models
+* **Core Offerings:** GPT-4o, o1, Operator / Computer-Using Agents, Realtime API
+* **Economic Leverage:** API usage billing, Enterprise licensing, Consumer subscriptions ($20–$200/mo)
+* **Structural Advantage:** Brand momentum, early research velocity, deep Microsoft infrastructure partnership
+
+---
+
+## Strategic Analysis & Thesis Signals
+
+### Defensibility Dynamics
+- **Research Velocity vs. Compute Compression:** OpenAI must outpace open-weights distillation (Llama, DeepSeek) while sustaining enormous training cluster capex.
+- **Agentic Pivot:** Shifting from static completion APIs to agentic frameworks (Operator, tool use, JSON schema constraints) to capture enterprise execution workflows.
+
+### Vulnerabilities & Competitive Pressures
+1. **Model Commoditization:** Frontier intelligence benchmarks compress every 6 months; developers switch providers when pricing drops.
+2. **Distribution Dependency:** Reliant on enterprise distribution rails (Microsoft Azure, Apple Intelligence) to access high-margin Fortune 500 workflows.
+
+---
+
+## Market Positioning in AI Customer Service
+- Powers tier-1 automation through custom GPTs, Assistive APIs, and direct enterprise contracts.
+- High risk of losing enterprise workflow capture to platforms like Salesforce (Agentforce) and ServiceNow that own the customer database.`
+  },
+  "file-entity-anthropic": {
+    id: "file-entity-anthropic",
+    name: "Anthropic.md",
+    path: "/entities/Anthropic.md",
+    type: "file",
+    category: "Entities",
+    content: `# Entity Profile: Anthropic
+
+## Layer: Frontier Models
+* **Core Offerings:** Claude 3.5 Sonnet, Claude 3.5 Haiku, Computer Use API, Artifacts
+* **Economic Leverage:** API consumption tokens, AWS Bedrock & Google Cloud Vertex distribution deals
+* **Structural Advantage:** Coding and computer-use benchmark leadership, enterprise safety alignment, multi-cloud distribution
+
+---
+
+## Strategic Analysis & Thesis Signals
+
+### Defensibility Dynamics
+- **Computer-Use Wedge:** Pioneer in enabling models to navigate standard desktop and web UIs directly, bridging legacy software that lacks REST APIs.
+- **Enterprise Multi-Cloud:** Independent distribution across AWS and GCP prevents vendor lock-in compared to single-cloud model partnerships.`
+  },
+  "file-entity-nvidia": {
+    id: "file-entity-nvidia",
+    name: "Nvidia.md",
+    path: "/entities/Nvidia.md",
+    type: "file",
+    category: "Entities",
+    content: `# Entity Profile: NVIDIA & TSMC
+
+## Layer: Compute & Silicon
+* **Core Offerings:** H100, B200 (Blackwell), CUDA platform, TSMC CoWoS advanced packaging
+* **Economic Leverage:** Hardware gross margins (70–75%), pricing power over hyperscalers
+* **Structural Advantage:** Supply choke point, chip allocation exclusivity, pervasive CUDA software lock-in
+
+---
+
+## Strategic Analysis & Thesis Signals
+
+### Defensibility Dynamics
+- **Supply Choke Point:** Every frontier model and enterprise inference cluster is physically bound by silicon availability and power interconnects.
+- **CUDA Software Moat:** Enterprise ML pipelines and inference runtimes remain optimized for NVIDIA architectures, creating friction for competing ASICs (Google TPU, AWS Trainium).`
+  },
+  "file-entity-salesforce": {
+    id: "file-entity-salesforce",
+    name: "Salesforce.md",
+    path: "/entities/Salesforce.md",
+    type: "file",
+    category: "Entities",
+    content: `# Entity Profile: Salesforce (Agentforce) & ServiceNow
+
+## Layer: Enterprise Workflows
+* **Core Offerings:** Agentforce, ServiceNow Now Assist, Service Cloud, Data Cloud
+* **Economic Leverage:** Per-seat SaaS licensing ($150–$300/user/mo) shifting to per-conversation billing ($2/conversation)
+* **Structural Advantage:** Deep enterprise workflow embedding, system-of-record dominance, high switching costs
+
+---
+
+## Strategic Analysis & Thesis Signals
+
+### Defensibility Dynamics
+- **System of Record Ownership:** Customer data, interaction histories, and corporate schemas reside directly within Salesforce/ServiceNow databases.
+- **Workflow Moat:** Even superior frontier models cannot easily execute actions without access to the authenticated corporate API graph and permission hierarchies.
+- **Pricing Transition:** Transitioning from seat-based pricing to outcome-based consumption billing without cannibalizing core recurring revenue.`
   }
 };
 

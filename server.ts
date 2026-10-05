@@ -1,9 +1,21 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import Stripe from 'stripe';
 import dotenv from "dotenv";
+import { gatekeeper } from "./server/src/gatekeeper";
+import { verifyUpstreamSettlement } from "./middleware/upstreamSettlement";
+import { 
+  handleMcpSse, 
+  handleMcpMessage, 
+  executeMcpTool,
+  APEX_VAULT_AGENT_TOOL,
+  MARKET_TELEMETRY, 
+  DEFENSIBILITY_MATRIX, 
+  MCP_TOOLS 
+} from "./server/src/mcp";
 
 dotenv.config();
 
@@ -14,9 +26,9 @@ const PORT = 3000;
 let geminiClient: GoogleGenAI | null = null;
 function getGeminiClient(): GoogleGenAI {
   if (!geminiClient) {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is not configured in the workspace secrets or environment properties.");
+      throw new Error("GOOGLE_API_KEY or GEMINI_API_KEY is not configured in the workspace secrets or environment properties.");
     }
     geminiClient = new GoogleGenAI({
       apiKey: apiKey,
@@ -212,13 +224,16 @@ const handleStripeWebhook = async (req: express.Request, res: express.Response) 
     if (userId) {
       if (session.customer) {
         db.linkCustomerToUser(session.customer, userId);
+        gatekeeper.linkCustomerToUser(session.customer, userId);
       }
       if (session.mode === 'payment') {
         // One-time credit top-up
         await db.addCredits(userId, amount);
+        gatekeeper.addCredits(userId, amount, { source: "stripe_checkout", sessionId: session.id });
       } else if (session.mode === 'subscription') {
         // Initial recurring subscription activation
         await db.activateSubscription(userId, session.subscription);
+        gatekeeper.activateSubscription(userId, session.subscription, "Pro");
       }
     }
   }
@@ -229,6 +244,8 @@ const handleStripeWebhook = async (req: express.Request, res: express.Response) 
     const customerId = invoice.customer;
     if (customerId) {
       await db.renewSubscription(customerId);
+      const matchedUser = gatekeeper.getUserIdByCustomer(customerId) || customerId;
+      gatekeeper.activateSubscription(matchedUser, invoice.subscription || `sub_${customerId}`, "Pro");
     }
   }
 
@@ -247,36 +264,328 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), hand
 // --- 2. JSON PARSER FOR REST OF APP ---
 app.use(express.json());
 
-// --- 3. PROTECTED EXECUTION ENDPOINT ---
-app.post('/api/skills/execute', async (req, res) => {
-  const { userId, skillId, params } = req.body;
+// --- A2A AGENT DISCOVERY CARD ---
+app.get('/.well-known/agent.json', (req, res) => {
+  const filePath = path.join(process.cwd(), "public", ".well-known", "agent.json");
+  if (fs.existsSync(filePath)) {
+    return res.sendFile(filePath);
+  }
+  return res.json({
+    name: "Apex Vault Agent",
+    id: "apex-vault-agent",
+    version: "1.0.0",
+    description: "Operational market intelligence engine, research vault, and agentic execution service for the global AI customer service and enterprise automation ecosystem."
+  });
+});
 
-  if (!userId || !skillId) {
-    return res.status(400).json({ error: 'Missing userId or skillId' });
+// --- MODEL CONTEXT PROTOCOL (MCP) INTEROP LAYER ---
+app.get('/mcp/sse', handleMcpSse);
+app.get('/api/mcp/sse', handleMcpSse);
+app.post('/mcp/message', handleMcpMessage);
+app.post('/api/mcp/message', handleMcpMessage);
+
+// --- MARKET TELEMETRY & STRATEGIC ANCHORS API ---
+app.get('/api/telemetry', (req, res) => {
+  res.json({
+    status: "ok",
+    telemetry: MARKET_TELEMETRY,
+    defensibilityMatrix: DEFENSIBILITY_MATRIX,
+    mcpTools: MCP_TOOLS,
+    unifiedTool: APEX_VAULT_AGENT_TOOL,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// --- APEX VAULT AGENT UNIFIED TOOL ENDPOINTS ---
+const handleApexVaultAgentRequest = async (req: express.Request, res: express.Response) => {
+  const { action, payload } = req.body || {};
+  if (!action) {
+    return res.status(400).json({
+      error: "Missing required parameter 'action'.",
+      tool: "apex_vault_agent",
+      expected: {
+        action: [
+          "market_telemetry",
+          "defensibility_matrix",
+          "vault_query",
+          "agentic_execution"
+        ],
+        payload: "object containing action-specific parameters"
+      }
+    });
   }
 
-  const subscription = await db.getCurrentSubscription(userId);
-  const cost = 0.05;
+  const authHeader = req.headers.authorization || "";
+  const reqAuthUserId = authHeader.startsWith("Bearer ") 
+    ? authHeader.substring(7) 
+    : (payload?.userId || "admin_agent");
 
-  // Atomic deduction: only succeeds if balance >= cost
-  let creditReserved = false;
-  if (!subscription?.isActive) {
-    creditReserved = await db.atomicDeductCredits(userId, cost);
-    if (!creditReserved) {
-      return res.status(402).json({
-        error: 'Insufficient Funds',
-        message: 'Active subscription or positive pay-per-call balance required.'
-      });
+  try {
+    const result = await executeMcpTool("apex_vault_agent", { action, payload: payload || {} }, reqAuthUserId);
+    if (result?.status === "rejected") {
+      return res.status(402).json(result);
     }
+    return res.json({
+      tool: "apex_vault_agent",
+      action,
+      timestamp: new Date().toISOString(),
+      ...result
+    });
+  } catch (err: any) {
+    return res.status(500).json({ 
+      error: err.message || "Failed to execute apex_vault_agent",
+      tool: "apex_vault_agent"
+    });
+  }
+};
+
+app.post('/api/tools/apex_vault_agent', handleApexVaultAgentRequest);
+app.post('/api/agent/apex_vault_agent', handleApexVaultAgentRequest);
+app.post('/api/apex_vault_agent', handleApexVaultAgentRequest);
+
+// --- DEEP RESEARCH INTERACTIONS API ENDPOINTS (deep-research-preview-04-2026) ---
+app.post('/api/deep-research/start', async (req, res) => {
+  try {
+    const { input, collaborativePlanning, visualization } = req.body || {};
+    if (!input || typeof input !== 'string') {
+      return res.status(400).json({ error: "Missing required research 'input' string." });
+    }
+
+    const ai = getGeminiClient();
+    const interaction = await (ai as any).interactions.create({
+      agent: 'deep-research-preview-04-2026',
+      input: input,
+      background: true,
+      tools: [
+        { type: 'google_search' },
+        { type: 'url_context' }
+      ],
+      agent_config: {
+        type: 'deep-research',
+        thinking_summaries: 'auto',
+        visualization: visualization === false ? 'none' : 'auto',
+        collaborative_planning: collaborativePlanning !== false
+      }
+    });
+
+    console.log(`[Deep Research] Started interaction: ${interaction.id}`);
+    return res.json({
+      success: true,
+      interactionId: interaction.id,
+      status: interaction.status || "in_progress",
+      agent: 'deep-research-preview-04-2026',
+      createdAt: new Date().toISOString()
+    });
+  } catch (err: any) {
+    console.error("[Deep Research Start Error]", err);
+    return res.status(500).json({
+      error: err.message || "Failed to start deep research interaction",
+      needsPaidKey: err.message?.includes("API_KEY") || err.message?.includes("key") || err.message?.includes("permission")
+    });
+  }
+});
+
+app.get('/api/deep-research/status/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ai = getGeminiClient();
+    const interaction = await (ai as any).interactions.get(id);
+
+    let fullText = interaction.output_text || "";
+    const steps = interaction.steps || [];
+    if (!fullText && Array.isArray(steps)) {
+      for (const step of steps) {
+        if (step.type === 'model_output' && step.content) {
+          const textContent = step.content.find((c: any) => c.type === 'text');
+          if (textContent) fullText += textContent.text;
+        }
+      }
+    }
+
+    return res.json({
+      id: interaction.id,
+      status: interaction.status,
+      outputText: fullText,
+      steps: steps,
+      error: interaction.error || null,
+      agent: interaction.agent
+    });
+  } catch (err: any) {
+    console.error("[Deep Research Status Error]", err);
+    return res.status(500).json({ error: err.message || "Failed to poll interaction status" });
+  }
+});
+
+app.post('/api/deep-research/collaborate', async (req, res) => {
+  try {
+    const { previousInteractionId, feedback, approve } = req.body || {};
+    if (!previousInteractionId) {
+      return res.status(400).json({ error: "Missing required 'previousInteractionId'." });
+    }
+
+    const ai = getGeminiClient();
+    const interaction = await (ai as any).interactions.create({
+      agent: 'deep-research-preview-04-2026',
+      input: approve ? (feedback || "Plan looks good! Please proceed with full execution.") : (feedback || "Please refine the plan."),
+      background: true,
+      previous_interaction_id: previousInteractionId,
+      tools: [
+        { type: 'google_search' },
+        { type: 'url_context' }
+      ],
+      agent_config: {
+        type: 'deep-research',
+        thinking_summaries: 'auto',
+        visualization: 'auto',
+        collaborative_planning: !approve
+      }
+    });
+
+    console.log(`[Deep Research Collaborate] Next interaction: ${interaction.id}, status: ${interaction.status}`);
+    return res.json({
+      success: true,
+      interactionId: interaction.id,
+      status: interaction.status,
+      isApproved: !!approve
+    });
+  } catch (err: any) {
+    console.error("[Deep Research Collaborate Error]", err);
+    return res.status(500).json({ error: err.message || "Failed to collaborate on research plan" });
+  }
+});
+
+app.post('/api/deep-research/save-to-vault', async (req, res) => {
+  try {
+    const { title, content, category } = req.body || {};
+    if (!title || !content) {
+      return res.status(400).json({ error: "Missing required 'title' or 'content'." });
+    }
+    const safeName = title.replace(/[^a-zA-Z0-9_\-]/g, "_") + ".md";
+    const subDir = category === "Entities" ? "entities" : "";
+    const targetDir = subDir ? path.join(process.cwd(), "vault", subDir) : path.join(process.cwd(), "vault");
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
+    }
+    const filePath = path.join(targetDir, safeName);
+    fs.writeFileSync(filePath, content, "utf-8");
+
+    return res.json({
+      success: true,
+      fileName: safeName,
+      path: subDir ? `${subDir}/${safeName}` : safeName,
+      message: `Saved research report to vault at ${safeName}`
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || "Failed to save research to vault" });
+  }
+});
+
+// --- VAULT KNOWLEDGE BASE API ---
+app.get('/api/vault', (req, res) => {
+  const vaultRoot = path.join(process.cwd(), "vault");
+  const files: Array<{ path: string; name: string; category: string; size: number }> = [];
+
+  function scan(dir: string, prefix = "") {
+    if (!fs.existsSync(dir)) return;
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) {
+        scan(full, rel);
+      } else if (entry.name.endsWith(".md")) {
+        const stat = fs.statSync(full);
+        files.push({
+          path: rel,
+          name: entry.name,
+          category: prefix || "root",
+          size: stat.size
+        });
+      }
+    }
+  }
+  scan(vaultRoot);
+  res.json({ files });
+});
+
+app.get('/api/vault/read', (req, res) => {
+  const fileParam = String(req.query.file || "");
+  const safeFile = fileParam.replace(/\.\./g, "").replace(/^\/+/, "");
+  const fullPath = path.join(process.cwd(), "vault", safeFile);
+  
+  if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
+    const content = fs.readFileSync(fullPath, "utf-8");
+    return res.json({ file: safeFile, content });
+  }
+  return res.status(404).json({ error: `Vault file '${safeFile}' not found.` });
+});
+
+// --- GATEKEEPER LEDGER & AUDIT TRAIL ---
+app.get('/api/gatekeeper/audit', (req, res) => {
+  const userId = req.query.userId ? String(req.query.userId) : undefined;
+  res.json({
+    auditLog: gatekeeper.getAuditTrail(userId),
+    adminAccount: gatekeeper.getAccount("admin_agent"),
+    demoAccount: gatekeeper.getAccount("demo_user")
+  });
+});
+
+// --- UPSTREAM SETTLEMENT VERIFICATION GATEWAY ---
+app.post('/api/upstream-settlement/verify', verifyUpstreamSettlement, (req, res) => {
+  return res.json({
+    status: "authorized",
+    workspace: req.workspace,
+    verifiedAt: new Date().toISOString()
+  });
+});
+
+// --- 3. PROTECTED EXECUTION ENDPOINT WITH UPSTREAM SETTLEMENT ---
+app.post('/api/skills/execute', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  let effectiveUserId = req.body.userId;
+  if (!effectiveUserId && authHeader && authHeader.startsWith('Bearer ')) {
+    effectiveUserId = authHeader.split(' ')[1];
+  }
+  const { skillId, params } = req.body;
+
+  if (!effectiveUserId || !skillId) {
+    return res.status(400).json({ error: 'Missing userId or skillId (or Authorization Bearer token)' });
+  }
+
+  // Enforce Operating Principle: Upstream Settlement
+  const cost = 0.05;
+  const settlement = await gatekeeper.verifyAndSettlePreflight(effectiveUserId, cost, { skillId, params });
+
+  if (!settlement.allowed) {
+    return res.status(402).json({
+      error: 'Insufficient compute credits. Settlement required.',
+      details: settlement.reason || 'Active subscription or positive pay-per-call balance required.',
+      remainingCredits: settlement.remainingCredits
+    });
+  }
+
+  // Also sync with db instance if needed
+  if (settlement.settlementType === 'metered_credit') {
+    await db.atomicDeductCredits(effectiveUserId, cost);
   }
 
   try {
     const result = await runAIModel(skillId, params);
-    return res.json({ success: true, data: result });
+    return res.json({ 
+      success: true, 
+      data: result,
+      settlement: {
+        type: settlement.settlementType,
+        creditsDeducted: settlement.creditsDeducted,
+        remainingCredits: settlement.remainingCredits,
+        auditId: settlement.auditId
+      }
+    });
   } catch (err: any) {
-    // Refund credit if the execution failed
-    if (creditReserved) {
-      await db.addCredits(userId, cost);
+    // Refund credit if execution failed
+    if (settlement.settlementType === 'metered_credit') {
+      gatekeeper.refundExecution(effectiveUserId, cost, err?.message || "Execution failed");
+      await db.addCredits(effectiveUserId, cost);
     }
     return res.status(500).json({ error: err?.message || "Execution error" });
   }

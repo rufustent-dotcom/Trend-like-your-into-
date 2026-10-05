@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gemini Go SDK - Structured Outputs &amp; Multi-Turn Chat</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "error": "#ffb4ab",
+            "on-background": "#dfe2ee",
+            "on-secondary-fixed-variant": "#004e5c",
+            "on-surface": "#dfe2ee",
+            "outline-variant": "#424754",
+            "surface-container-lowest": "#0a0e16",
+            "surface-container-high": "#262a33",
+            "surface-container-highest": "#31353e",
+            "surface-variant": "#31353e",
+            "on-secondary-container": "#00424e",
+            "secondary-fixed": "#acedff",
+            "primary-fixed-dim": "#adc6ff",
+            "on-secondary": "#003640",
+            "inverse-on-surface": "#2c3039",
+            "on-primary-container": "#00285d",
+            "surface-bright": "#353942",
+            "tertiary-fixed-dim": "#d0bcff",
+            "on-surface-variant": "#c2c6d6",
+            "tertiary-container": "#a078ff",
+            "on-error-container": "#ffdad6",
+            "surface-dim": "#0f131c",
+            "surface-tint": "#adc6ff",
+            "surface-container-low": "#181c24",
+            "outline": "#8c909f",
+            "tertiary": "#d0bcff",
+            "secondary-fixed-dim": "#4cd7f6",
+            "primary-container": "#4d8eff",
+            "primary": "#adc6ff",
+            "on-primary": "#002e6a",
+            "background": "#0f131c",
+            "on-primary-fixed": "#001a42",
+            "inverse-primary": "#005ac2",
+            "on-error": "#690005",
+            "secondary-container": "#03b5d3",
+            "on-primary-fixed-variant": "#004395",
+            "surface-container": "#1c2028",
+            "on-tertiary": "#3c0091",
+            "surface": "#0f131c",
+            "secondary": "#4cd7f6",
+            "on-secondary-fixed": "#001f26",
+            "primary-fixed": "#d8e2ff",
+            "inverse-surface": "#dfe2ee",
+            "on-tertiary-fixed-variant": "#5516be",
+            "tertiary-fixed": "#e9ddff",
+            "on-tertiary-container": "#340080",
+            "on-tertiary-fixed": "#23005c",
+            "error-container": "#93000a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter-lg": "2rem",
+            "space-sm": "0.5rem",
+            "margin": "1.5rem",
+            "space-xs": "0.25rem",
+            "gutter": "1.5rem",
+            "gutter-sm": "1rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "margin-sm": "1rem",
+            "margin-lg": "3rem",
+            "space-xl": "2.5rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Geist"],
+            "headline-lg-mobile": ["Geist"],
+            "label-md": ["JetBrains Mono"],
+            "body-lg": ["Geist"],
+            "body-sm": ["Geist"],
+            "label-sm": ["JetBrains Mono"],
+            "body-md": ["Geist"],
+            "headline-xl": ["Geist"],
+            "headline-md": ["Geist"],
+            "headline-xl-mobile": ["Geist"],
+            "code-sm": ["JetBrains Mono"],
+            "headline-sm": ["Geist"],
+            "code-lg": ["JetBrains Mono"],
+            "code-md": ["JetBrains Mono"]
+          },
+          "fontSize": {
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+            "headline-xl-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "code-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-sm": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "code-lg": ["14px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+            "code-md": ["13px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 18px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    pre code {
+      font-family: 'JetBrains Mono', monospace;
+      tab-size: 2;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0f131c;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #262a33;
+      border-radius: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #424754;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar (Shared Component Execution) -->
+<header class="flex justify-between items-center h-14 px-gutter w-full border-b border-outline-variant bg-surface docked full-width top-0 sticky z-50">
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="w-6 h-6 rounded bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-size: 16px;">code_blocks</span>
+</span>
+<span class="text-headline-sm font-headline-sm font-semibold text-primary tracking-tight">Gemini Go SDK</span>
+</div>
+<!-- Quick Search Bar (on_left) -->
+<div class="relative ml-space-md hidden sm:flex items-center">
+<span class="material-symbols-outlined absolute left-2.5 text-on-surface-variant pointer-events-none" style="font-size: 16px;">search</span>
+<input class="bg-surface-container-low border border-outline-variant rounded pl-8 pr-12 py-1 text-code-sm font-code-sm text-on-surface focus:outline-none focus:border-primary w-64 transition-all duration-150 placeholder:text-on-surface-variant" placeholder="Search methods, schemas, structs..." type="text"/>
+<span class="absolute right-2 px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant text-label-sm font-label-sm border border-outline-variant">⌘K</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden lg:flex items-center h-full gap-space-lg">
+<a class="text-primary border-b-2 border-primary font-medium text-label-md font-label-md h-full flex items-center px-1" href="#">Docs</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors text-label-md font-label-md h-full flex items-center px-1" href="#">Playground</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors text-label-md font-label-md h-full flex items-center px-1" href="#">Schema Studio</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors text-label-md font-label-md h-full flex items-center px-1" href="#">API Reference</a>
+</nav>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-space-sm">
+<!-- API Key Status Badge -->
+<div class="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container-low border border-outline-variant text-label-sm font-label-sm text-secondary">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span>Active - GEMINI_API_KEY</span>
+</div>
+<!-- Trailing Icon Actions -->
+<div class="flex items-center text-on-surface-variant">
+<button class="p-1.5 rounded hover:bg-surface-container-high hover:text-on-surface transition-all duration-150 active:scale-[0.98]" title="Terminal Logs">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+<button class="p-1.5 rounded hover:bg-surface-container-high hover:text-on-surface transition-all duration-150 active:scale-[0.98]" title="Raw Go Code">
+<span class="material-symbols-outlined">code</span>
+</button>
+<button class="p-1.5 rounded hover:bg-surface-container-high hover:text-on-surface transition-all duration-150 active:scale-[0.98]" title="Settings">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="h-4 w-px bg-outline-variant mx-1 hidden sm:block"></div>
+<!-- Secondary Trailing Action -->
+<a class="hidden md:inline-flex items-center gap-1 px-3 py-1.5 rounded text-code-sm font-code-sm text-on-surface border border-outline-variant hover:bg-surface-container-high transition-colors" href="#">
+<span>Go to Playground</span>
+</a>
+<!-- Primary Trailing Action -->
+<button class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-primary text-on-primary text-code-sm font-code-sm font-medium hover:bg-primary-fixed-dim transition-all duration-150 active:scale-[0.98] shadow-sm">
+<span class="material-symbols-outlined" style="font-size: 16px;">play_arrow</span>
+<span>Run Code</span>
+</button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden relative">
+<!-- SideNavBar (Shared Component Execution) -->
+<aside class="w-64 h-[calc(100vh-3.5rem)] hidden md:flex flex-col justify-between p-space-md overflow-y-auto border-r border-outline-variant bg-surface-container-low shrink-0 custom-scrollbar">
+<div class="space-y-space-md">
+<!-- SDK Meta Header -->
+<div class="px-space-xs pb-space-sm border-b border-outline-variant flex items-center justify-between">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="text-headline-sm font-headline-sm font-semibold text-on-surface">v0.14.0-go</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-highest text-secondary text-label-sm font-label-sm border border-outline-variant">Latest</span>
+</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant">genai SDK Reference</div>
+</div>
+<span class="material-symbols-outlined text-primary" style="font-size: 20px;">deployed_code</span>
+</div>
+<!-- Navigation Tab Items -->
+<div class="space-y-1">
+<div class="text-label-sm font-label-sm text-outline px-space-xs uppercase tracking-wider mb-2">Capabilities</div>
+<!-- Tab 1: Overview -->
+<a class="flex items-center gap-space-sm px-space-md py-space-xs rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">menu_book</span>
+<span>Overview</span>
+</a>
+<!-- Tab 2: System Instructions -->
+<a class="flex items-center gap-space-sm px-space-md py-space-xs rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">psychology</span>
+<span>System Instructions</span>
+</a>
+<!-- Tab 3: Structured Outputs -->
+<a class="flex items-center gap-space-sm px-space-md py-space-xs rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">data_object</span>
+<span>Structured Outputs</span>
+</a>
+<!-- Tab 4: ResponseSchema in Go (Active per JSON authority) -->
+<a class="flex items-center gap-space-sm px-space-md py-space-xs rounded bg-surface-container-highest text-primary font-medium border-l-2 border-primary text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined text-primary" style="font-size: 18px;">integration_instructions</span>
+<span>ResponseSchema in Go</span>
+</a>
+<!-- Tab 5: Multi-turn Chat -->
+<a class="flex items-center gap-space-sm px-space-md py-space-xs rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">forum</span>
+<span>Multi-turn Chat</span>
+</a>
+<!-- Tab 6: Model Config Inspector -->
+<a class="flex items-center gap-space-sm px-space-md py-space-xs rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">tune</span>
+<span>Model Config Inspector</span>
+</a>
+</div>
+<!-- Embedded Mini Playground Quick Launcher -->
+<div class="p-space-sm rounded bg-surface-container border border-outline-variant">
+<div class="text-label-sm font-label-sm text-secondary font-medium mb-1">Inline AST Validation</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant leading-relaxed mb-2.5">Instant OpenAPI schema compile check for Go struct types.</p>
+<button class="w-full py-1.5 px-2 rounded bg-surface-container-high border border-outline-variant hover:border-primary text-on-surface hover:text-primary text-label-sm font-label-sm flex items-center justify-center gap-1.5 transition-all">
+<span class="material-symbols-outlined" style="font-size: 14px;">play_circle</span>
+<span>Run in Playground</span>
+</button>
+</div>
+</div>
+<!-- SideNav Footer Links -->
+<div class="pt-space-md border-t border-outline-variant space-y-1">
+<a class="flex items-center justify-between px-space-xs py-1 rounded text-on-surface-variant hover:text-on-surface text-code-sm font-code-sm transition-colors" href="#">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
+<span>Go Package Docs</span>
+</span>
+<span class="text-outline">pkg.go.dev</span>
+</a>
+<a class="flex items-center justify-between px-space-xs py-1 rounded text-on-surface-variant hover:text-on-surface text-code-sm font-code-sm transition-colors" href="#">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined" style="font-size: 16px;">code</span>
+<span>GitHub Repository</span>
+</span>
+<span class="material-symbols-outlined text-outline" style="font-size: 14px;">arrow_outward</span>
+</a>
+</div>
+</aside>
+<!-- Main Workbench Workspace (Split-Pane Responsive Layout) -->
+<main class="flex-1 overflow-y-auto h-[calc(100vh-3.5rem)] custom-scrollbar bg-background flex flex-col">
+<!-- Top Documentation Header & Breadcrumb -->
+<div class="border-b border-outline-variant bg-surface-container-lowest/70 backdrop-blur-md px-6 py-5">
+<div class="max-w-7xl mx-auto space-y-3">
+<!-- Breadcrumb Navigation -->
+<div class="flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">Docs</a>
+<span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Go SDK</a>
+<span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span>
+<span class="text-on-surface">Structured Outputs &amp; Multi-Turn Chat</span>
+</div>
+<!-- Main Title & Badge Bar -->
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight flex items-center gap-3">
+                Structured Outputs &amp; Multi-Turn Chat in Go
+              </h1>
+</div>
+<!-- Badges -->
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container-high border border-outline-variant text-code-sm font-code-sm text-primary">
+<span class="material-symbols-outlined" style="font-size: 14px;">neurology</span>
+<span>gemini-2.5-flash</span>
+</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container-high border border-outline-variant text-code-sm font-code-sm text-secondary">
+<span class="material-symbols-outlined" style="font-size: 14px;">data_object</span>
+<span>application/json</span>
+</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container-high border border-outline-variant text-code-sm font-code-sm text-on-surface-variant">
+<span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
+<span>Strict Mode</span>
+</span>
+</div>
+</div>
+<!-- Technical Abstract / Lead -->
+<p class="text-body-md font-body-md text-on-surface-variant max-w-4xl leading-relaxed">
+            By configuring <code class="text-code-sm font-code-sm text-primary bg-surface-container px-1 py-0.5 rounded">model.ResponseSchema</code> using Go SDK's <code class="text-code-sm font-code-sm text-primary bg-surface-container px-1 py-0.5 rounded">*genai.Schema</code> alongside <code class="text-code-sm font-code-sm text-secondary bg-surface-container px-1 py-0.5 rounded">model.ResponseMIMEType = "application/json"</code>, the Gemini model is bound to valid JSON representations matching your structural grammar across continuous <code class="text-code-sm font-code-sm text-on-surface bg-surface-container px-1 py-0.5 rounded">chat.SendMessage(ctx, ...)</code> session dialogues.
+          </p>
+</div>
+</div>
+<!-- Split-Pane Workbench -->
+<div class="p-6 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
+<!-- Left / Code Editor Pane (7 Cols) -->
+<div class="lg:col-span-7 flex flex-col rounded border border-outline-variant bg-surface-container-lowest overflow-hidden shadow-2xl">
+<!-- Editor Header -->
+<div class="flex items-center justify-between px-4 py-2.5 bg-surface-container-low border-b border-outline-variant">
+<div class="flex items-center gap-2.5">
+<span class="flex gap-1.5">
+<span class="w-3 h-3 rounded-full bg-surface-container-highest border border-outline-variant"></span>
+<span class="w-3 h-3 rounded-full bg-surface-container-highest border border-outline-variant"></span>
+<span class="w-3 h-3 rounded-full bg-surface-container-highest border border-outline-variant"></span>
+</span>
+<div class="h-4 w-px bg-outline-variant mx-1"></div>
+<span class="text-code-sm font-code-sm text-on-surface font-medium flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;">code</span>
+                main.go
+              </span>
+<span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-surface-container text-on-surface-variant border border-outline-variant">
+                package main
+              </span>
+</div>
+<!-- Toolbar Actions -->
+<div class="flex items-center gap-1.5">
+<button class="px-2 py-1 rounded bg-surface-container hover:bg-surface-container-high border border-outline-variant text-code-sm font-code-sm text-on-surface-variant hover:text-on-surface flex items-center gap-1 transition-all" id="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('code-content').innerText); document.getElementById('copy-feedback').classList.remove('hidden'); setTimeout(() =&gt; document.getElementById('copy-feedback').classList.add('hidden'), 2000);">
+<span class="material-symbols-outlined" style="font-size: 14px;">content_copy</span>
+<span>Copy</span>
+</button>
+<button class="px-2 py-1 rounded bg-surface-container hover:bg-surface-container-high border border-outline-variant text-code-sm font-code-sm text-on-surface-variant hover:text-on-surface flex items-center gap-1 transition-all">
+<span class="material-symbols-outlined" style="font-size: 14px;">download</span>
+<span>main.go</span>
+</button>
+<button class="px-2.5 py-1 rounded bg-primary text-on-primary text-code-sm font-code-sm font-medium hover:bg-primary-fixed-dim flex items-center gap-1 transition-all">
+<span class="material-symbols-outlined" style="font-size: 14px;">play_arrow</span>
+<span>Run</span>
+</button>
+</div>
+</div>
+<!-- Code View Area -->
+<div class="relative overflow-x-auto p-4 custom-scrollbar text-code-sm font-code-sm bg-surface-container-lowest leading-relaxed text-on-surface">
+<!-- Copy Notification Overlay -->
+<div class="hidden absolute top-4 right-4 bg-secondary text-on-secondary px-2.5 py-1 rounded text-label-sm font-label-sm flex items-center gap-1 shadow-lg z-10" id="copy-feedback">
+<span class="material-symbols-outlined" style="font-size: 14px;">check</span>
+<span>Copied to clipboard</span>
+</div>
+<pre class="text-on-surface-variant font-code-sm text-code-sm" id="code-content"><code><span class="text-tertiary">package</span> main
+
+<span class="text-tertiary">import</span> (
+	<span class="text-secondary">"context"</span>
+	<span class="text-secondary">"encoding/json"</span>
+	<span class="text-secondary">"fmt"</span>
+	<span class="text-secondary">"log"</span>
+	<span class="text-secondary">"os"</span>
+
+	<span class="text-secondary">"github.com/google/generative-ai-go/genai"</span>
+	<span class="text-secondary">"google.golang.org/api/option"</span>
+)
+
+<span class="text-tertiary">func</span> <span class="text-primary font-medium">main</span>() {
+	ctx := context.Background()
+	apiKey := os.Getenv(<span class="text-secondary">"GEMINI_API_KEY"</span>)
+
+	<span class="text-outline">// Initialize Generative AI client</span>
+	client, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
+	<span class="text-tertiary">if</span> err != <span class="text-tertiary">nil</span> {
+		log.Fatalf(<span class="text-secondary">"Failed to create client: %v"</span>, err)
+	}
+	<span class="text-tertiary">defer</span> client.Close()
+
+	model := client.GenerativeModel(<span class="text-secondary">"gemini-2.5-flash"</span>)
+
+	<span class="text-outline">// Step 1: System Instruction ensures agent behavioral constraints</span>
+	model.SystemInstruction = genai.NewUserContent(
+		genai.Text(<span class="text-secondary">"You are an architectural state manager. Always respond in valid JSON matching schema."</span>),
+	)
+
+	<span class="text-outline">// Step 2: Enforce strict application/json and define OpenAPI Schema</span>
+	model.ResponseMIMEType = <span class="text-secondary">"application/json"</span>
+	model.ResponseSchema = &amp;genai.Schema{
+		Type: genai.TypeObject,
+		Properties: <span class="text-tertiary">map</span>[<span class="text-tertiary">string</span>]*genai.Schema{
+			<span class="text-secondary">"project_name"</span>: {
+				Type:        genai.TypeString,
+				Description: <span class="text-secondary">"Canonical identifier for the active initiative."</span>,
+			},
+			<span class="text-secondary">"priority"</span>: {
+				Type:        genai.TypeString,
+				Enum:        []<span class="text-tertiary">string</span>{<span class="text-secondary">"Low"</span>, <span class="text-secondary">"Medium"</span>, <span class="text-secondary">"High"</span>},
+				Description: <span class="text-secondary">"Calculated escalation tier."</span>,
+			},
+			<span class="text-secondary">"tags"</span>: {
+				Type:        genai.TypeArray,
+				Description: <span class="text-secondary">"Technological component stack tags."</span>,
+				Items: &amp;genai.Schema{
+					Type: genai.TypeString,
+				},
+			},
+		},
+		Required: []<span class="text-tertiary">string</span>{<span class="text-secondary">"project_name"</span>, <span class="text-secondary">"priority"</span>, <span class="text-secondary">"tags"</span>},
+	}
+
+	<span class="text-outline">// Step 3: Initiate multi-turn stateful chat session</span>
+	chat := model.StartChat()
+
+	<span class="text-outline">// Turn 1: Initial creation request</span>
+	resp1, err := chat.SendMessage(ctx, genai.Text(<span class="text-secondary">"Initialize Project Hydro with High priority using Go and gRPC"</span>))
+	<span class="text-tertiary">if</span> err != <span class="text-tertiary">nil</span> {
+		log.Fatalf(<span class="text-secondary">"Turn 1 error: %v"</span>, err)
+	}
+	fmt.Println(<span class="text-secondary">"--- Turn 1 Output ---"</span>)
+	printFirstPart(resp1)
+
+	<span class="text-outline">// Turn 2: Subsequent request modifying accumulated chat context</span>
+	resp2, err := chat.SendMessage(ctx, genai.Text(<span class="text-secondary">"Please add Kubernetes to the stack"</span>))
+	<span class="text-tertiary">if</span> err != <span class="text-tertiary">nil</span> {
+		log.Fatalf(<span class="text-secondary">"Turn 2 error: %v"</span>, err)
+	}
+	fmt.Println(<span class="text-secondary">"--- Turn 2 Output ---"</span>)
+	printFirstPart(resp2)
+}
+
+<span class="text-tertiary">func</span> <span class="text-primary font-medium">printFirstPart</span>(resp *genai.GenerateContentResponse) {
+	<span class="text-tertiary">for</span> _, cand := <span class="text-tertiary">range</span> resp.Candidates {
+		<span class="text-tertiary">for</span> _, part := <span class="text-tertiary">range</span> cand.Content.Parts {
+			fmt.Printf(<span class="text-secondary">"%s\n"</span>, part)
+		}
+	}
+}</code></pre>
+</div>
+<!-- Editor Footer Status Bar -->
+<div class="px-4 py-1.5 bg-surface-container-low border-t border-outline-variant flex items-center justify-between text-label-sm font-label-sm text-on-surface-variant">
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1 text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>Go 1.23.4</span>
+</span>
+<span>UTF-8</span>
+<span>LF</span>
+</div>
+<div class="flex items-center gap-3">
+<span>Lines: 76</span>
+<span>Schema: Valid (3 properties)</span>
+</div>
+</div>
+</div>
+<!-- Right / Terminal Output & Schema Inspector Pane (5 Cols) -->
+<div class="lg:col-span-5 flex flex-col gap-6">
+<!-- Terminal Output Widget -->
+<div class="rounded border border-outline-variant bg-surface-container-lowest overflow-hidden flex flex-col shadow-xl">
+<!-- Tabs -->
+<div class="flex items-center justify-between bg-surface-container-low border-b border-outline-variant px-3 pt-1">
+<div class="flex items-center gap-1">
+<button class="px-3 py-1.5 border-b-2 border-primary text-primary font-medium text-label-md font-label-md flex items-center gap-1.5">
+<span class="material-symbols-outlined" style="font-size: 15px;">terminal</span>
+<span>Terminal Output</span>
+</button>
+<button class="px-3 py-1.5 text-on-surface-variant hover:text-on-surface text-label-md font-label-md flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 15px;">account_tree</span>
+<span>JSON Inspector</span>
+</button>
+<button class="px-3 py-1.5 text-on-surface-variant hover:text-on-surface text-label-md font-label-md flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 15px;">swap_horiz</span>
+<span>HTTP Raw</span>
+</button>
+</div>
+<span class="text-label-sm font-label-sm text-secondary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary" style="font-size: 14px;">bolt</span>
+<span>200 OK (384ms)</span>
+</span>
+</div>
+<!-- Terminal Stream Console -->
+<div class="p-4 font-code-sm text-code-sm bg-surface-container-lowest space-y-4 custom-scrollbar">
+<!-- Turn 1 Box -->
+<div class="p-3 rounded bg-surface-container border border-outline-variant">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-primary text-label-sm font-label-sm font-medium">Turn 1</span>
+<span class="text-on-surface text-code-sm font-code-sm">"Initialize Project Hydro with High priority..."</span>
+</div>
+<span class="text-label-sm font-label-sm text-secondary flex items-center gap-0.5">
+<span class="material-symbols-outlined" style="font-size: 12px;">check_circle</span>
+<span>Valid JSON</span>
+</span>
+</div>
+<pre class="text-secondary bg-surface-container-low p-2 rounded border border-outline-variant/60 overflow-x-auto"><code>{
+  <span class="text-primary">"project_name"</span>: <span class="text-tertiary">"Project Hydro"</span>,
+  <span class="text-primary">"priority"</span>: <span class="text-tertiary">"High"</span>,
+  <span class="text-primary">"tags"</span>: [
+    <span class="text-tertiary">"Go"</span>,
+    <span class="text-tertiary">"gRPC"</span>
+  ]
+}</code></pre>
+</div>
+<!-- Turn 2 Box -->
+<div class="p-3 rounded bg-surface-container border border-outline-variant">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-secondary text-label-sm font-label-sm font-medium">Turn 2</span>
+<span class="text-on-surface text-code-sm font-code-sm">"Please add Kubernetes to the stack"</span>
+</div>
+<span class="text-label-sm font-label-sm text-secondary flex items-center gap-0.5">
+<span class="material-symbols-outlined" style="font-size: 12px;">check_circle</span>
+<span>Schema Met</span>
+</span>
+</div>
+<pre class="text-secondary bg-surface-container-low p-2 rounded border border-outline-variant/60 overflow-x-auto"><code>{
+  <span class="text-primary">"project_name"</span>: <span class="text-tertiary">"Project Hydro"</span>,
+  <span class="text-primary">"priority"</span>: <span class="text-tertiary">"High"</span>,
+  <span class="text-primary">"tags"</span>: [
+    <span class="text-tertiary">"Go"</span>,
+    <span class="text-tertiary">"gRPC"</span>,
+    <span class="text-tertiary">"Kubernetes"</span>
+  ]
+}</code></pre>
+</div>
+<!-- Execution Telemetry Indicator -->
+<div class="flex items-center justify-between text-label-sm font-label-sm text-on-surface-variant pt-1 border-t border-outline-variant/50">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary" style="font-size: 14px;">check</span>
+<span>Exit status: 0</span>
+</span>
+<span>Total tokens: 218</span>
+</div>
+</div>
+</div>
+<!-- Interactive Schema Visualizer Card -->
+<div class="rounded border border-outline-variant bg-surface-container-lowest p-4">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-size: 18px;">schema</span>
+<span class="text-headline-sm font-headline-sm font-medium text-on-surface">Compiled Schema AST</span>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-primary text-label-sm font-label-sm border border-outline-variant">OpenAPI 3.0</span>
+</div>
+<!-- Schema Node Tree -->
+<div class="space-y-2 text-code-sm font-code-sm">
+<!-- Root Object -->
+<div class="p-2 rounded bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline" style="font-size: 16px;">data_object</span>
+<span class="text-on-surface font-medium">ResponseSchema</span>
+<span class="text-secondary text-label-sm font-label-sm bg-surface-container-high px-1.5 rounded">TypeObject</span>
+</div>
+<span class="text-label-sm font-label-sm text-outline">root</span>
+</div>
+<!-- Property 1: project_name -->
+<div class="ml-4 pl-3 border-l-2 border-outline-variant p-2 rounded bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="text-primary font-medium">project_name</span>
+<span class="text-outline text-label-sm font-label-sm">TypeString</span>
+<span class="px-1 py-0.2 rounded bg-error-container/40 text-error text-label-sm font-label-sm border border-error/30">required</span>
+</div>
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;">verified</span>
+</div>
+<!-- Property 2: priority -->
+<div class="ml-4 pl-3 border-l-2 border-outline-variant p-2 rounded bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="text-primary font-medium">priority</span>
+<span class="text-outline text-label-sm font-label-sm">Enum("Low","Medium","High")</span>
+<span class="px-1 py-0.2 rounded bg-error-container/40 text-error text-label-sm font-label-sm border border-error/30">required</span>
+</div>
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;">verified</span>
+</div>
+<!-- Property 3: tags -->
+<div class="ml-4 pl-3 border-l-2 border-outline-variant p-2 rounded bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="text-primary font-medium">tags</span>
+<span class="text-outline text-label-sm font-label-sm">TypeArray [ TypeString ]</span>
+<span class="px-1 py-0.2 rounded bg-error-container/40 text-error text-label-sm font-label-sm border border-error/30">required</span>
+</div>
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;">verified</span>
+</div>
+</div>
+<!-- Tip Note -->
+<div class="mt-3 pt-3 border-t border-outline-variant flex items-start gap-2 text-body-sm font-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary shrink-0" style="font-size: 16px;">info</span>
+<span>All 3 fields are strictly validated before stream emissions, guaranteeing zero deserialization panics in Go unmarshaling.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Step-by-Step Architecture Callouts (Bento Layout) -->
+<section class="max-w-7xl mx-auto w-full px-6 pb-12 pt-4">
+<div class="mb-4 flex items-center justify-between">
+<div>
+<h2 class="text-headline-md font-headline-md text-on-surface">Architectural Anatomy</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">How the Gemini Go SDK guarantees type stability across dialogues.</p>
+</div>
+<span class="text-label-sm font-label-sm text-outline">Go GenAI SDK Spec</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+<!-- Card 1: System Instructions -->
+<div class="p-5 rounded border border-outline-variant bg-surface-container-low hover:border-primary/60 transition-all flex flex-col justify-between">
+<div>
+<div class="w-8 h-8 rounded bg-surface-container-high border border-outline-variant flex items-center justify-center text-primary mb-3">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface mb-1">System Instructions</h3>
+<p class="text-code-sm font-code-sm text-primary mb-2">genai.NewUserContent()</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
+                Applies system-level steerability without corrupting the chat context history. The instruction acts as a permanent behavioral boundary across all subsequent dialogue turns.
+              </p>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant text-label-sm font-label-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">check</span>
+<span>Isolated from chat history</span>
+</div>
+</div>
+<!-- Card 2: Strict ResponseSchema -->
+<div class="p-5 rounded border border-outline-variant bg-surface-container-low hover:border-secondary/60 transition-all flex flex-col justify-between">
+<div>
+<div class="w-8 h-8 rounded bg-surface-container-high border border-outline-variant flex items-center justify-center text-secondary mb-3">
+<span class="material-symbols-outlined">data_object</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface mb-1">Strict ResponseSchema</h3>
+<p class="text-code-sm font-code-sm text-secondary mb-2">*genai.Schema OpenAPI AST</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
+                Maps native Go struct definitions directly into OpenAPI 3.0 schema definitions. The model's constrained decoding guarantees valid JSON output matching your explicit schema.
+              </p>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant text-label-sm font-label-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">check</span>
+<span>Zero-hallucination syntax</span>
+</div>
+</div>
+<!-- Card 3: Persistent Chat Context -->
+<div class="p-5 rounded border border-outline-variant bg-surface-container-low hover:border-primary/60 transition-all flex flex-col justify-between">
+<div>
+<div class="w-8 h-8 rounded bg-surface-container-high border border-outline-variant flex items-center justify-center text-primary mb-3">
+<span class="material-symbols-outlined">forum</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface mb-1">Persistent Chat Context</h3>
+<p class="text-code-sm font-code-sm text-primary mb-2">model.StartChat()</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
+                Maintains multi-turn conversational history while re-applying schema adherence guarantees. The state retains previously generated fields and updates them coherently.
+              </p>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant text-label-sm font-label-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">check</span>
+<span>Cumulative memory state</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Platform Status Bar -->
+<footer class="mt-auto border-t border-outline-variant bg-surface-container-lowest px-6 py-3 flex flex-wrap items-center justify-between text-label-sm font-label-sm text-on-surface-variant">
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span>Gemini API: Operational</span>
+</span>
+<span class="hidden sm:inline text-outline">|</span>
+<span class="hidden sm:inline">SDK: google/generative-ai-go v0.14.0</span>
+</div>
+<div class="flex items-center gap-4">
+<a class="hover:text-on-surface transition-colors" href="#">Documentation</a>
+<a class="hover:text-on-surface transition-colors" href="#">Schema Reference</a>
+<a class="hover:text-on-surface transition-colors" href="#">Go Package</a>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

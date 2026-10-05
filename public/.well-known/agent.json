@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Apex Vault Agent",
+  "id": "apex-vault-agent",
+  "version": "1.0.0",
+  "description": "Operational market intelligence engine, research vault, and agentic execution service for the global AI customer service and enterprise automation ecosystem.",
+  "url": "https://ais-dev-oj2xir2xkp2etyakeyx3eu-498372438.us-east1.run.app",
+  "capabilities": [
+    "market_telemetry",
+    "defensibility_matrix",
+    "vault_query",
+    "agentic_execution",
+    "upstream_metering",
+    "mcp_server"
+  ],
+  "endpoints": {
+    "agent_card": "/.well-known/agent.json",
+    "apex_vault_agent": "/api/tools/apex_vault_agent",
+    "mcp_sse": "/mcp/sse",
+    "mcp_messages": "/mcp/message",
+    "skills_execute": "/api/skills/execute",
+    "telemetry": "/api/telemetry",
+    "vault": "/api/vault",
+    "user_status": "/api/user/:userId/status"
+  },
+  "tools": [
+    {
+      "name": "apex_vault_agent",
+      "description": "Execute deterministic enterprise workflows, query research vault telemetry, and inspect market intelligence via the Apex Vault service.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "market_telemetry",
+              "defensibility_matrix",
+              "vault_query",
+              "agentic_execution"
+            ],
+            "description": "The specific capability to invoke."
+          },
+          "payload": {
+            "type": "object",
+            "description": "Parameters required for the selected action (e.g., query string, task payload, execution parameters)."
+          }
+        },
+        "required": ["action", "payload"]
+      }
+    }
+  ],
+  "market_sizing_anchors": {
+    "baseline_2024": "$12.06B",
+    "projection_2030": "$47.82B",
+    "cagr_2024_2030": "25.8%",
+    "tam": "$140B (Global support operations & contact center labor)",
+    "sam": "$47.82B (Agentic software & AI inference pipelines)",
+    "som": "$4.5B (High-volume enterprise wedges: SaaS, FinTech, Telecom)"
+  },
+  "defensibility_layers": [
+    {
+      "layer": "Compute & Silicon",
+      "players": ["NVIDIA", "TSMC"],
+      "economic_leverage": "Hardware margins",
+      "structural_advantage": "Supply choke point & compute availability"
+    },
+    {
+      "layer": "Cloud & Distribution",
+      "players": ["Microsoft", "Amazon", "Google"],
+      "economic_leverage": "Recurring compute pipelines",
+      "structural_advantage": "Enterprise deployment pipelines & infrastructure dominance"
+    },
+    {
+      "layer": "Frontier Models",
+      "players": ["OpenAI", "Anthropic"],
+      "economic_leverage": "API usage & licensing",
+      "structural_advantage": "Research velocity vs. compute compression"
+    },
+    {
+      "layer": "Enterprise Workflows",
+      "players": ["Salesforce", "ServiceNow"],
+      "economic_leverage": "Per-seat SaaS licensing",
+      "structural_advantage": "Deep workflow embedding & high switching costs"
+    }
+  ],
+  "operating_principles": [
+    "Momentum Over Recursion: Simpler systems generate sustainable velocity; clarity scales better than complexity.",
+    "Task Execution Over Q&A: Interface evolution moves from passive prompt generation to deterministic, audit-ready operational labor.",
+    "Upstream Settlement: Zero compute executes without valid pre-flight authentication and active ledger verification."
+  ],
+  "authentication": {
+    "type": "Bearer / Upstream Settlement",
+    "required": true,
+    "description": "Pre-flight ledger verification or subscription authorization required for compute execution."
+  }
+}

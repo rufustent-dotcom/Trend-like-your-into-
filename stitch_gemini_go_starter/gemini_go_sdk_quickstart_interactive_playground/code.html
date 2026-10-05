@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Google Gemini Go SDK - Quickstart Documentation &amp; Live Playground</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-container": "#a078ff",
+            "surface-container-highest": "#31353e",
+            "primary": "#adc6ff",
+            "tertiary-fixed": "#e9ddff",
+            "on-secondary-container": "#00424e",
+            "on-tertiary-container": "#340080",
+            "tertiary-fixed-dim": "#d0bcff",
+            "surface-container-low": "#181c24",
+            "on-primary-container": "#00285d",
+            "on-secondary": "#003640",
+            "on-secondary-fixed": "#001f26",
+            "surface-bright": "#353942",
+            "surface-container-high": "#262a33",
+            "primary-container": "#4d8eff",
+            "error-container": "#93000a",
+            "inverse-surface": "#dfe2ee",
+            "secondary-container": "#03b5d3",
+            "surface-container": "#1c2028",
+            "on-error-container": "#ffdad6",
+            "on-surface-variant": "#c2c6d6",
+            "surface-variant": "#31353e",
+            "on-tertiary-fixed": "#23005c",
+            "primary-fixed-dim": "#adc6ff",
+            "on-secondary-fixed-variant": "#004e5c",
+            "on-tertiary": "#3c0091",
+            "outline-variant": "#424754",
+            "secondary-fixed": "#acedff",
+            "tertiary": "#d0bcff",
+            "on-tertiary-fixed-variant": "#5516be",
+            "on-primary-fixed": "#001a42",
+            "secondary-fixed-dim": "#4cd7f6",
+            "on-background": "#dfe2ee",
+            "background": "#0f131c",
+            "surface-container-lowest": "#0a0e16",
+            "error": "#ffb4ab",
+            "on-primary": "#002e6a",
+            "inverse-on-surface": "#2c3039",
+            "on-surface": "#dfe2ee",
+            "surface-tint": "#adc6ff",
+            "surface-dim": "#0f131c",
+            "outline": "#8c909f",
+            "inverse-primary": "#005ac2",
+            "primary-fixed": "#d8e2ff",
+            "surface": "#0f131c",
+            "on-primary-fixed-variant": "#004395",
+            "secondary": "#4cd7f6",
+            "on-error": "#690005"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "gutter-sm": "1rem",
+            "space-xs": "0.25rem",
+            "margin": "1.5rem",
+            "margin-sm": "1rem",
+            "gutter-lg": "2rem",
+            "space-md": "1rem",
+            "space-xl": "2.5rem",
+            "space-lg": "1.5rem",
+            "margin-lg": "3rem",
+            "gutter": "1.5rem"
+          },
+          "fontFamily": {
+            "headline-sm": ["Geist"],
+            "headline-lg": ["Geist"],
+            "headline-lg-mobile": ["Geist"],
+            "body-sm": ["Geist"],
+            "headline-xl": ["Geist"],
+            "code-md": ["JetBrains Mono"],
+            "body-lg": ["Geist"],
+            "headline-md": ["Geist"],
+            "code-sm": ["JetBrains Mono"],
+            "headline-xl-mobile": ["Geist"],
+            "label-sm": ["JetBrains Mono"],
+            "code-lg": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "body-md": ["Geist"]
+          },
+          "fontSize": {
+            "headline-sm": ["18px", {"lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+            "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "body-sm": ["12px", {"lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+            "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "600"}],
+            "code-md": ["13px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+            "body-lg": ["16px", {"lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "400"}],
+            "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "500"}],
+            "code-sm": ["11px", {"lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400"}],
+            "headline-xl-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+            "label-sm": ["10px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500"}],
+            "code-lg": ["14px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+            "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+            "body-md": ["14px", {"lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 18px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+    }
+    /* Syntax Highlighting Tokens */
+    .syn-keyword { color: #d0bcff; font-weight: 500; }
+    .syn-func { color: #adc6ff; }
+    .syn-string { color: #4cd7f6; }
+    .syn-type { color: #e9ddff; }
+    .syn-pkg { color: #c2c6d6; }
+    .syn-comment { color: #8c909f; font-style: italic; }
+    .syn-var { color: #dfe2ee; }
+    
+    /* Code line styling */
+    .code-line {
+      display: flex;
+      line-height: 20px;
+    }
+    .code-ln {
+      width: 32px;
+      text-align: right;
+      padding-right: 16px;
+      color: #424754;
+      user-select: none;
+      flex-shrink: 0;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #0a0e16; }
+    ::-webkit-scrollbar-thumb { background: #31353e; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #424754; }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary selection:text-on-primary-container">
+<!-- TOP NAV BAR (Shared Component JSON Source of Truth) -->
+<header class="bg-surface-container-low dark:bg-surface-container-low docked full-width top-0 z-40 border-b border-outline-variant dark:border-outline-variant flat no shadows sticky">
+<div class="w-full px-6 flex justify-between items-center h-14 border-b border-outline-variant dark:border-outline-variant">
+<!-- Brand & Search cluster -->
+<div class="flex items-center gap-6">
+<div class="text-headline-sm font-headline-sm font-semibold text-on-surface dark:text-on-surface flex items-center gap-2">
+<div class="w-7 h-7 rounded-lg bg-surface-container-high border border-outline-variant flex items-center justify-center text-primary shadow-inner">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+</div>
+<span class="tracking-tight font-headline-sm text-headline-sm">Gemini Go SDK</span>
+<span class="text-label-sm font-label-sm px-2 py-0.5 rounded bg-surface-container border border-outline-variant text-secondary ml-1">v0.19.0</span>
+</div>
+<!-- Search Bar (on_left) -->
+<div class="hidden lg:flex items-center bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1.5 w-72 text-on-surface-variant focus-within:border-primary transition-colors">
+<span class="material-symbols-outlined mr-2 text-outline" data-icon="search">search</span>
+<input class="bg-transparent border-0 p-0 text-body-sm font-body-sm text-on-surface focus:ring-0 w-full placeholder:text-outline outline-none" placeholder="Search docs, functions, types..." type="text"/>
+<kbd class="text-label-sm font-label-sm bg-surface-container px-1.5 py-0.5 rounded border border-outline-variant text-outline">⌘K</kbd>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden md:flex items-center gap-6 text-label-md font-label-md">
+<a class="text-primary dark:text-primary border-b-2 border-primary dark:border-primary pb-1 font-medium" href="#docs">Docs</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface transition-colors" href="#api">API Reference</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface transition-colors" href="#samples">Samples</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface transition-colors" href="#playground">Playground</a>
+</nav>
+<!-- Trailing Action Cluster -->
+<div class="flex items-center gap-3">
+<!-- API Key Status Pill -->
+<div class="hidden sm:flex items-center gap-1.5 bg-surface-container border border-outline-variant px-2.5 py-1 rounded-lg text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary" data-icon="key" style="font-variation-settings: 'FILL' 1;">key</span>
+<span>API Key: <span class="text-secondary font-code-sm">Set (••••3a9F)</span></span>
+</div>
+<!-- GitHub Star Badge -->
+<a class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-high hover:bg-surface-variant border border-outline-variant text-label-sm font-label-sm text-on-surface transition-colors active:scale-[0.98]" href="https://github.com/google/generative-ai-go" target="_blank">
+<span class="material-symbols-outlined text-secondary" data-icon="star">star</span>
+<span class="hidden sm:inline">4.2k</span>
+</a>
+<!-- Trailing Primary Action button: Run Playground -->
+<button class="bg-primary-container text-on-primary-container px-3.5 py-1.5 rounded-lg text-label-md font-label-md font-medium flex items-center gap-1.5 hover:bg-primary transition-colors active:scale-[0.98] shadow-sm" id="topRunBtn">
+<span class="material-symbols-outlined" data-icon="play_arrow">play_arrow</span>
+<span>Run Playground</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center text-primary ml-1" title="Developer Profile">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</div>
+</div>
+</div>
+</header>
+<!-- BODY MULTI-PANE CONTAINER -->
+<div class="flex-1 flex w-full">
+<!-- LEFT SIDENAV (Shared Component JSON Source of Truth) -->
+<aside class="h-[calc(100vh-3.5rem)] w-[260px] flex-shrink-0 sticky top-14 left-0 overflow-y-auto border-r border-outline-variant dark:border-outline-variant bg-surface-container-lowest dark:bg-surface-container-lowest w-[260px] p-3 flex flex-col justify-between hidden md:flex">
+<div>
+<!-- Tree Header -->
+<div class="px-3 py-2 mb-2">
+<div class="text-headline-sm font-headline-sm font-bold text-on-surface dark:text-on-surface">Documentation</div>
+<div class="text-label-sm font-label-sm text-outline">v0.19.0 Go GenAI</div>
+</div>
+<!-- Navigation Tabs Group -->
+<div class="space-y-1">
+<!-- Overview Section -->
+<div class="text-label-sm font-label-sm text-outline px-3 pt-2 pb-1">OVERVIEW</div>
+<a class="bg-surface-container dark:bg-surface-container text-primary dark:text-primary font-medium border-l-2 border-primary dark:border-primary rounded-r-lg px-3 py-2 flex items-center gap-2.5 text-label-md font-label-md active:scale-[0.99] transition-transform duration-100" href="#getting-started">
+<span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+<span>Getting Started</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-low rounded-lg px-3 py-2 flex items-center gap-2.5 text-label-md font-label-md transition-colors" href="#installation">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+<span>Installation</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-low rounded-lg px-3 py-2 flex items-center gap-2.5 text-label-md font-label-md transition-colors" href="#authentication">
+<span class="material-symbols-outlined" data-icon="key">key</span>
+<span>Authentication</span>
+</a>
+<!-- Guides Section -->
+<div class="text-label-sm font-label-sm text-outline px-3 pt-3 pb-1">CORE GUIDES</div>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-low rounded-lg px-3 py-2 flex items-center justify-between text-label-md font-label-md transition-colors" href="#text-generation">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span>Text Generation</span>
+</div>
+<span class="text-label-sm font-label-sm px-1.5 py-0.2 bg-surface-container-high rounded text-primary">Active</span>
+</a>
+<!-- Sub items for active branch -->
+<div class="pl-8 pr-2 space-y-1">
+<a class="block py-1 text-code-sm font-code-sm text-primary font-medium hover:underline" href="#first-prompt">
+              • Your First Prompt
+            </a>
+<a class="block py-1 text-code-sm font-code-sm text-on-surface-variant hover:text-on-surface" href="#structured-outputs">
+              • Structured Outputs (JSON)
+            </a>
+<a class="block py-1 text-code-sm font-code-sm text-on-surface-variant hover:text-on-surface" href="#system-instructions">
+              • System Instructions
+            </a>
+</div>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-low rounded-lg px-3 py-2 flex items-center gap-2.5 text-label-md font-label-md transition-colors" href="#multimodal">
+<span class="material-symbols-outlined" data-icon="perm_media">perm_media</span>
+<span>Multimodal</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-low rounded-lg px-3 py-2 flex items-center gap-2.5 text-label-md font-label-md transition-colors" href="#streaming">
+<span class="material-symbols-outlined" data-icon="stream">stream</span>
+<span>Streaming</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-low rounded-lg px-3 py-2 flex items-center gap-2.5 text-label-md font-label-md transition-colors" href="#function-calling">
+<span class="material-symbols-outlined" data-icon="code_blocks">code_blocks</span>
+<span>Function Calling</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-low rounded-lg px-3 py-2 flex items-center gap-2.5 text-label-md font-label-md transition-colors" href="#api-reference">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span>API Reference</span>
+</a>
+</div>
+</div>
+<!-- Footer Navigation Items from JSON -->
+<div class="pt-4 border-t border-outline-variant space-y-1">
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-3 py-1.5 flex items-center gap-2.5 text-label-sm font-label-sm transition-colors" href="https://pkg.go.dev/github.com/google/generative-ai-go/genai" target="_blank">
+<span class="material-symbols-outlined" data-icon="code">code</span>
+<span>GitHub Repo</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-3 py-1.5 flex items-center gap-2.5 text-label-sm font-label-sm transition-colors" href="#issues">
+<span class="material-symbols-outlined" data-icon="bug_report">bug_report</span>
+<span>Report Issue</span>
+</a>
+</div>
+</aside>
+<!-- CENTER CANVAS & RIGHT PLAYGROUND SPLIT CONTAINER -->
+<div class="flex-1 flex flex-col xl:flex-row min-w-0">
+<!-- MAIN CENTER CANVAS: Prose & Code Documentation (~60% on large viewports) -->
+<main class="flex-1 max-w-4xl px-6 lg:px-10 py-8 overflow-y-auto">
+<!-- Breadcrumb & Tag -->
+<div class="flex items-center gap-2 text-label-sm font-label-sm text-outline mb-4">
+<span class="hover:text-on-surface cursor-pointer">Documentation</span>
+<span>/</span>
+<span class="hover:text-on-surface cursor-pointer">Getting Started</span>
+<span>/</span>
+<span class="text-primary font-medium">First Generation (Go)</span>
+</div>
+<!-- Section Title & Lead Subtitle -->
+<div class="mb-6 border-b border-outline-variant pb-6">
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight mb-2">
+            Quickstart: Text Generation with Go
+          </h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant">
+            Generate content in under 5 minutes using the official <code class="text-code-md font-code-md px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant text-primary">github.com/google/generative-ai-go/genai</code> package for Go 1.21+.
+          </p>
+</div>
+<!-- Prerequisites Bento Card -->
+<div class="mb-8 p-4 rounded-xl bg-surface-container-low border border-outline-variant relative overflow-hidden">
+<div class="flex items-center gap-2.5 mb-2.5 text-primary">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+<h2 class="text-headline-sm font-headline-sm font-medium">Prerequisites</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-body-sm font-body-sm">
+<div class="p-3 rounded-lg bg-surface-container border border-outline-variant">
+<span class="text-outline text-label-sm font-label-sm block mb-1">RUNTIME</span>
+<div class="text-on-surface font-code-sm">Go 1.21 or higher</div>
+</div>
+<div class="p-3 rounded-lg bg-surface-container border border-outline-variant">
+<span class="text-outline text-label-sm font-label-sm block mb-1">ENVIRONMENT</span>
+<div class="text-secondary font-code-sm">GEMINI_API_KEY exported</div>
+</div>
+<div class="p-3 rounded-lg bg-surface-container border border-outline-variant">
+<span class="text-outline text-label-sm font-label-sm block mb-1">DEPENDENCY</span>
+<div class="text-on-surface font-code-sm">google.golang.org/api/option</div>
+</div>
+</div>
+</div>
+<!-- PRIMARY CODE BLOCK CONTAINER -->
+<div class="mb-8 rounded-xl bg-surface-container-lowest border border-outline-variant overflow-hidden shadow-2xl">
+<!-- Code Block Header -->
+<div class="flex items-center justify-between px-4 py-2.5 bg-surface-container-low border-b border-outline-variant">
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 text-outline">
+<span class="w-3 h-3 rounded-full bg-surface-container-highest border border-outline-variant"></span>
+<span class="w-3 h-3 rounded-full bg-surface-container-highest border border-outline-variant"></span>
+<span class="w-3 h-3 rounded-full bg-surface-container-highest border border-outline-variant"></span>
+</div>
+<span class="text-code-md font-code-md text-on-surface font-medium ml-2">main.go</span>
+<span class="text-label-sm font-label-sm px-2 py-0.5 rounded bg-surface-container border border-outline-variant text-secondary">Go</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface-variant hover:text-on-surface text-code-sm font-code-sm transition-colors" id="copyCodeBtn" title="Copy code">
+<span class="material-symbols-outlined text-sm" data-icon="content_copy">content_copy</span>
+<span id="copyText">Copy</span>
+</button>
+<button class="flex items-center gap-1 px-3 py-1 rounded bg-primary-container text-on-primary-container hover:bg-primary font-medium text-code-sm font-code-sm transition-colors shadow-sm" id="canvasRunBtn">
+<span class="material-symbols-outlined text-sm" data-icon="play_arrow">play_arrow</span>
+<span>Run</span>
+</button>
+</div>
+</div>
+<!-- Code Display with Exact Verbatim Code & Syntax Highlighting -->
+<div class="p-4 overflow-x-auto text-code-md font-code-md leading-relaxed selection:bg-surface-container-high">
+<div class="code-line"><span class="code-ln">1</span><span class="syn-keyword">package</span> <span class="syn-var">main</span></div>
+<div class="code-line"><span class="code-ln">2</span></div>
+<div class="code-line"><span class="code-ln">3</span><span class="syn-keyword">import</span> (</div>
+<div class="code-line"><span class="code-ln">4</span>    <span class="syn-string">"context"</span></div>
+<div class="code-line"><span class="code-ln">5</span>    <span class="syn-string">"fmt"</span></div>
+<div class="code-line"><span class="code-ln">6</span>    <span class="syn-string">"log"</span></div>
+<div class="code-line"><span class="code-ln">7</span>    <span class="syn-string">"os"</span></div>
+<div class="code-line"><span class="code-ln">8</span></div>
+<div class="code-line"><span class="code-ln">9</span>    <span class="syn-string">"github.com/google/generative-ai-go/genai"</span></div>
+<div class="code-line"><span class="code-ln">10</span>    <span class="syn-string">"google.golang.org/api/option"</span></div>
+<div class="code-line"><span class="code-ln">11</span>)</div>
+<div class="code-line"><span class="code-ln">12</span></div>
+<div class="code-line"><span class="code-ln">13</span><span class="syn-keyword">func</span> <span class="syn-func">main</span>() {</div>
+<div class="code-line"><span class="code-ln">14</span>    <span class="syn-var">ctx</span> := <span class="syn-pkg">context</span>.<span class="syn-func">Background</span>()</div>
+<div class="code-line"><span class="code-ln">15</span></div>
+<div class="code-line"><span class="code-ln">16</span>    <span class="syn-var">apiKey</span> := <span class="syn-pkg">os</span>.<span class="syn-func">Getenv</span>(<span class="syn-string">"GEMINI_API_KEY"</span>)</div>
+<div class="code-line"><span class="code-ln">17</span>    <span class="syn-keyword">if</span> <span class="syn-var">apiKey</span> == <span class="syn-string">""</span> {</div>
+<div class="code-line"><span class="code-ln">18</span>        <span class="syn-pkg">log</span>.<span class="syn-func">Fatal</span>(<span class="syn-string">"GEMINI_API_KEY environment variable not set"</span>)</div>
+<div class="code-line"><span class="code-ln">19</span>    }</div>
+<div class="code-line"><span class="code-ln">20</span></div>
+<div class="code-line"><span class="code-ln">21</span>    <span class="syn-var">client</span>, <span class="syn-var">err</span> := <span class="syn-pkg">genai</span>.<span class="syn-func">NewClient</span>(<span class="syn-var">ctx</span>, <span class="syn-pkg">option</span>.<span class="syn-func">WithAPIKey</span>(<span class="syn-var">apiKey</span>))</div>
+<div class="code-line"><span class="code-ln">22</span>    <span class="syn-keyword">if</span> <span class="syn-var">err</span> != <span class="syn-keyword">nil</span> {</div>
+<div class="code-line"><span class="code-ln">23</span>        <span class="syn-pkg">log</span>.<span class="syn-func">Fatalf</span>(<span class="syn-string">"Error creating client: %v"</span>, <span class="syn-var">err</span>)</div>
+<div class="code-line"><span class="code-ln">24</span>    }</div>
+<div class="code-line"><span class="code-ln">25</span>    <span class="syn-keyword">defer</span> <span class="syn-var">client</span>.<span class="syn-func">Close</span>()</div>
+<div class="code-line"><span class="code-ln">26</span></div>
+<div class="code-line"><span class="code-ln">27</span>    <span class="syn-var">model</span> := <span class="syn-var">client</span>.<span class="syn-func">GenerativeModel</span>(<span class="syn-string">"gemini-2.5-flash"</span>)</div>
+<div class="code-line"><span class="code-ln">28</span></div>
+<div class="code-line"><span class="code-ln">29</span>    <span class="syn-var">resp</span>, <span class="syn-var">err</span> := <span class="syn-var">model</span>.<span class="syn-func">GenerateContent</span>(<span class="syn-var">ctx</span>, <span class="syn-pkg">genai</span>.<span class="syn-func">Text</span>(<span class="syn-string">"Write a haiku about writing Go code."</span>))</div>
+<div class="code-line"><span class="code-ln">30</span>    <span class="syn-keyword">if</span> <span class="syn-var">err</span> != <span class="syn-keyword">nil</span> {</div>
+<div class="code-line"><span class="code-ln">31</span>        <span class="syn-pkg">log</span>.<span class="syn-func">Fatalf</span>(<span class="syn-string">"Error generating content: %v"</span>, <span class="syn-var">err</span>)</div>
+<div class="code-line"><span class="code-ln">32</span>    }</div>
+<div class="code-line"><span class="code-ln">33</span></div>
+<div class="code-line"><span class="code-ln">34</span>    <span class="syn-keyword">for</span> <span class="syn-var">_</span>, <span class="syn-var">cand</span> := <span class="syn-keyword">range</span> <span class="syn-var">resp</span>.<span class="syn-var">Candidates</span> {</div>
+<div class="code-line"><span class="code-ln">35</span>        <span class="syn-keyword">if</span> <span class="syn-var">cand</span>.<span class="syn-var">Content</span> != <span class="syn-keyword">nil</span> {</div>
+<div class="code-line"><span class="code-ln">36</span>            <span class="syn-keyword">for</span> <span class="syn-var">_</span>, <span class="syn-var">part</span> := <span class="syn-keyword">range</span> <span class="syn-var">cand</span>.<span class="syn-var">Content</span>.<span class="syn-var">Parts</span> {</div>
+<div class="code-line"><span class="code-ln">37</span>                <span class="syn-pkg">fmt</span>.<span class="syn-func">Println</span>(<span class="syn-var">part</span>)</div>
+<div class="code-line"><span class="code-ln">38</span>            }</div>
+<div class="code-line"><span class="code-ln">39</span>        }</div>
+<div class="code-line"><span class="code-ln">40</span>    }</div>
+<div class="code-line"><span class="code-ln">41</span>}</div>
+</div>
+</div>
+<!-- Interactive Prompt Modification Inline Pill -->
+<div class="mb-8 p-3 rounded-lg bg-surface-container-low border border-outline-variant flex flex-wrap items-center gap-2">
+<span class="text-label-sm font-label-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="psychology">psychology</span>
+            Try other prompts:
+          </span>
+<button class="prompt-chip text-code-sm font-code-sm px-2.5 py-1 rounded bg-surface-container border border-outline-variant hover:border-primary text-on-surface-variant hover:text-on-surface transition-colors" data-prompt="Explain goroutines simply">
+            "Explain goroutines simply"
+          </button>
+<button class="prompt-chip text-code-sm font-code-sm px-2.5 py-1 rounded bg-surface-container border border-outline-variant hover:border-primary text-on-surface-variant hover:text-on-surface transition-colors" data-prompt="Generate REST handler in Go">
+            "Generate REST handler"
+          </button>
+<button class="prompt-chip text-code-sm font-code-sm px-2.5 py-1 rounded bg-surface-container border border-outline-variant hover:border-primary text-on-surface-variant hover:text-on-surface transition-colors" data-prompt="Parse JSON schema in Go struct">
+            "Parse JSON schema"
+          </button>
+</div>
+<!-- STEP-BY-STEP EXPLANATION WALKTHROUGH -->
+<div class="space-y-4 mb-8">
+<h2 class="text-headline-sm font-headline-sm text-on-surface font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="account_tree">account_tree</span>
+            Code Walkthrough &amp; Concepts
+          </h2>
+<!-- Step 1 -->
+<div class="p-4 rounded-xl bg-surface-container border border-outline-variant">
+<div class="flex items-center gap-3 mb-2">
+<span class="w-6 h-6 rounded-full bg-primary-container text-on-primary-container text-label-sm font-label-sm flex items-center justify-center font-bold">1</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Initialize Client with API Credentials</h3>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant ml-9">
+              The <code class="text-code-sm font-code-sm text-primary">genai.NewClient(ctx, option.WithAPIKey(apiKey))</code> constructs an authenticated RPC client. Always call <code class="text-code-sm font-code-sm text-secondary">defer client.Close()</code> immediately after verifying that <code class="text-code-sm font-code-sm">err == nil</code> to ensure underlying connection pools close gracefully.
+            </p>
+</div>
+<!-- Step 2 -->
+<div class="p-4 rounded-xl bg-surface-container border border-outline-variant">
+<div class="flex items-center gap-3 mb-2">
+<span class="w-6 h-6 rounded-full bg-surface-container-high text-on-surface text-label-sm font-label-sm flex items-center justify-center font-bold">2</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Instantiate the Target Generative Model</h3>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant ml-9">
+              Use <code class="text-code-sm font-code-sm text-primary">client.GenerativeModel("gemini-2.5-flash")</code> for high-frequency low-latency generation. You can configure execution parameters directly on the model instance like <code class="text-code-sm font-code-sm text-outline">model.SetTemperature(0.7)</code> before calling generation routines.
+            </p>
+</div>
+<!-- Step 3 -->
+<div class="p-4 rounded-xl bg-surface-container border border-outline-variant">
+<div class="flex items-center gap-3 mb-2">
+<span class="w-6 h-6 rounded-full bg-surface-container-high text-on-surface text-label-sm font-label-sm flex items-center justify-center font-bold">3</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Generate &amp; Iterate Content Candidates</h3>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant ml-9">
+<code class="text-code-sm font-code-sm text-primary">model.GenerateContent(...)</code> accepts variadic <code class="text-code-sm font-code-sm text-secondary">genai.Part</code> values. The response structure contains one or more <code class="text-code-sm font-code-sm">Candidate</code> instances containing generated text fragments.
+            </p>
+</div>
+</div>
+</main>
+<!-- RIGHT PANEL: INTERACTIVE RUNNER & OUTPUT INSPECTOR (~35% width) -->
+<aside class="w-full xl:w-[460px] 2xl:w-[500px] flex-shrink-0 bg-surface-container-low border-t xl:border-t-0 xl:border-l border-outline-variant flex flex-col h-auto xl:h-[calc(100vh-3.5rem)] sticky top-14">
+<!-- Header & Runner Trigger -->
+<div class="p-4 border-b border-outline-variant flex items-center justify-between bg-surface-container-lowest">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+<span class="text-label-md font-label-md font-medium text-on-surface">Interactive Runner</span>
+<span class="text-label-sm font-label-sm text-outline">Ready / Connected</span>
+</div>
+<div class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 rounded border border-outline-variant text-outline">
+            Go 1.22.4 Sandbox
+          </div>
+</div>
+<!-- Primary Action Trigger -->
+<div class="p-4 border-b border-outline-variant bg-surface-container">
+<button class="w-full py-2.5 px-4 rounded-lg bg-primary-container hover:bg-primary text-on-primary-container font-headline-sm text-headline-sm flex items-center justify-center gap-2 font-medium shadow transition-all active:scale-[0.98]" id="executeMainBtn">
+<span class="material-symbols-outlined" data-icon="play_circle">play_circle</span>
+<span>Execute Go Routine</span>
+<kbd class="text-label-sm font-label-sm bg-on-primary-container/20 text-on-primary-container px-2 py-0.5 rounded ml-2">Shift+Enter</kbd>
+</button>
+</div>
+<!-- Tabbed Inspector Navigation -->
+<div class="flex border-b border-outline-variant bg-surface-container-low px-3">
+<button class="px-3 py-2 text-label-md font-label-md text-primary border-b-2 border-primary font-medium flex items-center gap-1.5" id="tabStdout">
+<span class="material-symbols-outlined text-sm" data-icon="terminal">terminal</span>
+<span>Terminal stdout</span>
+</button>
+<button class="px-3 py-2 text-label-md font-label-md text-on-surface-variant hover:text-on-surface flex items-center gap-1.5 transition-colors" id="tabJson">
+<span class="material-symbols-outlined text-sm" data-icon="data_object">data_object</span>
+<span>Raw JSON Response</span>
+</button>
+<button class="px-3 py-2 text-label-md font-label-md text-on-surface-variant hover:text-on-surface flex items-center gap-1.5 transition-colors" id="tabEnv">
+<span class="material-symbols-outlined text-sm" data-icon="tune">tune</span>
+<span>Parameters</span>
+</button>
+</div>
+<!-- Terminal Output Window -->
+<div class="flex-1 overflow-y-auto p-4 font-code-md text-code-md bg-surface-container-lowest text-on-surface">
+<!-- View 1: Terminal stdout -->
+<div class="space-y-1" id="viewStdout">
+<div class="text-outline">$ export GEMINI_API_KEY="AIzaSyA4_••••3a9F"</div>
+<div class="text-outline">$ go run main.go</div>
+<div class="text-secondary-fixed-dim">[stdout] Compiling package main with gcflags="-m"...</div>
+<div class="text-primary">[stdout] Response received in 248ms:</div>
+<div class="text-outline">--------------------------------------</div>
+<div class="text-secondary font-medium pl-2 border-l-2 border-primary my-2 space-y-0.5" id="haikuOutput">
+<div>Fast and simple threads,</div>
+<div>Channels whisper in the dark,</div>
+<div>Compiled binary.</div>
+</div>
+<div class="text-outline">--------------------------------------</div>
+<div class="text-outline text-label-sm font-label-sm pt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="check_circle">check_circle</span>
+              Process finished with exit code 0 (SIGKILL 0)
+            </div>
+</div>
+<!-- View 2: Raw JSON Response (Hidden by default) -->
+<div class="hidden text-code-sm font-code-sm space-y-1 text-on-surface-variant" id="viewJson">
+<pre class="overflow-x-auto p-2 bg-surface-container rounded border border-outline-variant text-secondary">{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          "Fast and simple threads,\nChannels whisper in the dark,\nCompiled binary."
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0,
+      "safetyRatings": [
+        {
+          "category": "HARM_CATEGORY_HARASSMENT",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_HATE_SPEECH",
+          "probability": "NEGLIGIBLE"
+        }
+      ]
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 12,
+    "candidatesTokenCount": 18,
+    "totalTokenCount": 30
+  }
+}</pre>
+</div>
+<!-- View 3: Parameters / Environment (Hidden by default) -->
+<div class="hidden space-y-3 text-body-sm font-body-sm" id="viewEnv">
+<div>
+<label class="block text-label-sm font-label-sm text-outline mb-1">TARGET MODEL</label>
+<select class="w-full bg-surface-container border border-outline-variant rounded px-2.5 py-1.5 text-code-sm font-code-sm text-on-surface focus:ring-1 focus:ring-primary">
+<option selected="">gemini-2.5-flash (Fast, Default)</option>
+<option>gemini-2.5-pro (Reasoning &amp; Coding)</option>
+<option>gemini-2.0-flash-lite</option>
+</select>
+</div>
+<div>
+<div class="flex justify-between text-label-sm font-label-sm mb-1">
+<span class="text-outline">TEMPERATURE</span>
+<span class="text-primary font-code-sm" id="tempVal">0.7</span>
+</div>
+<input class="w-full accent-primary bg-surface-container" id="tempSlider" max="2" min="0" step="0.1" type="range" value="0.7"/>
+</div>
+<div>
+<div class="flex justify-between text-label-sm font-label-sm mb-1">
+<span class="text-outline">TOP P</span>
+<span class="text-secondary font-code-sm">0.95</span>
+</div>
+<input class="w-full accent-secondary bg-surface-container" max="1" min="0" step="0.05" type="range" value="0.95"/>
+</div>
+</div>
+</div>
+<!-- Telemetry & Metadata Card Footer -->
+<div class="p-3 border-t border-outline-variant bg-surface-container text-label-sm font-label-sm">
+<div class="text-outline uppercase tracking-wider mb-2 text-label-sm font-label-sm flex items-center justify-between">
+<span>Execution Telemetry</span>
+<span class="text-secondary">248 ms (TTFT: 110ms)</span>
+</div>
+<div class="grid grid-cols-2 gap-2 text-body-sm font-body-sm">
+<div class="flex items-center justify-between p-1.5 rounded bg-surface-container-low border border-outline-variant">
+<span class="text-outline text-label-sm font-label-sm">Tokens In / Out</span>
+<span class="text-on-surface font-code-sm">12 / 18</span>
+</div>
+<div class="flex items-center justify-between p-1.5 rounded bg-surface-container-low border border-outline-variant">
+<span class="text-outline text-label-sm font-label-sm">Finish Reason</span>
+<span class="text-secondary font-code-sm">STOP</span>
+</div>
+<div class="flex items-center justify-between p-1.5 rounded bg-surface-container-low border border-outline-variant col-span-2">
+<span class="text-outline text-label-sm font-label-sm">Safety Filter</span>
+<span class="text-on-surface-variant font-code-sm">Harassment: Negligible</span>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+    // Copy code button logic
+    const copyBtn = document.getElementById('copyCodeBtn');
+    const copyText = document.getElementById('copyText');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const rawCode = `package main\n\nimport (\n\t"context"\n\t"fmt"\n\t"log"\n\t"os"\n\n\t"github.com/google/generative-ai-go/genai"\n\t"google.golang.org/api/option"\n)\n\nfunc main() {\n\tctx := context.Background()\n\n\tapiKey := os.Getenv("GEMINI_API_KEY")\n\tif apiKey == "" {\n\t\tlog.Fatal("GEMINI_API_KEY environment variable not set")\n\t}\n\n\tclient, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))\n\tif err != nil {\n\t\tlog.Fatalf("Error creating client: %v", err)\n\t}\n\tdefer client.Close()\n\n\tmodel := client.GenerativeModel("gemini-2.5-flash")\n\n\tresp, err := model.GenerateContent(ctx, genai.Text("Write a haiku about writing Go code."))\n\tif err != nil {\n\t\tlog.Fatalf("Error generating content: %v", err)\n\t}\n\n\tfor _, cand := range resp.Candidates {\n\t\tif cand.Content != nil {\n\t\t\tfor _, part := range cand.Content.Parts {\n\t\t\t\tfmt.Println(part)\n\t\t\t}\n\t\t}\n\t}\n}`;
+        navigator.clipboard.writeText(rawCode).then(() => {
+          copyText.textContent = 'Copied!';
+          setTimeout(() => { copyText.textContent = 'Copy'; }, 2000);
+        });
+      });
+    }
+
+    // Tab switching for Runner Output
+    const tabStdout = document.getElementById('tabStdout');
+    const tabJson = document.getElementById('tabJson');
+    const tabEnv = document.getElementById('tabEnv');
+
+    const viewStdout = document.getElementById('viewStdout');
+    const viewJson = document.getElementById('viewJson');
+    const viewEnv = document.getElementById('viewEnv');
+
+    function resetTabs() {
+      [tabStdout, tabJson, tabEnv].forEach(tab => {
+        tab.className = "px-3 py-2 text-label-md font-label-md text-on-surface-variant hover:text-on-surface flex items-center gap-1.5 transition-colors";
+      });
+      viewStdout.classList.add('hidden');
+      viewJson.classList.add('hidden');
+      viewEnv.classList.add('hidden');
+    }
+
+    if (tabStdout && tabJson && tabEnv) {
+      tabStdout.addEventListener('click', () => {
+        resetTabs();
+        tabStdout.className = "px-3 py-2 text-label-md font-label-md text-primary border-b-2 border-primary font-medium flex items-center gap-1.5";
+        viewStdout.classList.remove('hidden');
+      });
+
+      tabJson.addEventListener('click', () => {
+        resetTabs();
+        tabJson.className = "px-3 py-2 text-label-md font-label-md text-primary border-b-2 border-primary font-medium flex items-center gap-1.5";
+        viewJson.classList.remove('hidden');
+      });
+
+      tabEnv.addEventListener('click', () => {
+        resetTabs();
+        tabEnv.className = "px-3 py-2 text-label-md font-label-md text-primary border-b-2 border-primary font-medium flex items-center gap-1.5";
+        viewEnv.classList.remove('hidden');
+      });
+    }
+
+    // Runner trigger simulation
+    const runBtn = document.getElementById('executeMainBtn');
+    const topRunBtn = document.getElementById('topRunBtn');
+    const canvasRunBtn = document.getElementById('canvasRunBtn');
+    const haikuOutput = document.getElementById('haikuOutput');
+
+    function triggerExecution(customPrompt) {
+      if (!haikuOutput) return;
+      haikuOutput.innerHTML = '<span class="text-outline animate-pulse font-code-sm">Executing remote Go binary via gRPC...</span>';
+      
+      // Ensure stdout tab is selected
+      if (tabStdout) tabStdout.click();
+
+      setTimeout(() => {
+        if (customPrompt === 'Explain goroutines simply') {
+          haikuOutput.innerHTML = `<div>Goroutines are lightweight threads,</div><div>Multiplexed on few OS cores,</div><div>Spawned with simple 'go'.</div>`;
+        } else if (customPrompt === 'Generate REST handler in Go') {
+          haikuOutput.innerHTML = `<div>w.Header().Set("Content-Type", "application/json")</div><div>json.NewEncoder(w).Encode(response)</div><div>HTTP ok sent.</div>`;
+        } else if (customPrompt === 'Parse JSON schema in Go struct') {
+          haikuOutput.innerHTML = `<div>Types defined with tags,</div><div>json.Unmarshal takes the bytes,</div><div>Structured memory.</div>`;
+        } else {
+          haikuOutput.innerHTML = `<div>Fast and simple threads,</div><div>Channels whisper in the dark,</div><div>Compiled binary.</div>`;
+        }
+      }, 350);
+    }
+
+    if (runBtn) runBtn.addEventListener('click', () => triggerExecution());
+    if (topRunBtn) topRunBtn.addEventListener('click', () => triggerExecution());
+    if (canvasRunBtn) canvasRunBtn.addEventListener('click', () => triggerExecution());
+
+    // Prompt chips
+    document.querySelectorAll('.prompt-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        const prompt = e.currentTarget.getAttribute('data-prompt');
+        triggerExecution(prompt);
+      });
+    });
+
+    // Keyboard shortcut Shift+Enter
+    window.addEventListener('keydown', (e) => {
+      if (e.shiftKey && e.key === 'Enter') {
+        e.preventDefault();
+        triggerExecution();
+      }
+    });
+
+    // Temperature slider display
+    const tempSlider = document.getElementById('tempSlider');
+    const tempVal = document.getElementById('tempVal');
+    if (tempSlider && tempVal) {
+      tempSlider.addEventListener('input', (e) => {
+        tempVal.textContent = e.target.value;
+      });
+    }
+  </script>
+</body></html>

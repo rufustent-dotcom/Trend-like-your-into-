@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Google Gemini Go SDK - Interactive Developer Quickstart</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration verbatim from Style Guidance -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "error-container": "#93000a",
+            "surface-bright": "#363941",
+            "on-tertiary-container": "#340080",
+            "error": "#ffb4ab",
+            "surface-container-lowest": "#0b0e15",
+            "on-primary-fixed-variant": "#2f2ebe",
+            "on-error-container": "#ffdad6",
+            "on-secondary-container": "#00424e",
+            "on-secondary-fixed": "#001f26",
+            "surface-container-highest": "#32353d",
+            "primary-fixed": "#e1e0ff",
+            "on-background": "#e1e2ec",
+            "surface-tint": "#c0c1ff",
+            "secondary-fixed": "#acedff",
+            "outline": "#908fa0",
+            "on-surface-variant": "#c7c4d7",
+            "on-primary-fixed": "#07006c",
+            "on-tertiary": "#3c0091",
+            "primary-container": "#8083ff",
+            "on-tertiary-fixed": "#23005c",
+            "surface-container": "#1d1f27",
+            "inverse-surface": "#e1e2ec",
+            "outline-variant": "#464554",
+            "on-surface": "#e1e2ec",
+            "tertiary": "#d0bcff",
+            "primary-fixed-dim": "#c0c1ff",
+            "on-secondary-fixed-variant": "#004e5c",
+            "surface-container-low": "#191b23",
+            "on-tertiary-fixed-variant": "#5516be",
+            "surface-dim": "#10131a",
+            "on-primary-container": "#0d0096",
+            "secondary-container": "#03b5d3",
+            "tertiary-fixed": "#e9ddff",
+            "on-primary": "#1000a9",
+            "secondary-fixed-dim": "#4cd7f6",
+            "on-secondary": "#003640",
+            "inverse-primary": "#494bd6",
+            "primary": "#c0c1ff",
+            "on-error": "#690005",
+            "secondary": "#4cd7f6",
+            "surface-container-high": "#272a32",
+            "surface": "#10131a",
+            "inverse-on-surface": "#2d3038",
+            "tertiary-container": "#a078ff",
+            "background": "#10131a",
+            "tertiary-fixed-dim": "#d0bcff",
+            "surface-variant": "#32353d"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-md": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "margin": "2rem",
+            "space-lg": "1.5rem",
+            "gutter": "1.5rem"
+          },
+          "fontFamily": {
+            "display-lg-mobile": [
+              "Geist", "sans-serif"
+            ],
+            "headline-sm": [
+              "Geist", "sans-serif"
+            ],
+            "display-lg": [
+              "Geist", "sans-serif"
+            ],
+            "label-caps": [
+              "JetBrains Mono", "monospace"
+            ],
+            "code-sm": [
+              "JetBrains Mono", "monospace"
+            ],
+            "headline-md": [
+              "Geist", "sans-serif"
+            ],
+            "body-base": [
+              "Geist", "sans-serif"
+            ],
+            "headline-lg": [
+              "Geist", "sans-serif"
+            ],
+            "code-base": [
+              "JetBrains Mono", "monospace"
+            ],
+            "body-sm": [
+              "Geist", "sans-serif"
+            ]
+          },
+          "fontSize": {
+            "display-lg-mobile": [
+              "30px",
+              {
+                "lineHeight": "38px",
+                "letterSpacing": "-0.02em",
+                "fontWeight": "700"
+              }
+            ],
+            "headline-sm": [
+              "16px",
+              {
+                "lineHeight": "24px",
+                "letterSpacing": "-0.01em",
+                "fontWeight": "600"
+              }
+            ],
+            "display-lg": [
+              "40px",
+              {
+                "lineHeight": "48px",
+                "letterSpacing": "-0.025em",
+                "fontWeight": "700"
+              }
+            ],
+            "label-caps": [
+              "11px",
+              {
+                "lineHeight": "16px",
+                "letterSpacing": "0.08em",
+                "fontWeight": "600"
+              }
+            ],
+            "code-sm": [
+              "12px",
+              {
+                "lineHeight": "18px",
+                "letterSpacing": "-0.005em",
+                "fontWeight": "400"
+              }
+            ],
+            "headline-md": [
+              "20px",
+              {
+                "lineHeight": "28px",
+                "letterSpacing": "-0.015em",
+                "fontWeight": "600"
+              }
+            ],
+            "body-base": [
+              "15px",
+              {
+                "lineHeight": "24px",
+                "letterSpacing": "-0.005em",
+                "fontWeight": "400"
+              }
+            ],
+            "headline-lg": [
+              "28px",
+              {
+                "lineHeight": "36px",
+                "letterSpacing": "-0.02em",
+                "fontWeight": "600"
+              }
+            ],
+            "code-base": [
+              "13.5px",
+              {
+                "lineHeight": "22px",
+                "letterSpacing": "-0.01em",
+                "fontWeight": "400"
+              }
+            ],
+            "body-sm": [
+              "13px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0em",
+                "fontWeight": "400"
+              }
+            ]
+          }
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen selection:bg-primary-container selection:text-on-primary-container">
+<!-- ================= TOP NAVIGATION BAR ================= -->
+<header class="bg-surface-container-lowest dark:bg-surface-container-lowest docked full-width top-0 sticky z-50 border-b border-outline-variant dark:border-outline-variant flat no shadows">
+<div class="flex justify-between items-center w-full px-space-lg h-14 max-w-7xl mx-auto">
+<!-- Left: Logo & Search -->
+<div class="flex items-center gap-space-lg">
+<a class="flex items-center gap-2 group" href="#">
+<div class="w-7 h-7 rounded-lg bg-surface-container-high border border-outline-variant flex items-center justify-center text-primary group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-headline-sm" data-icon="code">code</span>
+</div>
+<span class="text-headline-md font-headline-md font-bold text-on-surface dark:text-on-surface tracking-tight">Go SDK Docs</span>
+</a>
+<div class="hidden md:flex items-center gap-space-xs px-2.5 py-1 rounded-lg bg-surface-container-low border border-outline-variant text-on-surface-variant font-code-sm text-code-sm">
+<span>v1.4.0</span>
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="text-secondary font-label-caps text-label-caps">STABLE</span>
+</div>
+<!-- Search Bar on Left -->
+<div class="relative hidden sm:block w-64 lg:w-72">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[16px]" data-icon="search">search</span>
+</div>
+<input class="w-full bg-surface-container-low border border-outline-variant text-on-surface pl-9 pr-12 py-1.5 rounded-lg text-body-sm font-body-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder-outline transition-all" placeholder="Search API docs or methods..." type="text"/>
+<div class="absolute inset-y-0 right-0 pr-2 flex items-center">
+<kbd class="text-label-caps font-label-caps text-outline bg-surface-container px-1.5 py-0.5 rounded border border-outline-variant">⌘K</kbd>
+</div>
+</div>
+</div>
+<!-- Center / Right Links & Actions -->
+<div class="flex items-center gap-space-md">
+<nav class="hidden lg:flex items-center gap-space-lg">
+<a class="text-primary dark:text-primary font-code-base border-b-2 border-primary pb-1" href="#guides">Guides</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface transition-colors font-body-sm text-body-sm" href="#reference">Reference</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface transition-colors font-body-sm text-body-sm" href="#samples">Samples</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface transition-colors font-body-sm text-body-sm" href="#architecture">Architecture</a>
+</nav>
+<div class="flex items-center gap-space-sm pl-space-sm border-l border-outline-variant">
+<a class="p-2 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-high transition-colors flex items-center" href="https://github.com/google/generative-ai-go" rel="noreferrer" target="_blank" title="GitHub Repository">
+<span class="material-symbols-outlined text-[18px]" data-icon="code">code</span>
+</a>
+<button class="p-2 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-high transition-colors flex items-center" title="Star SDK">
+<span class="material-symbols-outlined text-[18px]" data-icon="star">star</span>
+</button>
+<a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary text-on-primary font-headline-sm text-body-sm font-semibold hover:bg-primary-fixed-dim transition-all shadow-sm" href="#api-key">
+<span class="material-symbols-outlined text-[15px]" data-icon="key">key</span>
+            Get API Key
+          </a>
+</div>
+</div>
+</div>
+</header>
+<!-- ================= ROOT GRID LAYOUT ================= -->
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row w-full min-h-[calc(100vh-3.5rem)]">
+<!-- ================= LEFT SIDENAVBAR / STEP RAIL ================= -->
+<aside class="w-full md:w-64 shrink-0 bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant dark:border-outline-variant flat no shadows">
+<div class="flex flex-col justify-between h-full py-space-md sticky top-14">
+<div>
+<!-- Header Area -->
+<div class="px-space-md pb-space-md border-b border-outline-variant">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="terminal">terminal</span>
+<h2 class="text-headline-sm font-headline-sm font-semibold text-on-surface dark:text-on-surface">Interactive Quickstart</h2>
+</div>
+<p class="text-body-sm font-body-sm text-outline">Setup Guide &amp; Playground</p>
+</div>
+<!-- Step Progression List (from JSON anchors) -->
+<nav class="mt-space-md space-y-1">
+<div class="px-space-md py-1">
+<span class="text-label-caps font-label-caps text-outline uppercase tracking-wider">Setup Milestones</span>
+</div>
+<a class="flex items-center gap-space-sm bg-surface-container-high dark:bg-surface-container-high text-secondary dark:text-secondary border-l-2 border-secondary font-code-base px-space-md py-space-sm transition-all duration-150 ease-in-out" href="#step-1">
+<span class="material-symbols-outlined text-[18px] text-secondary" data-icon="terminal">terminal</span>
+<span class="text-code-sm font-code-sm font-medium">01 Init Module</span>
+</a>
+<a class="flex items-center gap-space-sm text-on-surface-variant dark:text-on-surface-variant font-code-sm px-space-md py-space-sm hover:text-on-surface hover:bg-surface-container transition-all duration-150 ease-in-out" href="#step-2">
+<span class="material-symbols-outlined text-[18px] text-outline" data-icon="download">download</span>
+<span class="text-code-sm font-code-sm">02 Install SDK</span>
+</a>
+<a class="flex items-center gap-space-sm text-on-surface-variant dark:text-on-surface-variant font-code-sm px-space-md py-space-sm hover:text-on-surface hover:bg-surface-container transition-all duration-150 ease-in-out" href="#step-3">
+<span class="material-symbols-outlined text-[18px] text-outline" data-icon="key">key</span>
+<span class="text-code-sm font-code-sm">03 Export Key</span>
+</a>
+<a class="flex items-center gap-space-sm text-on-surface-variant dark:text-on-surface-variant font-code-sm px-space-md py-space-sm hover:text-on-surface hover:bg-surface-container transition-all duration-150 ease-in-out" href="#step-4">
+<span class="material-symbols-outlined text-[18px] text-outline" data-icon="play_arrow">play_arrow</span>
+<span class="text-code-sm font-code-sm">04 Run main.go</span>
+</a>
+</nav>
+</div>
+<!-- Sidebar Footer Action & Links -->
+<div class="px-space-md pt-space-md border-t border-outline-variant space-y-3">
+<button class="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-surface-container-high border border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-primary text-body-sm font-body-sm transition-colors" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+<span class="material-symbols-outlined text-[16px]" data-icon="restart_alt">restart_alt</span>
+            Restart Walkthrough
+          </button>
+<div class="space-y-1">
+<a class="flex items-center gap-2 text-outline hover:text-on-surface text-code-sm font-code-sm py-1 transition-colors" href="#troubleshooting">
+<span class="material-symbols-outlined text-[16px]" data-icon="help">help</span>
+              Troubleshooting
+            </a>
+<a class="flex items-center gap-2 text-outline hover:text-on-surface text-code-sm font-code-sm py-1 transition-colors" href="#api-reference">
+<span class="material-symbols-outlined text-[16px]" data-icon="menu_book">menu_book</span>
+              API Reference
+            </a>
+</div>
+</div>
+</div>
+</aside>
+<!-- ================= CENTER MAIN WELL & RIGHT TOC ================= -->
+<div class="flex-1 flex flex-col lg:flex-row min-w-0">
+<!-- MAIN CONTENT WELL (Max 840px fluid) -->
+<main class="flex-1 px-4 sm:px-space-lg lg:px-space-xl py-space-xl max-w-3xl space-y-space-xl">
+<!-- Header & Breadcrumb -->
+<header class="space-y-space-sm pb-space-lg border-b border-outline-variant">
+<nav class="flex items-center gap-2 text-body-sm font-body-sm text-outline">
+<a class="hover:text-on-surface transition-colors" href="#">Docs</a>
+<span>/</span>
+<a class="hover:text-on-surface transition-colors" href="#">Go SDK</a>
+<span>/</span>
+<span class="text-secondary font-code-sm">Quickstart</span>
+</nav>
+<h1 class="text-headline-lg font-headline-lg font-bold text-on-surface tracking-tight">
+            Get started with the Gemini API in Go
+          </h1>
+<p class="text-body-base font-body-base text-on-surface-variant leading-relaxed">
+            Set up your environment, install the official <code class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant text-primary font-code-sm text-code-sm">generative-ai-go</code> SDK, configure authentication, and run your first model inference in under 2 minutes.
+          </p>
+<!-- Status Badges -->
+<div class="flex flex-wrap items-center gap-2 pt-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container border border-outline-variant text-body-sm font-code-sm text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              Go 1.21+
+            </span>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container border border-outline-variant text-body-sm font-code-sm text-primary">
+<span class="material-symbols-outlined text-[14px]" data-icon="verified">verified</span>
+              Official Google SDK
+            </span>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container border border-outline-variant text-body-sm font-code-sm text-on-surface">
+              gemini-1.5-flash / pro ready
+            </span>
+</div>
+</header>
+<!-- ================= STEP 1: INITIALIZE MODULE ================= -->
+<section class="rounded-xl border border-outline-variant bg-surface-container-low overflow-hidden" id="step-1">
+<div class="p-space-lg border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="flex items-center justify-center w-7 h-7 rounded-full bg-primary-container text-on-primary-container font-code-sm font-bold text-code-sm">
+                01
+              </span>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Initialize a Go module</h3>
+<p class="text-body-sm font-body-sm text-outline">Create a clean directory and scaffold standard module manifests</p>
+</div>
+</div>
+<span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-surface-container text-label-caps font-label-caps text-secondary border border-outline-variant">
+              CLI COMMAND
+            </span>
+</div>
+<div class="p-space-lg space-y-space-md">
+<!-- Terminal Box -->
+<div class="rounded-lg border border-outline-variant bg-surface-container-lowest overflow-hidden">
+<div class="flex items-center justify-between px-3 py-2 bg-surface-container-high border-b border-outline-variant">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-error"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="ml-2 font-code-sm text-code-sm text-outline">bash — terminal</span>
+</div>
+<button class="flex items-center gap-1 px-2 py-1 rounded text-outline hover:text-on-surface hover:bg-surface-container text-label-caps font-label-caps transition-all" onclick="copySnippet('cmd-step1', this)">
+<span class="material-symbols-outlined text-[14px]" data-icon="content_copy">content_copy</span>
+<span>Copy</span>
+</button>
+</div>
+<pre class="p-space-md text-code-base font-code-base overflow-x-auto text-on-surface" id="cmd-step1"><code><span class="text-secondary select-none">$ </span>mkdir -p ~/gemini-go &amp;&amp; cd ~/gemini-go
+<span class="text-secondary select-none">$ </span>go mod init gemini-go</code></pre>
+</div>
+</div>
+</section>
+<!-- ================= STEP 2: INSTALL SDK ================= -->
+<section class="rounded-xl border border-outline-variant bg-surface-container-low overflow-hidden" id="step-2">
+<div class="p-space-lg border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="flex items-center justify-center w-7 h-7 rounded-full bg-primary-container text-on-primary-container font-code-sm font-bold text-code-sm">
+                02
+              </span>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Install the Gemini SDK and Google API dependencies</h3>
+<p class="text-body-sm font-body-sm text-outline">Pull the official Generative AI engine client and runtime options</p>
+</div>
+</div>
+<span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-surface-container text-label-caps font-label-caps text-secondary border border-outline-variant">
+              DEPENDENCIES
+            </span>
+</div>
+<div class="p-space-lg space-y-space-md">
+<!-- Terminal Box -->
+<div class="rounded-lg border border-outline-variant bg-surface-container-lowest overflow-hidden">
+<div class="flex items-center justify-between px-3 py-2 bg-surface-container-high border-b border-outline-variant">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-error"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="ml-2 font-code-sm text-code-sm text-outline">go get — dependencies</span>
+</div>
+<button class="flex items-center gap-1 px-2 py-1 rounded text-outline hover:text-on-surface hover:bg-surface-container text-label-caps font-label-caps transition-all" onclick="copySnippet('cmd-step2', this)">
+<span class="material-symbols-outlined text-[14px]" data-icon="content_copy">content_copy</span>
+<span>Copy</span>
+</button>
+</div>
+<pre class="p-space-md text-code-base font-code-base overflow-x-auto text-on-surface" id="cmd-step2"><code><span class="text-secondary select-none">$ </span>go get github.com/google/generative-ai-go/genai
+<span class="text-secondary select-none">$ </span>go get google.golang.org/api/option
+<span class="text-secondary select-none">$ </span>go get google.golang.org/api/iterator</code></pre>
+</div>
+<!-- Description Pills Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm pt-2">
+<div class="p-3 rounded-lg bg-surface-container border border-outline-variant">
+<div class="flex items-center gap-1.5 text-primary font-code-sm text-code-sm font-semibold mb-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="token">token</span>
+                  genai
+                </div>
+<p class="text-body-sm font-body-sm text-outline">Provides core client lifecycle, GenerativeModel, and prompt constructors.</p>
+</div>
+<div class="p-3 rounded-lg bg-surface-container border border-outline-variant">
+<div class="flex items-center gap-1.5 text-secondary font-code-sm text-code-sm font-semibold mb-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="vpn_key">vpn_key</span>
+                  option
+                </div>
+<p class="text-body-sm font-body-sm text-outline">Configures API authentication tokens, endpoints, and HTTP telemetry client options.</p>
+</div>
+<div class="p-3 rounded-lg bg-surface-container border border-outline-variant">
+<div class="flex items-center gap-1.5 text-tertiary font-code-sm text-code-sm font-semibold mb-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="stream">stream</span>
+                  iterator
+                </div>
+<p class="text-body-sm font-body-sm text-outline">Handles streaming response chunks and continuous token iterations gracefully.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= STEP 3: EXPORT API KEY ================= -->
+<section class="rounded-xl border border-outline-variant bg-surface-container-low overflow-hidden" id="step-3">
+<div class="p-space-lg border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="flex items-center justify-center w-7 h-7 rounded-full bg-primary-container text-on-primary-container font-code-sm font-bold text-code-sm">
+                03
+              </span>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Export your API key</h3>
+<p class="text-body-sm font-body-sm text-outline">Expose credential variable to your environment shell</p>
+</div>
+</div>
+<span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-surface-container text-label-caps font-label-caps text-secondary border border-outline-variant">
+              SECURITY
+            </span>
+</div>
+<div class="p-space-lg space-y-space-md">
+<!-- Terminal Box -->
+<div class="rounded-lg border border-outline-variant bg-surface-container-lowest overflow-hidden">
+<div class="flex items-center justify-between px-3 py-2 bg-surface-container-high border-b border-outline-variant">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-error"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="ml-2 font-code-sm text-code-sm text-outline">env — auth</span>
+</div>
+<button class="flex items-center gap-1 px-2 py-1 rounded text-outline hover:text-on-surface hover:bg-surface-container text-label-caps font-label-caps transition-all" onclick="copySnippet('cmd-step3', this)">
+<span class="material-symbols-outlined text-[14px]" data-icon="content_copy">content_copy</span>
+<span>Copy</span>
+</button>
+</div>
+<pre class="p-space-md text-code-base font-code-base overflow-x-auto text-on-surface" id="cmd-step3"><code><span class="text-secondary select-none">$ </span>export GEMINI_API_KEY="your-actual-api-key"</code></pre>
+</div>
+<!-- Security Tip Callout -->
+<div class="rounded-lg border border-error-container bg-surface-container p-space-md flex gap-3 items-start">
+<span class="material-symbols-outlined text-error text-[20px] shrink-0 mt-0.5" data-icon="security">security</span>
+<div class="space-y-1">
+<h4 class="text-body-sm font-headline-sm font-semibold text-error">Security Warning &amp; Secret Management</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+                  Never commit your API key to public repositories, source files, or build containers. In production, load tokens via secret managers (Secret Manager, Vault) or inject via secure runtime environment vars.
+                </p>
+<div class="pt-2">
+<a class="inline-flex items-center gap-1 text-secondary hover:text-secondary-fixed text-code-sm font-code-sm underline underline-offset-4" href="https://aistudio.google.com/app/apikey" rel="noreferrer" target="_blank">
+                    Grab a free developer API key in Google AI Studio
+                    <span class="material-symbols-outlined text-[14px]" data-icon="open_in_new">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= STEP 4: RUN MAIN.GO ================= -->
+<section class="rounded-xl border border-outline-variant bg-surface-container-low overflow-hidden" id="step-4">
+<div class="p-space-lg border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="flex items-center justify-center w-7 h-7 rounded-full bg-primary-container text-on-primary-container font-code-sm font-bold text-code-sm">
+                04
+              </span>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Save your code into main.go, then run it</h3>
+<p class="text-body-sm font-body-sm text-outline">Full runnable implementation of client configuration and token generation</p>
+</div>
+</div>
+<span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded bg-surface-container text-label-caps font-label-caps text-secondary border border-outline-variant">
+              GO RUN
+            </span>
+</div>
+<div class="p-space-lg space-y-space-md">
+<!-- Dual-tab Code Viewer -->
+<div class="rounded-lg border border-outline-variant bg-surface-container-lowest overflow-hidden">
+<div class="flex items-center justify-between px-3 py-1.5 bg-surface-container-high border-b border-outline-variant">
+<!-- Tabs -->
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-3 py-1 rounded bg-surface-container-low text-primary border border-outline-variant text-code-sm font-code-sm font-medium" id="tab-code-btn" onclick="switchTab('code')">
+<span class="material-symbols-outlined text-[14px]" data-icon="description">description</span>
+                    main.go
+                  </button>
+<button class="flex items-center gap-1.5 px-3 py-1 rounded text-outline hover:text-on-surface text-code-sm font-code-sm" id="tab-out-btn" onclick="switchTab('output')">
+<span class="material-symbols-outlined text-[14px]" data-icon="terminal">terminal</span>
+                    Terminal Output
+                  </button>
+</div>
+<div class="flex items-center gap-2">
+<span class="hidden sm:inline-block font-label-caps text-label-caps text-outline">gemini-1.5-flash</span>
+<button class="flex items-center gap-1 px-2 py-1 rounded text-outline hover:text-on-surface hover:bg-surface-container text-label-caps font-label-caps transition-all" onclick="copySnippet('code-step4', this)">
+<span class="material-symbols-outlined text-[14px]" data-icon="content_copy">content_copy</span>
+<span>Copy</span>
+</button>
+</div>
+</div>
+<!-- Tab 1: main.go Code -->
+<div class="p-space-md overflow-x-auto text-code-base font-code-base" id="tab-code-pane">
+<pre class="text-on-surface" id="code-step4"><code class="leading-relaxed"><span class="text-primary font-semibold">package</span> main
+
+<span class="text-primary font-semibold">import</span> (
+    <span class="text-secondary">"context"</span>
+    <span class="text-secondary">"fmt"</span>
+    <span class="text-secondary">"log"</span>
+    <span class="text-secondary">"os"</span>
+
+    <span class="text-secondary">"github.com/google/generative-ai-go/genai"</span>
+    <span class="text-secondary">"google.golang.org/api/option"</span>
+)
+
+<span class="text-primary font-semibold">func</span> <span class="text-tertiary">main</span>() {
+    ctx := context.<span class="text-tertiary">Background</span>()
+    client, err := genai.<span class="text-tertiary">NewClient</span>(ctx, option.<span class="text-tertiary">WithAPIKey</span>(os.<span class="text-tertiary">Getenv</span>(<span class="text-secondary">"GEMINI_API_KEY"</span>)))
+    <span class="text-primary font-semibold">if</span> err != nil {
+        log.<span class="text-tertiary">Fatalf</span>(<span class="text-secondary">"Failed to create client: %v"</span>, err)
+    }
+    <span class="text-primary font-semibold">defer</span> client.<span class="text-tertiary">Close</span>()
+
+    model := client.<span class="text-tertiary">GenerativeModel</span>(<span class="text-secondary">"gemini-1.5-flash"</span>)
+    resp, err := model.<span class="text-tertiary">GenerateContent</span>(ctx, genai.<span class="text-tertiary">Text</span>(<span class="text-secondary">"Explain quantum computing in one sentence for a developer."</span>))
+    <span class="text-primary font-semibold">if</span> err != nil {
+        log.<span class="text-tertiary">Fatalf</span>(<span class="text-secondary">"Error generating content: %v"</span>, err)
+    }
+
+    <span class="text-primary font-semibold">for</span> _, cand := <span class="text-primary font-semibold">range</span> resp.Candidates {
+        <span class="text-primary font-semibold">if</span> cand.Content != nil {
+            <span class="text-primary font-semibold">for</span> _, part := <span class="text-primary font-semibold">range</span> cand.Content.Parts {
+                fmt.<span class="text-tertiary">Printf</span>(<span class="text-secondary">"%v\n"</span>, part)
+            }
+        }
+    }
+}</code></pre>
+</div>
+<!-- Tab 2: Terminal Output -->
+<div class="p-space-md hidden space-y-3 font-code-base text-code-base bg-surface-container-lowest" id="tab-out-pane">
+<div class="text-outline">
+<span class="text-secondary select-none">$ </span>go run main.go
+                </div>
+<div class="p-space-md rounded bg-surface-container-high border border-outline-variant text-on-surface">
+                  Quantum computing harnesses superposition and entanglement of qubits to solve specific probabilistic and combinatorial problems exponentially faster than classical bits.
+                </div>
+<div class="flex items-center gap-4 text-label-caps font-label-caps text-outline pt-2 border-t border-outline-variant">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-secondary" data-icon="check_circle">check_circle</span>
+                    EXIT CODE 0
+                  </span>
+<span>142ms TTFT</span>
+<span>245 tok/s</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= NEXT STEPS ROW ================= -->
+<section class="space-y-space-md pt-space-md border-t border-outline-variant">
+<div class="flex items-center justify-between">
+<h2 class="text-headline-md font-headline-md text-on-surface">Next Steps with Gemini Go SDK</h2>
+<span class="text-label-caps font-label-caps text-outline">LEVEL UP</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<!-- Card 1 -->
+<div class="p-space-md rounded-xl bg-surface-container-low border border-outline-variant hover:border-primary transition-all group flex flex-col justify-between">
+<div class="space-y-2">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]" data-icon="stream">stream</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface group-hover:text-primary transition-colors">Streaming Responses</h3>
+<p class="text-body-sm font-body-sm text-outline">
+                  Consume tokens as they generate using the iterator pattern (<code class="font-code-sm text-code-sm text-secondary">GenerateContentStream</code>).
+                </p>
+</div>
+<div class="pt-4 flex items-center text-primary text-code-sm font-code-sm gap-1 group-hover:translate-x-1 transition-transform">
+<span>View Stream Sample</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="p-space-md rounded-xl bg-surface-container-low border border-outline-variant hover:border-primary transition-all group flex flex-col justify-between">
+<div class="space-y-2">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]" data-icon="perm_media">perm_media</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface group-hover:text-primary transition-colors">Multimodal Prompts</h3>
+<p class="text-body-sm font-body-sm text-outline">
+                  Pass inline byte arrays or use File API for images, video, and audio analysis directly from Go routines.
+                </p>
+</div>
+<div class="pt-4 flex items-center text-primary text-code-sm font-code-sm gap-1 group-hover:translate-x-1 transition-transform">
+<span>Multimodal Guide</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="p-space-md rounded-xl bg-surface-container-low border border-outline-variant hover:border-primary transition-all group flex flex-col justify-between">
+<div class="space-y-2">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[20px]" data-icon="tune">tune</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface group-hover:text-primary transition-colors">System &amp; Temperature</h3>
+<p class="text-body-sm font-body-sm text-outline">
+                  Configure custom personas, system instructions, safety thresholds, and topK/temperature hyper-parameters.
+                </p>
+</div>
+<div class="pt-4 flex items-center text-primary text-code-sm font-code-sm gap-1 group-hover:translate-x-1 transition-transform">
+<span>Configure Models</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- ================= RIGHT TABLE OF CONTENTS (220px Fixed) ================= -->
+<aside class="hidden xl:block w-56 shrink-0 py-space-xl px-space-md border-l border-outline-variant">
+<div class="sticky top-20 space-y-space-md">
+<div class="flex items-center gap-1.5 text-label-caps font-label-caps text-outline uppercase tracking-wider">
+<span class="material-symbols-outlined text-[16px]" data-icon="list">list</span>
+            On This Page
+          </div>
+<nav class="space-y-2 text-body-sm font-body-sm border-l border-outline-variant">
+<a class="block pl-3 text-outline hover:text-on-surface hover:border-l-2 hover:border-outline -ml-[1px] transition-all" href="#prerequisites">Prerequisites</a>
+<a class="block pl-3 text-primary font-medium border-l-2 border-primary -ml-[1px] transition-all" href="#step-1">1. Init Go module</a>
+<a class="block pl-3 text-outline hover:text-on-surface hover:border-l-2 hover:border-outline -ml-[1px] transition-all" href="#step-2">2. Install dependencies</a>
+<a class="block pl-3 text-outline hover:text-on-surface hover:border-l-2 hover:border-outline -ml-[1px] transition-all" href="#step-3">3. Export API Key</a>
+<a class="block pl-3 text-outline hover:text-on-surface hover:border-l-2 hover:border-outline -ml-[1px] transition-all" href="#step-4">4. Run main.go</a>
+<a class="block pl-3 text-outline hover:text-on-surface hover:border-l-2 hover:border-outline -ml-[1px] transition-all" href="#next-steps">Next Steps</a>
+</nav>
+<!-- Telemetry Pill Card -->
+<div class="p-3 rounded-lg bg-surface-container border border-outline-variant space-y-2 mt-space-xl">
+<div class="flex items-center justify-between text-label-caps font-label-caps text-outline">
+<span>SDK HEALTH</span>
+<span class="text-secondary">ONLINE</span>
+</div>
+<div class="font-code-sm text-code-sm text-on-surface">gemini-1.5-flash</div>
+<div class="flex items-center justify-between text-label-caps font-label-caps text-outline pt-1 border-t border-outline-variant">
+<span>LATENCY</span>
+<span class="text-on-surface">~140ms</span>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+    function copySnippet(elementId, btn) {
+      const textToCopy = document.getElementById(elementId).innerText.replace(/^\$ /gm, '');
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = `
+          <span class="material-symbols-outlined text-[14px] text-secondary" data-icon="check">check</span>
+          <span class="text-secondary font-medium">Copied!</span>
+        `;
+        setTimeout(() => {
+          btn.innerHTML = originalHTML;
+        }, 2000);
+      });
+    }
+
+    function switchTab(target) {
+      const codeBtn = document.getElementById('tab-code-btn');
+      const outBtn = document.getElementById('tab-out-btn');
+      const codePane = document.getElementById('tab-code-pane');
+      const outPane = document.getElementById('tab-out-pane');
+
+      if (target === 'code') {
+        codePane.classList.remove('hidden');
+        outPane.classList.add('hidden');
+        codeBtn.className = "flex items-center gap-1.5 px-3 py-1 rounded bg-surface-container-low text-primary border border-outline-variant text-code-sm font-code-sm font-medium";
+        outBtn.className = "flex items-center gap-1.5 px-3 py-1 rounded text-outline hover:text-on-surface text-code-sm font-code-sm";
+      } else {
+        outPane.classList.remove('hidden');
+        codePane.classList.add('hidden');
+        outBtn.className = "flex items-center gap-1.5 px-3 py-1 rounded bg-surface-container-low text-primary border border-outline-variant text-code-sm font-code-sm font-medium";
+        codeBtn.className = "flex items-center gap-1.5 px-3 py-1 rounded text-outline hover:text-on-surface text-code-sm font-code-sm";
+      }
+    }
+  </script>
+</body></html>

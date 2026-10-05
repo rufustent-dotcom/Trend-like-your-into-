@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gemini Go SDK - Concurrent Multi-User Streaming Chat Sessions</title>
+<!-- Fonts: Geist & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration verbatim from Design System -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "error-container": "#93000a",
+            "on-secondary-fixed-variant": "#004e5c",
+            "surface-container": "#1c2028",
+            "on-surface-variant": "#c2c6d6",
+            "secondary-fixed-dim": "#4cd7f6",
+            "primary-container": "#4d8eff",
+            "surface-container-low": "#181c24",
+            "surface-bright": "#353942",
+            "surface-variant": "#31353e",
+            "on-error": "#690005",
+            "on-primary-container": "#00285d",
+            "tertiary-fixed": "#e9ddff",
+            "secondary": "#4cd7f6",
+            "on-tertiary-fixed": "#23005c",
+            "primary-fixed-dim": "#adc6ff",
+            "surface-dim": "#0f131c",
+            "surface": "#0f131c",
+            "on-primary-fixed-variant": "#004395",
+            "surface-container-high": "#262a33",
+            "on-background": "#dfe2ee",
+            "on-tertiary": "#3c0091",
+            "outline": "#8c909f",
+            "surface-container-lowest": "#0a0e16",
+            "error": "#ffb4ab",
+            "primary": "#adc6ff",
+            "background": "#0f131c",
+            "inverse-on-surface": "#2c3039",
+            "tertiary-fixed-dim": "#d0bcff",
+            "on-primary-fixed": "#001a42",
+            "primary-fixed": "#d8e2ff",
+            "on-tertiary-container": "#340080",
+            "inverse-primary": "#005ac2",
+            "secondary-container": "#03b5d3",
+            "on-tertiary-fixed-variant": "#5516be",
+            "secondary-fixed": "#acedff",
+            "on-surface": "#dfe2ee",
+            "on-primary": "#002e6a",
+            "on-secondary-fixed": "#001f26",
+            "inverse-surface": "#dfe2ee",
+            "outline-variant": "#424754",
+            "tertiary": "#d0bcff",
+            "on-secondary-container": "#00424e",
+            "on-secondary": "#003640",
+            "surface-container-highest": "#31353e",
+            "tertiary-container": "#a078ff",
+            "surface-tint": "#adc6ff",
+            "on-error-container": "#ffdad6"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter": "1.5rem",
+            "gutter-sm": "1rem",
+            "margin-lg": "3rem",
+            "space-xl": "2.5rem",
+            "space-sm": "0.5rem",
+            "space-xs": "0.25rem",
+            "gutter-lg": "2rem",
+            "space-lg": "1.5rem",
+            "margin": "1.5rem",
+            "space-md": "1rem",
+            "margin-sm": "1rem"
+          },
+          "fontFamily": {
+            "headline-xl": ["Geist"],
+            "code-md": ["JetBrains Mono"],
+            "headline-sm": ["Geist"],
+            "headline-lg-mobile": ["Geist"],
+            "headline-md": ["Geist"],
+            "headline-xl-mobile": ["Geist"],
+            "code-lg": ["JetBrains Mono"],
+            "body-sm": ["Geist"],
+            "label-sm": ["JetBrains Mono"],
+            "code-sm": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "body-lg": ["Geist"],
+            "headline-lg": ["Geist"],
+            "body-md": ["Geist"]
+          },
+          "fontSize": {
+            "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+            "code-md": ["13px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+            "headline-sm": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+            "headline-xl-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "code-lg": ["14px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "code-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    /* Custom pulse & streaming animations */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .cursor-blink {
+      animation: blink 0.9s infinite;
+    }
+    .luminous-line {
+      background: linear-gradient(90deg, #adc6ff 0%, #4cd7f6 50%, #d0bcff 100%);
+    }
+    .grid-bg {
+      background-size: 24px 24px;
+      background-image: linear-gradient(to right, rgba(66, 71, 84, 0.15) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(66, 71, 84, 0.15) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased font-body-md text-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container min-h-screen">
+<!-- ================= TOP NAVIGATION BAR (Shared Component) ================= -->
+<header class="bg-surface-container-lowest dark:bg-surface-container-lowest docked full-width top-0 sticky z-50 border-b border-outline-variant dark:border-outline-variant flex justify-between items-center w-full px-6 h-14">
+<!-- Brand & Search -->
+<div class="flex items-center space-x-6">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-secondary text-[22px]">hub</span>
+<span class="text-headline-sm font-headline-sm font-semibold text-on-surface dark:text-on-surface tracking-tight">Gemini Go SDK</span>
+</div>
+<!-- Search Bar (on_left) -->
+<div class="relative hidden sm:flex items-center">
+<span class="material-symbols-outlined absolute left-2.5 text-outline text-[16px]">search</span>
+<input class="bg-surface-container-low border border-outline-variant rounded-lg pl-8 pr-12 py-1 text-code-sm font-code-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary w-64 transition-all" placeholder="Search genai pkg, mutex methods..." type="text"/>
+<kbd class="absolute right-2 text-label-sm font-label-sm text-outline bg-surface-container px-1 py-0.5 rounded border border-outline-variant">⌘K</kbd>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden xl:flex items-center space-x-6">
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-headline-sm text-[13px] hover:bg-surface-container dark:hover:bg-surface-container px-2 py-1 rounded transition-colors duration-150" href="#architecture">Architecture</a>
+<a class="text-primary dark:text-primary border-b-2 border-primary dark:border-primary pb-1 font-headline-sm text-[13px]" href="#concurrency-guide">Concurrency Guide</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-headline-sm text-[13px] hover:bg-surface-container dark:hover:bg-surface-container px-2 py-1 rounded transition-colors duration-150" href="#visualizer">Live Stream Visualizer</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-headline-sm text-[13px] hover:bg-surface-container dark:hover:bg-surface-container px-2 py-1 rounded transition-colors duration-150" href="#api">API Reference</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-headline-sm text-[13px] hover:bg-surface-container dark:hover:bg-surface-container px-2 py-1 rounded transition-colors duration-150" href="#benchmarks">Benchmarks</a>
+</nav>
+<!-- Trailing Actions & Icons -->
+<div class="flex items-center space-x-3">
+<!-- Trailing Icon Actions -->
+<div class="hidden lg:flex items-center space-x-1 border-r border-outline-variant pr-3">
+<button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 active:scale-[0.98]" title="Terminal">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 active:scale-[0.98]" title="Source Code">
+<span class="material-symbols-outlined text-[18px]">code</span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 active:scale-[0.98]" title="Telemetry Monitoring">
+<span class="material-symbols-outlined text-[18px]">monitoring</span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 active:scale-[0.98]" title="Configuration">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+</button>
+</div>
+<!-- Secondary & Primary Actions -->
+<button class="hidden md:inline-flex items-center px-3 py-1.5 text-label-md font-label-md text-on-surface bg-surface-container border border-outline-variant rounded-lg hover:border-outline hover:bg-surface-bright transition-all active:scale-[0.98]" onclick="runStreamSimulation()">
+        Run Playground
+      </button>
+<button class="inline-flex items-center space-x-1 px-3 py-1.5 text-label-md font-label-md text-on-primary-container bg-primary-container hover:opacity-90 rounded-lg transition-all active:scale-[0.98] font-medium shadow-sm">
+<span class="material-symbols-outlined text-[15px]">speed</span>
+<span>Deploy Benchmark</span>
+</button>
+</div>
+</header>
+<!-- ================= MAIN WRAPPER WITH SIDE NAV ================= -->
+<div class="flex min-h-[calc(100vh-3.5rem)] w-full">
+<!-- ================= SIDE NAVIGATION BAR (Shared Component) ================= -->
+<aside class="hidden lg:flex fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-[260px] z-40 bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant dark:border-outline-variant flex-col justify-between py-4 px-3">
+<!-- Upper Section -->
+<div class="space-y-4">
+<!-- Header Info -->
+<div class="px-2 pt-1 pb-2">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="deployed_code">deployed_code</span>
+<div>
+<div class="text-headline-sm font-headline-sm text-on-surface dark:text-on-surface text-[14px]">genai/concurrent</div>
+<div class="text-label-sm font-label-sm text-outline">v0.14.2 • Go 1.22+</div>
+</div>
+</div>
+</div>
+<!-- CTA Button -->
+<button class="w-full py-2 px-3 flex items-center justify-center space-x-2 bg-primary-container hover:bg-primary text-on-primary-container rounded-lg text-label-md font-label-md transition-all active:scale-[0.99] font-medium" onclick="addNewSession()">
+<span class="material-symbols-outlined text-[16px]">add_circle</span>
+<span>New Stream Session</span>
+</button>
+<!-- Navigation Tabs (7 tabs) -->
+<nav class="space-y-1">
+<a class="flex items-center space-x-2.5 py-2 px-2 rounded text-primary dark:text-primary bg-surface-container dark:bg-surface-container border-l-2 border-primary dark:border-primary font-headline-sm text-[13px] pl-3 transition-all duration-150" href="#overview">
+<span class="material-symbols-outlined text-[18px]">hub</span>
+<span>Overview &amp; Mutex</span>
+</a>
+<a class="flex items-center space-x-2.5 py-2 px-2 rounded text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-headline-sm text-[13px] pl-3 hover:bg-surface-container dark:hover:bg-surface-container transition-all duration-150" href="#session-manager">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+<span>SessionManager</span>
+</a>
+<a class="flex items-center space-x-2.5 py-2 px-2 rounded text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-headline-sm text-[13px] pl-3 hover:bg-surface-container dark:hover:bg-surface-container transition-all duration-150" href="#worker-pools">
+<span class="material-symbols-outlined text-[18px]">sync_alt</span>
+<span>Goroutine Pools</span>
+</a>
+<a class="flex items-center space-x-2.5 py-2 px-2 rounded text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-headline-sm text-[13px] pl-3 hover:bg-surface-container dark:hover:bg-surface-container transition-all duration-150" href="#multiplexing">
+<span class="material-symbols-outlined text-[18px]">call_split</span>
+<span>Channel Multiplexing</span>
+</a>
+<a class="flex items-center space-x-2.5 py-2 px-2 rounded text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-headline-sm text-[13px] pl-3 hover:bg-surface-container dark:hover:bg-surface-container transition-all duration-150" href="#token-pipe">
+<span class="material-symbols-outlined text-[18px]">stream</span>
+<span>Streaming Token Pipe</span>
+</a>
+<a class="flex items-center space-x-2.5 py-2 px-2 rounded text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-headline-sm text-[13px] pl-3 hover:bg-surface-container dark:hover:bg-surface-container transition-all duration-150" href="#cancellation">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+<span>Context Cancellation</span>
+</a>
+<a class="flex items-center space-x-2.5 py-2 px-2 rounded text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface font-headline-sm text-[13px] pl-3 hover:bg-surface-container dark:hover:bg-surface-container transition-all duration-150" href="#metrics">
+<span class="material-symbols-outlined text-[18px]">speed</span>
+<span>Metrics &amp; Telemetry</span>
+</a>
+</nav>
+</div>
+<!-- Footer Tabs (2 tabs) -->
+<div class="border-t border-outline-variant pt-3 space-y-1">
+<a class="flex items-center space-x-2.5 py-1.5 px-3 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container text-label-md font-label-md transition-colors" href="https://pkg.go.dev/google.golang.org/genai" target="_blank">
+<span class="material-symbols-outlined text-[16px]">deployed_code</span>
+<span>Go Packages</span>
+</a>
+<a class="flex items-center space-x-2.5 py-1.5 px-3 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container text-label-md font-label-md transition-colors" href="#report">
+<span class="material-symbols-outlined text-[16px]">bug_report</span>
+<span>Report Issue</span>
+</a>
+</div>
+</aside>
+<!-- ================= CONTENT WORKSPACE CANVAS ================= -->
+<main class="w-full lg:ml-[260px] p-4 sm:p-6 lg:p-8 space-y-8">
+<!-- Top Section: Breadcrumb & Main Header -->
+<section class="space-y-3 border-b border-outline-variant pb-6">
+<div class="flex items-center space-x-2 text-label-md font-label-md text-outline">
+<span>Docs</span>
+<span class="text-outline-variant">/</span>
+<span>Gemini Go SDK</span>
+<span class="text-outline-variant">/</span>
+<span>Concurrency Patterns</span>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-medium">Multi-User Stream Manager</span>
+</div>
+<div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+<div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight">
+              Concurrent Multi-User Streaming Sessions
+            </h1>
+<p class="text-body-md font-body-md text-on-surface-variant mt-1 max-w-3xl">
+              High-throughput asynchronous streaming architecture for Gemini 2.5 on Go. Orchestrates thread-safe <code class="text-code-sm font-code-sm text-secondary bg-surface-container px-1.5 py-0.5 rounded border border-outline-variant">sync.RWMutex</code> protected sessions, non-blocking goroutine dispatchers, and parallel token pipe multiplexing.
+            </p>
+</div>
+<!-- Badges & Primary Execution Triggers -->
+<div class="flex flex-wrap items-center gap-2">
+<span class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded bg-surface-container border border-outline-variant text-label-sm font-label-sm text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>Go 1.22+</span>
+</span>
+<span class="inline-flex items-center px-2.5 py-1 rounded bg-surface-container border border-outline-variant text-label-sm font-label-sm text-tertiary">
+              sync.RWMutex
+            </span>
+<span class="inline-flex items-center px-2.5 py-1 rounded bg-surface-container border border-outline-variant text-label-sm font-label-sm text-secondary">
+              gemini-2.5-flash
+            </span>
+<span class="inline-flex items-center space-x-1 px-2.5 py-1 rounded bg-surface-container border border-secondary-container text-label-sm font-label-sm text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container animate-ping"></span>
+<span>Status: Ready</span>
+</span>
+</div>
+</div>
+<!-- Action Bar -->
+<div class="flex flex-wrap items-center gap-3 pt-2">
+<button class="inline-flex items-center space-x-2 px-3.5 py-1.5 text-label-md font-label-md text-on-primary-container bg-primary-container hover:bg-primary rounded-lg transition-all active:scale-[0.98]" onclick="triggerBenchmark()">
+<span class="material-symbols-outlined text-[16px]">play_arrow</span>
+<span>Run Concurrency Benchmark</span>
+</button>
+<button class="inline-flex items-center space-x-2 px-3.5 py-1.5 text-label-md font-label-md text-on-surface bg-surface-container border border-outline-variant hover:border-outline hover:bg-surface-bright rounded-lg transition-all active:scale-[0.98]" onclick="toggleMutexInspection()">
+<span class="material-symbols-outlined text-[16px]">lock_clock</span>
+<span>Inspect Mutex State</span>
+</button>
+<button class="inline-flex items-center space-x-2 px-3.5 py-1.5 text-label-md font-label-md text-on-surface-variant hover:text-on-surface bg-surface-container-low border border-outline-variant rounded-lg transition-all active:scale-[0.98]" id="copy-btn" onclick="copyFullSnippet()">
+<span class="material-symbols-outlined text-[16px]" id="copy-icon">content_copy</span>
+<span id="copy-text">Copy Full Go Code</span>
+</button>
+</div>
+</section>
+<!-- ================= SECTION 5: REAL-TIME TELEMETRY & CONCURRENCY STATS ================= -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="metrics">
+<!-- Metric 1 -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-4 flex flex-col justify-between relative overflow-hidden group hover:border-primary/50 transition-colors">
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-secondary"></div>
+<div class="flex items-center justify-between text-outline">
+<span class="text-label-md font-label-md uppercase tracking-wider">Active Goroutines</span>
+<span class="material-symbols-outlined text-secondary text-[20px]">sync</span>
+</div>
+<div class="mt-3">
+<div class="text-headline-md font-headline-md text-on-surface flex items-baseline space-x-1.5">
+<span id="stat-goroutines">2</span>
+<span class="text-body-sm font-body-sm text-outline">running / 0 blocked</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1">Managed via <code class="text-code-sm font-code-sm text-secondary">sync.WaitGroup</code></p>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-4 flex flex-col justify-between relative overflow-hidden group hover:border-primary/50 transition-colors">
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-tertiary"></div>
+<div class="flex items-center justify-between text-outline">
+<span class="text-label-md font-label-md uppercase tracking-wider">Mutex Lock Time</span>
+<span class="material-symbols-outlined text-tertiary text-[20px]">lock_reset</span>
+</div>
+<div class="mt-3">
+<div class="text-headline-md font-headline-md text-on-surface flex items-baseline space-x-1.5">
+<span id="stat-mutex">&lt; 0.04 ms</span>
+</div>
+<p class="text-label-sm font-label-sm text-secondary mt-1">No lock contention detected</p>
+</div>
+</div>
+<!-- Metric 3 -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-4 flex flex-col justify-between relative overflow-hidden group hover:border-primary/50 transition-colors">
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-primary"></div>
+<div class="flex items-center justify-between text-outline">
+<span class="text-label-md font-label-md uppercase tracking-wider">Throughput</span>
+<span class="material-symbols-outlined text-primary text-[20px]">speed</span>
+</div>
+<div class="mt-3">
+<div class="text-headline-md font-headline-md text-on-surface flex items-baseline space-x-1.5">
+<span id="stat-tps">148.4</span>
+<span class="text-body-sm font-body-sm text-outline">tokens/sec</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1">Aggregate multi-channel pipe</p>
+</div>
+</div>
+<!-- Metric 4 -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-4 flex flex-col justify-between relative overflow-hidden group hover:border-primary/50 transition-colors">
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-secondary-fixed-dim"></div>
+<div class="flex items-center justify-between text-outline">
+<span class="text-label-md font-label-md uppercase tracking-wider">Time to First Token</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim text-[20px]">timer</span>
+</div>
+<div class="mt-3">
+<div class="text-headline-md font-headline-md text-on-surface flex items-baseline space-x-1.5">
+<span>182 ms</span>
+<span class="text-body-sm font-body-sm text-outline">avg TTFT</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1">gemini-2.5-flash streaming</p>
+</div>
+</div>
+</section>
+<!-- ================= SECTION 2: ARCHITECTURE & CONCURRENCY VISUALIZER ================= -->
+<section class="bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden" id="architecture">
+<div class="p-4 sm:p-5 border-b border-outline-variant flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface-container-lowest">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center border border-outline-variant text-primary">
+<span class="material-symbols-outlined text-[20px]">account_tree</span>
+</div>
+<div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface font-semibold">SessionManager Concurrency Flow</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Thread-safe allocation, locking lifecycles, and asynchronous IO distribution</p>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-label-sm font-label-sm bg-surface-container border border-outline-variant text-outline">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>2 Goroutines Dispatched</span>
+</span>
+</div>
+</div>
+<!-- Visual Architecture Diagram Canvas -->
+<div class="p-6 grid-bg relative overflow-x-auto">
+<div class="min-w-[760px] flex items-center justify-between gap-4 py-4">
+<!-- Node 1: Client & GenerativeModel -->
+<div class="flex-1 bg-surface-container border border-outline-variant rounded-xl p-4 shadow-sm relative group hover:border-primary transition-all">
+<div class="flex items-center justify-between pb-2 mb-2 border-b border-outline-variant">
+<span class="text-label-sm font-label-sm text-primary uppercase font-bold">1. Shared Model</span>
+<span class="material-symbols-outlined text-outline text-[16px]">memory</span>
+</div>
+<p class="text-code-sm font-code-sm text-on-surface font-semibold">*genai.Client</p>
+<div class="mt-2 text-label-sm font-label-sm text-on-surface-variant bg-surface-container-lowest p-2 rounded border border-outline-variant">
+<code>genai.GenerativeModel</code><br/>
+<span class="text-outline">ReadOnly safe across all threads</span>
+</div>
+</div>
+<!-- Arrow 1 -->
+<div class="flex flex-col items-center text-outline">
+<span class="text-label-sm font-label-sm text-outline-variant">Init</span>
+<span class="material-symbols-outlined text-primary">arrow_forward</span>
+</div>
+<!-- Node 2: SessionManager & RWMutex -->
+<div class="flex-1 bg-surface-container border-2 border-primary/40 rounded-xl p-4 shadow-sm relative">
+<div class="absolute -top-2.5 right-3 bg-primary text-on-primary-container text-label-sm font-label-sm px-2 py-0.2 rounded font-bold">
+                Lock Guard
+              </div>
+<div class="flex items-center justify-between pb-2 mb-2 border-b border-outline-variant">
+<span class="text-label-sm font-label-sm text-secondary uppercase font-bold">2. SessionManager</span>
+<span class="material-symbols-outlined text-secondary text-[16px]">lock</span>
+</div>
+<p class="text-code-sm font-code-sm text-on-surface font-semibold">sync.RWMutex</p>
+<div class="mt-2 space-y-1.5">
+<div class="text-label-sm font-label-sm bg-surface-container-lowest p-1.5 rounded border border-outline-variant flex items-center justify-between">
+<span class="text-outline">sm.mu.Lock()</span>
+<span class="text-secondary font-mono">Exclusive</span>
+</div>
+<div class="text-label-sm font-label-sm bg-surface-container-lowest p-1.5 rounded border border-outline-variant text-on-surface">
+<code>map[string]*ChatSession</code>
+</div>
+</div>
+</div>
+<!-- Arrow 2 -->
+<div class="flex flex-col items-center text-outline">
+<span class="text-label-sm font-label-sm text-secondary">Dispatch</span>
+<span class="material-symbols-outlined text-secondary">fork_right</span>
+</div>
+<!-- Node 3: Goroutines & Active Sessions -->
+<div class="flex-1 bg-surface-container border border-outline-variant rounded-xl p-4 shadow-sm space-y-2.5">
+<div class="flex items-center justify-between pb-2 mb-2 border-b border-outline-variant">
+<span class="text-label-sm font-label-sm text-tertiary uppercase font-bold">3. Goroutine Pool</span>
+<span class="material-symbols-outlined text-tertiary text-[16px]">bolt</span>
+</div>
+<!-- Worker 1 -->
+<div class="bg-surface-container-lowest p-2 rounded border border-outline-variant/80 flex items-center justify-between text-code-sm font-code-sm">
+<div class="flex items-center space-x-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-secondary font-medium">user_42</span>
+</div>
+<span class="text-label-sm font-label-sm text-outline">go worker(wg)</span>
+</div>
+<!-- Worker 2 -->
+<div class="bg-surface-container-lowest p-2 rounded border border-outline-variant/80 flex items-center justify-between text-code-sm font-code-sm">
+<div class="flex items-center space-x-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="text-tertiary font-medium">user_99</span>
+</div>
+<span class="text-label-sm font-label-sm text-outline">go worker(wg)</span>
+</div>
+</div>
+<!-- Arrow 3 -->
+<div class="flex flex-col items-center text-outline">
+<span class="text-label-sm font-label-sm text-tertiary">Pipe</span>
+<span class="material-symbols-outlined text-tertiary">merge</span>
+</div>
+<!-- Node 4: Stream Multiplexer Output -->
+<div class="flex-1 bg-surface-container border border-outline-variant rounded-xl p-4 shadow-sm">
+<div class="flex items-center justify-between pb-2 mb-2 border-b border-outline-variant">
+<span class="text-label-sm font-label-sm text-on-surface uppercase font-bold">4. Token Mux Pipe</span>
+<span class="material-symbols-outlined text-outline text-[16px]">terminal</span>
+</div>
+<p class="text-code-sm font-code-sm text-on-surface font-semibold">io.Writer / stdout</p>
+<div class="mt-2 text-label-sm font-label-sm text-on-surface-variant bg-surface-container-lowest p-2 rounded border border-outline-variant space-y-1">
+<div class="flex items-center justify-between">
+<span>Stream chunks:</span>
+<span class="text-secondary">iter.Next()</span>
+</div>
+<div class="text-outline text-[10px]">errors.Is(err, iterator.Done)</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= SECTION 3 & 4: CODE EXPLORER & INTERACTIVE TERMINAL (Side-by-Side Bento) ================= -->
+<section class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+<!-- Left 7 Cols: Full Go Code Explorer with Tab Navigation -->
+<div class="xl:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-lg">
+<!-- Code Block Header & Tabs -->
+<div class="bg-surface-container-low border-b border-outline-variant flex flex-wrap items-center justify-between px-3 pt-2 gap-2">
+<div class="flex items-center space-x-1 overflow-x-auto">
+<button class="px-3 py-1.5 border-b-2 border-primary text-primary text-label-md font-label-md flex items-center space-x-1.5 transition-colors" id="tab-main" onclick="switchTab('main')">
+<span class="material-symbols-outlined text-[15px]">code</span>
+<span>main.go</span>
+</button>
+<button class="px-3 py-1.5 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface text-label-md font-label-md flex items-center space-x-1.5 transition-colors" id="tab-session" onclick="switchTab('session')">
+<span class="material-symbols-outlined text-[15px]">lock</span>
+<span>session_manager.go</span>
+</button>
+<button class="px-3 py-1.5 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface text-label-md font-label-md flex items-center space-x-1.5 transition-colors" id="tab-worker" onclick="switchTab('worker')">
+<span class="material-symbols-outlined text-[15px]">sync_alt</span>
+<span>worker_pool.go</span>
+</button>
+<button class="px-3 py-1.5 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface text-label-md font-label-md flex items-center space-x-1.5 transition-colors" id="tab-benchmark" onclick="switchTab('benchmark')">
+<span class="material-symbols-outlined text-[15px]">speed</span>
+<span>benchmark_test.go</span>
+</button>
+</div>
+<div class="flex items-center space-x-2 pb-2">
+<span class="text-label-sm font-label-sm text-outline hidden sm:inline">Go 1.22 Runtime</span>
+<button class="p-1 text-on-surface-variant hover:text-on-surface bg-surface-container rounded border border-outline-variant transition-colors" onclick="copySnippetText()" title="Copy Tab Code">
+<span class="material-symbols-outlined text-[15px]">content_copy</span>
+</button>
+</div>
+</div>
+<!-- Code Content Panel -->
+<div class="p-4 overflow-x-auto max-h-[560px] overflow-y-auto text-code-sm font-code-sm bg-surface-container-lowest font-mono leading-relaxed">
+<pre id="code-content"><code class="text-on-surface"><span class="text-tertiary">package</span> main
+
+<span class="text-tertiary">import</span> (
+    <span class="text-secondary">"context"</span>
+    <span class="text-secondary">"errors"</span>
+    <span class="text-secondary">"fmt"</span>
+    <span class="text-secondary">"io"</span>
+    <span class="text-secondary">"log"</span>
+    <span class="text-secondary">"os"</span>
+    <span class="text-secondary">"sync"</span>
+
+    <span class="text-secondary">"google.golang.org/api/iterator"</span>
+    <span class="text-secondary">"github.com/google/generative-ai-go/genai"</span>
+)
+
+<span class="text-outline-variant">// SessionManager guarantees thread-safe multi-user access to active Gemini chat sessions.</span>
+<span class="text-tertiary">type</span> <span class="text-primary font-semibold">SessionManager</span> <span class="text-tertiary">struct</span> {
+    mu       sync.RWMutex
+    model    *genai.GenerativeModel
+    sessions map[<span class="text-primary">string</span>]*genai.ChatSession
+}
+
+<span class="text-tertiary">func</span> <span class="text-secondary-fixed font-semibold">NewSessionManager</span>(model *genai.GenerativeModel) *SessionManager {
+    <span class="text-tertiary">return</span> &amp;SessionManager{
+        model:    model,
+        sessions: make(map[<span class="text-primary">string</span>]*genai.ChatSession),
+    }
+}
+
+<span class="text-outline-variant">// GetOrCreateSession safely retrieves or initializes a ChatSession for a given user.</span>
+<span class="text-tertiary">func</span> (sm *SessionManager) <span class="text-secondary-fixed font-semibold">GetOrCreateSession</span>(userID <span class="text-primary">string</span>) *genai.ChatSession {
+    sm.mu.Lock()
+    <span class="text-tertiary">defer</span> sm.mu.Unlock()
+
+    <span class="text-tertiary">if</span> session, exists := sm.sessions[userID]; exists {
+        <span class="text-tertiary">return</span> session
+    }
+
+    session := sm.model.StartChat()
+    sm.sessions[userID] = session
+    <span class="text-tertiary">return</span> session
+}
+
+<span class="text-outline-variant">// StreamUserMessage issues a streaming prompt and pipes token chunks directly to an io.Writer.</span>
+<span class="text-tertiary">func</span> (sm *SessionManager) <span class="text-secondary-fixed font-semibold">StreamUserMessage</span>(
+    ctx context.Context, 
+    userID <span class="text-primary">string</span>, 
+    prompt <span class="text-primary">string</span>, 
+    out io.Writer,
+) <span class="text-primary">error</span> {
+    session := sm.GetOrCreateSession(userID)
+
+    <span class="text-outline-variant">// SendMessageStream returns a non-blocking iterator</span>
+    iter := session.SendMessageStream(ctx, genai.Text(prompt))
+
+    <span class="text-tertiary">for</span> {
+        resp, err := iter.Next()
+        <span class="text-tertiary">if</span> errors.Is(err, iterator.Done) {
+            <span class="text-tertiary">break</span>
+        }
+        <span class="text-tertiary">if</span> err != <span class="text-tertiary">nil</span> {
+            <span class="text-tertiary">return</span> fmt.Errorf(<span class="text-secondary">"stream iteration error: %w"</span>, err)
+        }
+
+        <span class="text-tertiary">for</span> _, cand := <span class="text-tertiary">range</span> resp.Candidates {
+            <span class="text-tertiary">if</span> cand.Content != <span class="text-tertiary">nil</span> {
+                <span class="text-tertiary">for</span> _, part := <span class="text-tertiary">range</span> cand.Content.Parts {
+                    fmt.Fprintf(out, <span class="text-secondary">"[User: %s] %v\n"</span>, userID, part)
+                }
+            }
+        }
+    }
+    <span class="text-tertiary">return</span> <span class="text-tertiary">nil</span>
+}
+
+<span class="text-tertiary">func</span> <span class="text-secondary-fixed font-semibold">main</span>() {
+    ctx := context.Background()
+    client, err := genai.NewClient(ctx)
+    <span class="text-tertiary">if</span> err != <span class="text-tertiary">nil</span> {
+        log.Fatalf(<span class="text-secondary">"Failed to create genai client: %v"</span>, err)
+    }
+    <span class="text-tertiary">defer</span> client.Close()
+
+    model := client.GenerativeModel(<span class="text-secondary">"gemini-2.5-flash"</span>)
+    sm := NewSessionManager(model)
+
+    <span class="text-tertiary">var</span> wg sync.WaitGroup
+
+    <span class="text-outline-variant">// Goroutine 1: user_42 stream</span>
+    wg.Add(1)
+    <span class="text-tertiary">go</span> <span class="text-tertiary">func</span>() {
+        <span class="text-tertiary">defer</span> wg.Done()
+        _ = sm.StreamUserMessage(ctx, <span class="text-secondary">"user_42"</span>, <span class="text-secondary">"Tell me a 1-sentence tip on writing clean Go"</span>, os.Stdout)
+    }()
+
+    <span class="text-outline-variant">// Goroutine 2: user_99 stream</span>
+    wg.Add(1)
+    <span class="text-tertiary">go</span> <span class="text-tertiary">func</span>() {
+        <span class="text-tertiary">defer</span> wg.Done()
+        _ = sm.StreamUserMessage(ctx, <span class="text-secondary">"user_99"</span>, <span class="text-secondary">"Give me a single Go interface example"</span>, os.Stdout)
+    }()
+
+    wg.Wait()
+}</code></pre>
+</div>
+<!-- Concurrency Best Practices Callouts -->
+<div class="p-3 bg-surface-container-low border-t border-outline-variant flex flex-wrap items-center gap-3 text-label-md font-label-md">
+<div class="flex items-center space-x-1.5 text-secondary">
+<span class="material-symbols-outlined text-[15px]">check_circle</span>
+<span>Granular Mutex Locking</span>
+</div>
+<div class="flex items-center space-x-1.5 text-primary">
+<span class="material-symbols-outlined text-[15px]">check_circle</span>
+<span>Non-Blocking Stream Iterators</span>
+</div>
+<div class="flex items-center space-x-1.5 text-tertiary">
+<span class="material-symbols-outlined text-[15px]">check_circle</span>
+<span>Context Cancellation Prepared</span>
+</div>
+</div>
+</div>
+<!-- Right 5 Cols: Live Concurrent Stream Multiplexer / Interactive Terminal Simulator -->
+<div class="xl:col-span-5 bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-lg flex flex-col h-full" id="visualizer">
+<!-- Terminal Header -->
+<div class="bg-surface-container-low border-b border-outline-variant px-4 py-3 flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="flex items-center space-x-1.5">
+<span class="w-3 h-3 rounded-full bg-error-container"></span>
+<span class="w-3 h-3 rounded-full bg-surface-bright"></span>
+<span class="w-3 h-3 rounded-full bg-secondary/40"></span>
+</div>
+<span class="text-label-md font-label-md text-on-surface font-semibold ml-2">stdout (Multiplexed Stream)</span>
+</div>
+<div class="flex items-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="text-label-sm font-label-sm text-secondary">Live Mux</span>
+</div>
+</div>
+<!-- Dual Channel Simulation Feeds -->
+<div class="p-4 space-y-4 flex-1 font-mono text-code-sm font-code-sm min-h-[380px] bg-[#070a10] overflow-y-auto">
+<!-- user_42 Stream Box -->
+<div class="border border-outline-variant/60 rounded-lg p-3 bg-surface-container-lowest/80 space-y-1.5">
+<div class="flex items-center justify-between text-label-sm font-label-sm text-outline border-b border-outline-variant/40 pb-1">
+<span class="text-secondary font-bold flex items-center space-x-1">
+<span class="material-symbols-outlined text-[14px]">terminal</span>
+<span>[Goroutine #1 - User: user_42]</span>
+</span>
+<span class="text-secondary-fixed">gemini-2.5-flash</span>
+</div>
+<p class="text-outline text-[12px] italic">&gt; Query: "Tell me a 1-sentence tip on writing clean Go"</p>
+<div class="text-on-surface mt-2 pl-2 border-l-2 border-secondary" id="stream-user42">
+<span class="text-secondary font-semibold">Model:</span> Make interfaces small, keep error handling explicit, and accept interfaces while returning concrete structs.<span class="inline-block w-2 h-4 bg-secondary cursor-blink align-middle ml-1"></span>
+</div>
+<div class="text-[11px] text-outline text-right">TTFT: 174ms • 62 tokens/s</div>
+</div>
+<!-- user_99 Stream Box -->
+<div class="border border-outline-variant/60 rounded-lg p-3 bg-surface-container-lowest/80 space-y-1.5">
+<div class="flex items-center justify-between text-label-sm font-label-sm text-outline border-b border-outline-variant/40 pb-1">
+<span class="text-tertiary font-bold flex items-center space-x-1">
+<span class="material-symbols-outlined text-[14px]">terminal</span>
+<span>[Goroutine #2 - User: user_99]</span>
+</span>
+<span class="text-tertiary-fixed">gemini-2.5-flash</span>
+</div>
+<p class="text-outline text-[12px] italic">&gt; Query: "Give me a single Go interface example"</p>
+<div class="text-on-surface mt-2 pl-2 border-l-2 border-tertiary" id="stream-user99">
+<span class="text-tertiary font-semibold">Model:</span> type Reader interface { Read(p []byte) (n int, err error) }<span class="inline-block w-2 h-4 bg-tertiary cursor-blink align-middle ml-1"></span>
+</div>
+<div class="text-[11px] text-outline text-right">TTFT: 189ms • 86.4 tokens/s</div>
+</div>
+<!-- Interactive Multiplexed Terminal Log Console -->
+<div class="border border-outline-variant/40 rounded-lg p-3 bg-surface-container-low/50">
+<div class="text-label-sm font-label-sm text-outline pb-1 mb-1 border-b border-outline-variant/30 flex items-center justify-between">
+<span>Multiplex Interleaved Output:</span>
+<span class="text-secondary text-[11px]" id="lock-state-badge">RWMutex: UNLOCKED</span>
+</div>
+<div class="space-y-1 text-[11px] text-on-surface-variant font-mono" id="interleaved-log">
+<div><span class="text-outline">[T+0ms]</span> <span class="text-secondary">sm.mu.Lock()</span> acquired for user_42 session init</div>
+<div><span class="text-outline">[T+1ms]</span> <span class="text-secondary">sm.mu.Unlock()</span> user_42 added to map</div>
+<div><span class="text-outline">[T+2ms]</span> <span class="text-tertiary">sm.mu.Lock()</span> acquired for user_99 session init</div>
+<div><span class="text-outline">[T+3ms]</span> <span class="text-tertiary">sm.mu.Unlock()</span> user_99 added to map</div>
+<div><span class="text-outline">[T+174ms]</span> [User: user_42] <span class="text-on-surface">"Make interfaces "</span></div>
+<div><span class="text-outline">[T+189ms]</span> [User: user_99] <span class="text-on-surface">"type Reader "</span></div>
+<div><span class="text-outline">[T+210ms]</span> [User: user_42] <span class="text-on-surface">"small, keep error..."</span></div>
+<div><span class="text-outline">[T+235ms]</span> [User: user_99] <span class="text-on-surface">"interface { Read(p []byte)..."</span></div>
+<div><span class="text-outline">[T+280ms]</span> <span class="text-secondary-fixed">Stream closed: iterator.Done on both channels</span></div>
+</div>
+</div>
+</div>
+<!-- Interactive Stream Controls Footer -->
+<div class="p-3 bg-surface-container-low border-t border-outline-variant space-y-2">
+<div class="flex flex-wrap items-center gap-2">
+<button class="flex-1 py-1.5 px-3 bg-surface-container hover:bg-surface-bright border border-outline-variant rounded-lg text-label-sm font-label-sm text-on-surface flex items-center justify-center space-x-1 transition-all active:scale-[0.98]" onclick="simulateNewGoroutine()">
+<span class="material-symbols-outlined text-[15px] text-secondary">add_circle</span>
+<span>Simulate New Goroutine Stream</span>
+</button>
+<button class="py-1.5 px-3 bg-surface-container hover:bg-surface-bright border border-outline-variant rounded-lg text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface flex items-center space-x-1 transition-all active:scale-[0.98]" onclick="toggleContention()">
+<span class="material-symbols-outlined text-[15px] text-tertiary">lock</span>
+<span>Toggle Lock Contention</span>
+</button>
+</div>
+<div class="flex items-center justify-between text-label-sm font-label-sm text-outline px-1">
+<span>Channel Sync: <code class="text-secondary font-mono">sync.WaitGroup</code></span>
+<span class="text-primary cursor-pointer hover:underline" onclick="inspectTTFT()">Inspect TTFT Breakdown →</span>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= DETAILED API & CONCURRENCY REFERENCE ================= -->
+<section class="bg-surface-container-low border border-outline-variant rounded-xl p-5 space-y-4" id="api">
+<div class="flex items-center justify-between border-b border-outline-variant pb-3">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary text-[20px]">menu_book</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface font-semibold">Concurrency API &amp; Type Signatures</h3>
+</div>
+<span class="text-label-sm font-label-sm text-outline font-mono">google.golang.org/genai</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+<div class="bg-surface-container-lowest p-3.5 rounded-lg border border-outline-variant space-y-2">
+<div class="flex items-center justify-between">
+<code class="text-code-sm font-code-sm text-secondary font-semibold">sync.RWMutex</code>
+<span class="text-label-sm font-label-sm text-outline">stdlib</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Guards the user sessions map. Safe for multiple concurrent readers using <code class="text-code-sm font-code-sm text-primary">sm.mu.RLock()</code> and exclusive writes using <code class="text-code-sm font-code-sm text-primary">sm.mu.Lock()</code>.</p>
+</div>
+<div class="bg-surface-container-lowest p-3.5 rounded-lg border border-outline-variant space-y-2">
+<div class="flex items-center justify-between">
+<code class="text-code-sm font-code-sm text-secondary font-semibold">SendMessageStream</code>
+<span class="text-label-sm font-label-sm text-secondary-fixed">genai</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Spawns an HTTP streaming session returning a <code class="text-code-sm font-code-sm text-primary">*GenerateContentResponseIterator</code>. Each iteration handles independent tokens safely.</p>
+</div>
+<div class="bg-surface-container-lowest p-3.5 rounded-lg border border-outline-variant space-y-2">
+<div class="flex items-center justify-between">
+<code class="text-code-sm font-code-sm text-secondary font-semibold">errors.Is(iterator.Done)</code>
+<span class="text-label-sm font-label-sm text-tertiary">iterator</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Graceful sentinel check signaling end-of-stream. Prevents goroutines from hanging and allows safe channel teardowns.</p>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- ================= INLINE INTERACTIVE JAVASCRIPT ================= -->
+<script>
+    // Tab switching for code explorer
+    const tabCodeMap = {
+      main: `package main
+
+import (
+    "context"
+    "errors"
+    "fmt"
+    "io"
+    "log"
+    "os"
+    "sync"
+
+    "google.golang.org/api/iterator"
+    "github.com/google/generative-ai-go/genai"
+)
+
+type SessionManager struct {
+    mu       sync.RWMutex
+    model    *genai.GenerativeModel
+    sessions map[string]*genai.ChatSession
+}
+
+func NewSessionManager(model *genai.GenerativeModel) *SessionManager {
+    return &SessionManager{
+        model:    model,
+        sessions: make(map[string]*genai.ChatSession),
+    }
+}
+
+func (sm *SessionManager) GetOrCreateSession(userID string) *genai.ChatSession {
+    sm.mu.Lock()
+    defer sm.mu.Unlock()
+
+    if session, exists := sm.sessions[userID]; exists {
+        return session
+    }
+
+    session := sm.model.StartChat()
+    sm.sessions[userID] = session
+    return session
+}
+
+func (sm *SessionManager) StreamUserMessage(
+    ctx context.Context, 
+    userID string, 
+    prompt string, 
+    out io.Writer,
+) error {
+    session := sm.GetOrCreateSession(userID)
+    iter := session.SendMessageStream(ctx, genai.Text(prompt))
+
+    for {
+        resp, err := iter.Next()
+        if errors.Is(err, iterator.Done) {
+            break
+        }
+        if err != nil {
+            return fmt.Errorf("stream iteration error: %w", err)
+        }
+
+        for _, cand := range resp.Candidates {
+            if cand.Content != nil {
+                for _, part := range cand.Content.Parts {
+                    fmt.Fprintf(out, "[User: %s] %v\\n", userID, part)
+                }
+            }
+        }
+    }
+    return nil
+}
+
+func main() {
+    ctx := context.Background()
+    client, err := genai.NewClient(ctx)
+    if err != nil {
+        log.Fatalf("Failed to create genai client: %v", err)
+    }
+    defer client.Close()
+
+    model := client.GenerativeModel("gemini-2.5-flash")
+    sm := NewSessionManager(model)
+
+    var wg sync.WaitGroup
+
+    // Goroutine 1: user_42 stream
+    wg.Add(1)
+    go func() {
+        defer wg.Done()
+        _ = sm.StreamUserMessage(ctx, "user_42", "Tell me a 1-sentence tip on writing clean Go", os.Stdout)
+    }()
+
+    // Goroutine 2: user_99 stream
+    wg.Add(1)
+    go func() {
+        defer wg.Done()
+        _ = sm.StreamUserMessage(ctx, "user_99", "Give me a single Go interface example", os.Stdout)
+    }()
+
+    wg.Wait()
+}`,
+      session: `package main
+
+import (
+    "sync"
+    "github.com/google/generative-ai-go/genai"
+)
+
+type SessionManager struct {
+    mu       sync.RWMutex
+    model    *genai.GenerativeModel
+    sessions map[string]*genai.ChatSession
+}
+
+func (sm *SessionManager) SessionCount() int {
+    sm.mu.RLock()
+    defer sm.mu.RUnlock()
+    return len(sm.sessions)
+}
+
+func (sm *SessionManager) RemoveSession(userID string) {
+    sm.mu.Lock()
+    defer sm.mu.Unlock()
+    delete(sm.sessions, userID)
+}`,
+      worker: `package main
+
+import (
+    "context"
+    "sync"
+)
+
+type StreamTask struct {
+    UserID string
+    Prompt string
+}
+
+func WorkerPool(ctx context.Context, sm *SessionManager, tasks <-chan StreamTask, wg *sync.WaitGroup) {
+    defer wg.Done()
+    for {
+        select {
+        case <-ctx.Done():
+            return
+        case task, ok := <-tasks:
+            if !ok {
+                return
+            }
+            _ = sm.StreamUserMessage(ctx, task.UserID, task.Prompt, nil)
+        }
+    }
+}`,
+      benchmark: `package main
+
+import (
+    "context"
+    "sync"
+    "testing"
+)
+
+func BenchmarkConcurrentStreams(b *testing.B) {
+    ctx := context.Background()
+    sm := NewSessionManager(nil)
+    b.ResetTimer()
+
+    b.RunParallel(func(pb *testing.PB) {
+        for pb.Next() {
+            session := sm.GetOrCreateSession("bench_user")
+            _ = session
+        }
+    })
+}`
+    };
+
+    function switchTab(tabKey) {
+      ['main', 'session', 'worker', 'benchmark'].forEach(key => {
+        const btn = document.getElementById(`tab-${key}`);
+        if (key === tabKey) {
+          btn.className = 'px-3 py-1.5 border-b-2 border-primary text-primary text-label-md font-label-md flex items-center space-x-1.5 transition-colors';
+        } else {
+          btn.className = 'px-3 py-1.5 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface text-label-md font-label-md flex items-center space-x-1.5 transition-colors';
+        }
+      });
+      document.getElementById('code-content').querySelector('code').textContent = tabCodeMap[tabKey];
+    }
+
+    // Copy handlers
+    function copyFullSnippet() {
+      navigator.clipboard.writeText(tabCodeMap.main);
+      const icon = document.getElementById('copy-icon');
+      const text = document.getElementById('copy-text');
+      icon.textContent = 'check';
+      text.textContent = 'Copied to Clipboard!';
+      setTimeout(() => {
+        icon.textContent = 'content_copy';
+        text.textContent = 'Copy Full Go Code';
+      }, 2000);
+    }
+
+    function copySnippetText() {
+      navigator.clipboard.writeText(document.getElementById('code-content').innerText);
+      alert('Code snippet copied to clipboard');
+    }
+
+    // Simulator Functions
+    let goroutineCount = 2;
+    function simulateNewGoroutine() {
+      goroutineCount++;
+      document.getElementById('stat-goroutines').textContent = goroutineCount;
+      const log = document.getElementById('interleaved-log');
+      const newUserID = `user_${Math.floor(Math.random() * 899 + 100)}`;
+      
+      const newEntry = document.createElement('div');
+      newEntry.innerHTML = `<span class="text-outline">[T+new]</span> <span class="text-secondary font-bold">go worker(wg)</span> spawned for <span class="text-on-surface font-semibold">${newUserID}</span> &bull; acquiring lock`;
+      log.appendChild(newEntry);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    let contentionActive = false;
+    function toggleContention() {
+      contentionActive = !contentionActive;
+      const badge = document.getElementById('lock-state-badge');
+      const mutexStat = document.getElementById('stat-mutex');
+      if (contentionActive) {
+        badge.textContent = 'RWMutex: CONTENTION SIMULATED (0.42ms wait)';
+        badge.className = 'text-error text-[11px] font-bold';
+        mutexStat.textContent = '0.42 ms (Heavy)';
+      } else {
+        badge.textContent = 'RWMutex: UNLOCKED';
+        badge.className = 'text-secondary text-[11px]';
+        mutexStat.textContent = '< 0.04 ms';
+      }
+    }
+
+    function toggleMutexInspection() {
+      toggleContention();
+    }
+
+    function triggerBenchmark() {
+      const tpsEl = document.getElementById('stat-tps');
+      tpsEl.textContent = 'Running...';
+      setTimeout(() => {
+        tpsEl.textContent = (145 + Math.random() * 20).toFixed(1);
+      }, 700);
+    }
+
+    function inspectTTFT() {
+      alert('TTFT Breakdown:\\n- Network TLS Handshake: 42ms\\n- Gemini Prompt Tokenizer: 34ms\\n- Pre-fill Attention Phase: 82ms\\n- First Chunk Multiplex: 24ms\\nTotal: 182ms avg');
+    }
+
+    function addNewSession() {
+      simulateNewGoroutine();
+    }
+
+    function runStreamSimulation() {
+      const log = document.getElementById('interleaved-log');
+      const ts = Date.now() % 10000;
+      const div = document.createElement('div');
+      div.innerHTML = `<span class="text-outline">[T+${ts}ms]</span> <span class="text-primary font-bold">Playground run:</span> iter.Next() multiplexed 24 chunks`;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+  </script>
+</body></html>
