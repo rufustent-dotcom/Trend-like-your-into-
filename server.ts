@@ -1,7 +1,11 @@
 import express from "express";
+import http from "http";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
+
+// In AI Studio preview environment, HMR is disabled to avoid WebSocket transport errors
+process.env.DISABLE_HMR = "true";
 import { GoogleGenAI, Type } from "@google/genai";
 import Stripe from 'stripe';
 import dotenv from "dotenv";
@@ -940,10 +944,15 @@ app.post("/api/chat", async (req, res) => {
 
 // Configure Vite dynamic middleware serving
 async function bootstrap() {
+  const httpServer = http.createServer(app);
+
   if (process.env.NODE_ENV !== "production") {
     // Development Mode
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { 
+        middlewareMode: true,
+        hmr: false
+      },
       appType: "spa"
     });
     app.use(vite.middlewares);
@@ -956,7 +965,7 @@ async function bootstrap() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  httpServer.listen(PORT, "0.0.0.0", () => {
     console.log(`Server executing live on http://localhost:${PORT}`);
   });
 }
